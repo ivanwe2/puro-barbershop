@@ -276,9 +276,44 @@
 - [x] `npm run lint` passes (0 errors)
 - [x] `npm run typecheck` passes
 
-### Commit 8: Legal pages
+### Commit 8: Legal pages (Privacy, Terms, Cookie info)
 
-**Status:** 🔲 TODO
+**Status:** ✅ DONE
+
+**Changes:**
+
+- Installed `remark`, `remark-html`, `@tailwindcss/typography`
+- `@plugin "@tailwindcss/typography"` added to `globals.css` for `prose` classes
+- `src/content/legal/` — raw markdown files for all 3 pages in both locales:
+  - `privacy-en.md` — copied verbatim from `docs/PRIVACY_POLICY_TEMPLATE.md`
+  - `terms-en.md` — copied verbatim from `docs/TERMS_OF_SERVICE_TEMPLATE.md`
+  - `privacy-bg.md` — Bulgarian translation of privacy policy
+  - `terms-bg.md` — Bulgarian translation of terms of service
+  - `cookie-info-en.md` — original English cookie info
+  - `cookie-info-bg.md` — original Bulgarian cookie info
+- `src/components/legal/LegalPage.tsx` — server component that reads `.md` file by locale, strips YAML frontmatter, renders via `remark` + `remark-html` into `prose prose-invert`
+- `src/app/[locale]/(public)/legal/privacy/page.tsx` — privacy policy page
+- `src/app/[locale]/(public)/legal/terms/page.tsx` — terms of service page
+- `src/app/[locale]/(public)/legal/cookie-info/page.tsx` — cookie info page
+- `src/app/[locale]/(public)/legal/layout.tsx` — print-friendly CSS for legal pages
+
+**Deviations / notes:**
+
+- No MDX — the plan said "MDX or plain JSX"; chose `remark` + `remark-html` to faithfully render the raw markdown without editing substance
+- Bulgarian translations of privacy and terms are provided as starting points; both templates' critical notices are preserved
+- Cookie info page is original content (no template existed) — describes strictly necessary cookies and the Instagram click-to-load pattern
+- Footer legal links already existed and point to the correct routes (`/legal/privacy`, `/legal/terms`, `/legal/cookie-info`)
+
+**Definition of Done:**
+
+- [x] All three pages render in both locales (`/bg/legal/privacy`, `/en/legal/privacy`, etc.)
+- [x] Footer links work
+- [x] Pages have clear sections with headings (rendered from markdown)
+- [x] Print-friendly CSS applied
+- [x] Content faithful to templates (no agent-introduced edits to substance)
+- [x] `npm run build` succeeds
+- [x] `npm run lint` passes (0 errors)
+- [x] `npm run typecheck` passes
 
 ---
 
