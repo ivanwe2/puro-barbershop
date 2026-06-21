@@ -26,6 +26,7 @@
 This privacy policy describes how `[PLACEHOLDER:legal_entity_name]` ("we", "us", "our", or "Puro Barbershop"), the operator of the Puro Barbershop located at Бул. Христо Ботев 114, Plovdiv, Bulgaria, processes personal data about visitors to our website at **purobarbershop.com** and customers who use it to book appointments.
 
 **Data controller:**
+
 - **Legal name:** `[PLACEHOLDER:legal_entity_name]`
 - **Unique identification code (EIK):** `[PLACEHOLDER:eik]`
 - **VAT number (where applicable):** `[PLACEHOLDER:vat_id]`
@@ -62,16 +63,16 @@ This policy does **not** cover:
 
 To accept and fulfil a booking, we collect:
 
-| Field | Purpose | Required? |
-| --- | --- | --- |
-| Full name | Identifying you on arrival; addressing you in correspondence | Yes |
-| Email address | Sending booking confirmation, reminder, and cancellation messages | Yes |
-| Phone number | Contacting you if there is an urgent issue with your appointment | Yes |
-| Notes (free text) | Any preferences you choose to share (e.g., "please use clippers only") | No |
-| Selected service | Identifying the appointment | Yes |
-| Selected barber (if any) | Identifying the appointment | Yes |
-| Date and time | Identifying the appointment | Yes |
-| Language preference | Sending correspondence in the language you selected | Yes |
+| Field                    | Purpose                                                                | Required? |
+| ------------------------ | ---------------------------------------------------------------------- | --------- |
+| Full name                | Identifying you on arrival; addressing you in correspondence           | Yes       |
+| Email address            | Sending booking confirmation, reminder, and cancellation messages      | Yes       |
+| Phone number             | Contacting you if there is an urgent issue with your appointment       | Yes       |
+| Notes (free text)        | Any preferences you choose to share (e.g., "please use clippers only") | No        |
+| Selected service         | Identifying the appointment                                            | Yes       |
+| Selected barber (if any) | Identifying the appointment                                            | Yes       |
+| Date and time            | Identifying the appointment                                            | Yes       |
+| Language preference      | Sending correspondence in the language you selected                    | Yes       |
 
 We do **not** collect any special categories of personal data (Article 9 GDPR) — for example, data revealing health, ethnicity, religion, or sexual orientation. Please do not provide such information in the free-text notes field.
 
@@ -111,10 +112,10 @@ This technical data is processed transiently and is **not** combined with the bo
 
 We use a small number of cookies. None of them are used for advertising or tracking across sites.
 
-| Cookie | Purpose | Type | Duration | Set by |
-| --- | --- | --- | --- | --- |
-| `authjs.session-token` (or similar) | Keeps you logged in to the admin area | Strictly necessary | 8 hours | Us |
-| `NEXT_LOCALE` (or similar) | Remembers your language choice | Strictly necessary / functional | 1 year | Us |
+| Cookie                              | Purpose                               | Type                            | Duration | Set by |
+| ----------------------------------- | ------------------------------------- | ------------------------------- | -------- | ------ |
+| `authjs.session-token` (or similar) | Keeps you logged in to the admin area | Strictly necessary              | 8 hours  | Us     |
+| `NEXT_LOCALE` (or similar)          | Remembers your language choice        | Strictly necessary / functional | 1 year   | Us     |
 
 The cookies listed above are **strictly necessary** for the website to function in the way you have requested. Under the EU ePrivacy regime they are exempt from prior consent.
 
@@ -126,14 +127,14 @@ The cookies listed above are **strictly necessary** for the website to function 
 
 Under Article 6 of the GDPR, we rely on the following lawful bases:
 
-| Processing activity | Lawful basis |
-| --- | --- |
-| Creating, managing, and fulfilling your booking | Performance of a contract (Art. 6(1)(b) GDPR) — we cannot deliver the booked service without this data |
-| Sending booking confirmation, reminder, and cancellation emails | Performance of a contract (Art. 6(1)(b) GDPR) |
-| Preventing abuse, fraud, and double-bookings (rate limiting, technical logs) | Legitimate interest (Art. 6(1)(f) GDPR) — to keep the booking system reliable and available for everyone |
-| Operating admin accounts for our staff | Performance of a contract (Art. 6(1)(b) GDPR) — the employment or service relationship with our barbers |
-| Complying with tax and accounting law (where booking records overlap with invoicing) | Legal obligation (Art. 6(1)(c) GDPR) |
-| Loading third-party content (Instagram) when you click to load it | Consent (Art. 6(1)(a) GDPR), given by the affirmative act of clicking the load button |
+| Processing activity                                                                  | Lawful basis                                                                                             |
+| ------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------- |
+| Creating, managing, and fulfilling your booking                                      | Performance of a contract (Art. 6(1)(b) GDPR) — we cannot deliver the booked service without this data   |
+| Sending booking confirmation, reminder, and cancellation emails                      | Performance of a contract (Art. 6(1)(b) GDPR)                                                            |
+| Preventing abuse, fraud, and double-bookings (rate limiting, technical logs)         | Legitimate interest (Art. 6(1)(f) GDPR) — to keep the booking system reliable and available for everyone |
+| Operating admin accounts for our staff                                               | Performance of a contract (Art. 6(1)(b) GDPR) — the employment or service relationship with our barbers  |
+| Complying with tax and accounting law (where booking records overlap with invoicing) | Legal obligation (Art. 6(1)(c) GDPR)                                                                     |
+| Loading third-party content (Instagram) when you click to load it                    | Consent (Art. 6(1)(a) GDPR), given by the affirmative act of clicking the load button                    |
 
 We do **not** rely on consent for booking-related processing. By making a booking, you are entering into a contract with us; the data is necessary to perform that contract. You can choose not to book; you cannot book and then refuse to provide the data.
 
@@ -141,15 +142,15 @@ We do **not** rely on consent for booking-related processing. By making a bookin
 
 ## 5. How long we keep your data
 
-| Data | Retention period | Why |
-| --- | --- | --- |
-| Booking records (name, email, phone, notes, service, time) | 12 months after the appointment date | To handle disputes, refunds, and customer queries that may arise after the appointment |
-| Cancelled bookings | 12 months after the originally scheduled date | Same as above |
-| Admin account data | Duration of your relationship with us, plus 30 days after termination | To restore access if termination is reversed and to comply with employment record-keeping obligations |
-| Technical logs (IP, request timestamps) | 30 days | Security investigation and abuse prevention |
-| Rate-limiting state | Up to 24 hours | To enforce the abuse-prevention rules in §3.4 |
-| Email blacklist entries (if introduced) | Indefinitely, until removed by us | To prevent repeated abuse of the booking system |
-| Accounting records that reference personal data | 5 years from the end of the financial year in which they were created | Bulgarian Accountancy Act (Закон за счетоводството) and tax-law obligations |
+| Data                                                       | Retention period                                                      | Why                                                                                                   |
+| ---------------------------------------------------------- | --------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------- |
+| Booking records (name, email, phone, notes, service, time) | 12 months after the appointment date                                  | To handle disputes, refunds, and customer queries that may arise after the appointment                |
+| Cancelled bookings                                         | 12 months after the originally scheduled date                         | Same as above                                                                                         |
+| Admin account data                                         | Duration of your relationship with us, plus 30 days after termination | To restore access if termination is reversed and to comply with employment record-keeping obligations |
+| Technical logs (IP, request timestamps)                    | 30 days                                                               | Security investigation and abuse prevention                                                           |
+| Rate-limiting state                                        | Up to 24 hours                                                        | To enforce the abuse-prevention rules in §3.4                                                         |
+| Email blacklist entries (if introduced)                    | Indefinitely, until removed by us                                     | To prevent repeated abuse of the booking system                                                       |
+| Accounting records that reference personal data            | 5 years from the end of the financial year in which they were created | Bulgarian Accountancy Act (Закон за счетоводството) and tax-law obligations                           |
 
 After the retention period, the records are deleted automatically by a scheduled job, or anonymised where the underlying data is needed for aggregate analysis (such as understanding how many bookings happened in a given month).
 
@@ -159,16 +160,16 @@ After the retention period, the records are deleted automatically by a scheduled
 
 We do not sell or rent your personal data. We share it only with the following categories of processors who help us run the service. Each operates under a Data Processing Agreement that requires them to process the data only on our instructions and to apply appropriate security measures.
 
-| Recipient | Role | What they see | Location of processing |
-| --- | --- | --- | --- |
-| Neon, Inc. (USA) | Database hosting (Postgres) | All booking and account data, stored at rest | EU region (`[PLACEHOLDER:neon_region]`) |
-| Vercel Inc. (USA) | Website hosting and request routing | All website traffic; processes data in memory during request handling | EU region (`[PLACEHOLDER:vercel_region]`) |
-| Resend (USA) | Transactional email delivery | Recipient email address, subject line, and email body (name, booking details, cancellation link) | EU region where available (`[PLACEHOLDER:resend_region]`) |
-| Upstash, Inc. (USA) | Rate-limiting state (Redis) | Hashed identifiers of recent booking attempts (IP, email, phone) — short-lived | EU region (`[PLACEHOLDER:upstash_region]`) |
-| Cloudinary Ltd. (Israel) | Image hosting for barber portraits and any uploaded media | Images we upload (not customer data) | EU region where available (`[PLACEHOLDER:cloudinary_region]`) |
-| LightWidget Sp. z o.o. (Poland) | Instagram feed embed | No customer data — only loads when a visitor clicks to load the Instagram feed | EU |
-| Cloudflare, Inc. (USA) | Domain registrar and DNS | DNS resolution traffic only (not customer data) | Global |
-| Meta Platforms Ireland Ltd. (Ireland) | Instagram content (loaded only on visitor click) | The visitor's IP and browser metadata, when they click to load | EU / global |
+| Recipient                             | Role                                                      | What they see                                                                                    | Location of processing                                        |
+| ------------------------------------- | --------------------------------------------------------- | ------------------------------------------------------------------------------------------------ | ------------------------------------------------------------- |
+| Neon, Inc. (USA)                      | Database hosting (Postgres)                               | All booking and account data, stored at rest                                                     | EU region (`[PLACEHOLDER:neon_region]`)                       |
+| Vercel Inc. (USA)                     | Website hosting and request routing                       | All website traffic; processes data in memory during request handling                            | EU region (`[PLACEHOLDER:vercel_region]`)                     |
+| Resend (USA)                          | Transactional email delivery                              | Recipient email address, subject line, and email body (name, booking details, cancellation link) | EU region where available (`[PLACEHOLDER:resend_region]`)     |
+| Upstash, Inc. (USA)                   | Rate-limiting state (Redis)                               | Hashed identifiers of recent booking attempts (IP, email, phone) — short-lived                   | EU region (`[PLACEHOLDER:upstash_region]`)                    |
+| Cloudinary Ltd. (Israel)              | Image hosting for barber portraits and any uploaded media | Images we upload (not customer data)                                                             | EU region where available (`[PLACEHOLDER:cloudinary_region]`) |
+| LightWidget Sp. z o.o. (Poland)       | Instagram feed embed                                      | No customer data — only loads when a visitor clicks to load the Instagram feed                   | EU                                                            |
+| Cloudflare, Inc. (USA)                | Domain registrar and DNS                                  | DNS resolution traffic only (not customer data)                                                  | Global                                                        |
+| Meta Platforms Ireland Ltd. (Ireland) | Instagram content (loaded only on visitor click)          | The visitor's IP and browser metadata, when they click to load                                   | EU / global                                                   |
 
 If a court or competent authority in Bulgaria orders us to disclose data (for example, in connection with a criminal investigation), we may have to do so. Such requests are rare and we will challenge any that we consider unlawful or disproportionate.
 
@@ -307,4 +308,4 @@ Recommend engaging a Bulgarian solicitor for the final translation (estimated co
 
 ---
 
-*End of Privacy Policy template.*
+_End of Privacy Policy template._

@@ -173,4 +173,4 @@ Recommended terminology for the Bulgarian version:
 
 ---
 
-*End of Terms of Service template.*
+_End of Terms of Service template._

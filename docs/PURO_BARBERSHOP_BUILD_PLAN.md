@@ -20,24 +20,24 @@
 
 ## 1. Project context
 
-| Field | Value |
-| --- | --- |
-| Client | Puro Barbershop |
-| Location | Plovdiv, Bulgaria |
-| Address | Бул. Христо Ботев 114, Plovdiv, Bulgaria |
-| Map pin | `[PLACEHOLDER:google_maps_embed_url]` |
-| Phone | `[PLACEHOLDER:shop_phone]` |
-| Email | `[PLACEHOLDER:shop_email]` |
-| Legal name | `[PLACEHOLDER:legal_entity_name]` |
-| EIK / VAT | `[PLACEHOLDER:eik]` / `[PLACEHOLDER:vat_id]` |
-| Registered address | `[PLACEHOLDER:registered_address]` |
-| Domain | `purobarbershop.com` (to be purchased via Cloudflare Registrar) |
-| Slogan (EN) | Precision · Confidence · Clean Look |
-| Slogan (BG) | Прецизност · Увереност · Стил |
-| Default locale | `bg` |
-| Supported locales | `bg`, `en` |
-| Timezone | `Europe/Sofia` |
-| Currency | BGN (лв) |
+| Field              | Value                                                           |
+| ------------------ | --------------------------------------------------------------- |
+| Client             | Puro Barbershop                                                 |
+| Location           | Plovdiv, Bulgaria                                               |
+| Address            | Бул. Христо Ботев 114, Plovdiv, Bulgaria                        |
+| Map pin            | `[PLACEHOLDER:google_maps_embed_url]`                           |
+| Phone              | `[PLACEHOLDER:shop_phone]`                                      |
+| Email              | `[PLACEHOLDER:shop_email]`                                      |
+| Legal name         | `[PLACEHOLDER:legal_entity_name]`                               |
+| EIK / VAT          | `[PLACEHOLDER:eik]` / `[PLACEHOLDER:vat_id]`                    |
+| Registered address | `[PLACEHOLDER:registered_address]`                              |
+| Domain             | `purobarbershop.com` (to be purchased via Cloudflare Registrar) |
+| Slogan (EN)        | Precision · Confidence · Clean Look                             |
+| Slogan (BG)        | Прецизност · Увереност · Стил                                   |
+| Default locale     | `bg`                                                            |
+| Supported locales  | `bg`, `en`                                                      |
+| Timezone           | `Europe/Sofia`                                                  |
+| Currency           | BGN (лв)                                                        |
 
 > **Slogan note:** The Bulgarian slogan above is a translation attempt by the planner. The human owner will revise if it doesn't land right. Do not change it without their go-ahead.
 
@@ -48,21 +48,25 @@
 Use exactly these. Do not substitute without approval.
 
 ### Runtime & framework
+
 - **Next.js 15+** (App Router, TypeScript, React Server Components by default)
 - **React 19**
 - **TypeScript** (strict mode, no implicit any, no unchecked indexed access)
 - **Node 20 LTS** (Vercel default)
 
 ### Database & ORM
+
 - **Neon** (Postgres, Free tier, region: `eu-central-1` for GDPR data residency)
 - **Drizzle ORM** + **drizzle-kit** for migrations
 - **@neondatabase/serverless** driver
 
 ### Auth
+
 - **Auth.js v5** (NextAuth) with Credentials provider only
 - **bcryptjs** for password hashing (Edge-compatible)
 
 ### UI
+
 - **Tailwind CSS v4**
 - **shadcn/ui** (canary/latest, copy components into repo)
 - **lucide-react** for icons
@@ -71,35 +75,44 @@ Use exactly these. Do not substitute without approval.
 - **react-hook-form** + **@hookform/resolvers/zod** for forms
 
 ### i18n
+
 - **next-intl** (v3+) with App Router integration
 
 ### Validation & env
+
 - **zod** for all runtime validation
 - **@t3-oss/env-nextjs** for type-safe env variables
 
 ### Email
+
 - **Resend** for sending (free tier: 100/day, 3000/month)
 - **react-email** for templates
 
 ### Rate limiting
+
 - **@upstash/ratelimit** + **@upstash/redis** (free tier)
 
 ### Dates
+
 - **date-fns** + **date-fns-tz** (timezone-aware)
 
 ### Analytics
+
 - **None.** Explicitly excluded from this build. If added later (post-launch), it must be cookieless and EU-hosted (e.g., Plausible). Do NOT add Google Analytics.
 
 ### Local dev infrastructure
+
 - **Docker Compose** with Postgres 16, Redis 7, Mailpit (SMTP catcher)
 
 ### Dev tooling
+
 - **eslint** + **eslint-config-next** + **eslint-plugin-security**
 - **prettier** + **prettier-plugin-tailwindcss**
 - **husky** + **lint-staged** for pre-commit hooks
 - **typescript-eslint** strict rules
 
 ### Testing (minimum viable)
+
 - **vitest** for unit tests
 - **@playwright/test** for one critical-path E2E (the booking flow)
 
@@ -257,20 +270,22 @@ NEXT_PUBLIC_SHOP_LNG=24.7453
 ## 5. Brand & design system
 
 ### Brand foundation
+
 - Logo: vintage script "PURO" with "BARBERSHOP" beneath. White on black. Use as-is.
 - Aesthetic: dark, editorial, classic, masculine. Think Barber & Co Miami, Wayward Barbershop.
 - Slogan rhythm: "Precision · Confidence · Clean Look" as a three-beat divider element used multiple times across the site.
 
 ### Color tokens
+
 Add to `globals.css` as CSS variables, referenced from Tailwind theme.
 
 ```css
 :root {
-  --background: #0a0a0a;        /* Near-black, not pure black */
-  --foreground: #f5f1ea;        /* Warm off-white */
+  --background: #0a0a0a; /* Near-black, not pure black */
+  --foreground: #f5f1ea; /* Warm off-white */
   --muted: #1a1a1a;
   --muted-foreground: #a8a29e;
-  --accent: #c9a961;            /* Muted champagne/gold */
+  --accent: #c9a961; /* Muted champagne/gold */
   --accent-foreground: #0a0a0a;
   --border: #262626;
   --input: #1a1a1a;
@@ -281,12 +296,14 @@ Add to `globals.css` as CSS variables, referenced from Tailwind theme.
 ```
 
 ### Typography
+
 - **Headings:** Cormorant Garamond (serif, weights 400/500/600) — pairs with the script logo
 - **Body:** Inter (sans-serif, weights 400/500/600)
 - **Slogan/accent:** Cormorant Garamond italic
 - Use `next/font/google` to self-host (avoids third-party requests, GDPR-friendlier)
 
 ### Layout principles
+
 - Mobile-first. Test every screen at 375px width.
 - Generous vertical spacing. Don't cram.
 - Use the slogan triple-beat as visual divider between major sections.
@@ -303,12 +320,14 @@ Add to `globals.css` as CSS variables, referenced from Tailwind theme.
 **Apply to every commit. PR cannot merge until all items pass.**
 
 ### Secrets & config
+
 - [ ] No secrets, tokens, or credentials in code or git history
 - [ ] `.env.local` is gitignored; `.env.example` has all keys with empty/placeholder values
 - [ ] All env vars validated through `src/lib/env.ts` with Zod
 - [ ] Server-only env vars are not prefixed `NEXT_PUBLIC_`
 
 ### Input handling
+
 - [ ] All Server Action inputs validated with Zod at the function boundary
 - [ ] All API route inputs validated with Zod at the function boundary
 - [ ] All URL parameters validated before use
@@ -316,12 +335,14 @@ Add to `globals.css` as CSS variables, referenced from Tailwind theme.
 - [ ] No `dangerouslySetInnerHTML` without sanitization (we shouldn't need it at all)
 
 ### Authentication & authorization
+
 - [ ] Every admin route protected by middleware
 - [ ] Every admin Server Action re-checks authentication and authorization (defense in depth)
 - [ ] Role checks use the helper in `src/lib/auth.ts`, never inline strings
 - [ ] No authorization logic on the client — always server-side
 
 ### Database
+
 - [ ] Migrations are forward-only and reviewed
 - [ ] All foreign keys defined
 - [ ] UNIQUE constraints prevent duplicate bookings at the DB level
@@ -329,21 +350,25 @@ Add to `globals.css` as CSS variables, referenced from Tailwind theme.
 - [ ] No N+1 queries in lists
 
 ### Rate limiting & abuse
+
 - [ ] Public mutation endpoints rate-limited per IP
 - [ ] Booking endpoint also rate-limited per email and per phone
 - [ ] Auth endpoints rate-limited per IP
 
 ### Output & XSS
+
 - [ ] No user-supplied HTML rendered without escaping
 - [ ] Email templates do not interpolate raw user input into HTML attributes
 - [ ] All external links in user content use `rel="noopener noreferrer"`
 
 ### Headers & transport
+
 - [ ] HTTPS only (Vercel default + HSTS)
 - [ ] CSP configured (see commit 21)
 - [ ] X-Frame-Options: DENY, X-Content-Type-Options: nosniff, Referrer-Policy: strict-origin-when-cross-origin
 
 ### Privacy & data
+
 - [ ] Only collect: name, email, phone, optional notes — nothing else
 - [ ] No PII in logs (mask emails to `j***@example.com` in any log output)
 - [ ] No PII in analytics events
@@ -351,11 +376,13 @@ Add to `globals.css` as CSS variables, referenced from Tailwind theme.
 - [ ] Booking records purged after 12 months (cron job, phase 6)
 
 ### Errors
+
 - [ ] Errors logged server-side with enough context to debug
 - [ ] User-facing errors are generic ("Something went wrong, please try again")
 - [ ] Never expose stack traces, DB errors, or internal paths to users
 
 ### Code quality
+
 - [ ] `npm run lint` passes
 - [ ] `npm run typecheck` passes (no `any`, no `// @ts-ignore` without explanation)
 - [ ] `npm run test` passes
@@ -363,6 +390,7 @@ Add to `globals.css` as CSS variables, referenced from Tailwind theme.
 - [ ] All new code has at least basic unit tests where logic is non-trivial
 
 ### Accessibility (verify per UI commit)
+
 - [ ] Color contrast WCAG AA (4.5:1 for text)
 - [ ] All interactive elements keyboard-accessible
 - [ ] Form fields have associated labels
@@ -377,103 +405,136 @@ Final shape. Build in commit 3.
 
 ```typescript
 // src/db/schema.ts
-import { pgTable, serial, text, timestamp, integer, boolean, uniqueIndex, pgEnum, varchar, decimal, time, smallint } from 'drizzle-orm/pg-core';
+import {
+  pgTable,
+  serial,
+  text,
+  timestamp,
+  integer,
+  boolean,
+  uniqueIndex,
+  pgEnum,
+  varchar,
+  decimal,
+  time,
+  smallint,
+} from "drizzle-orm/pg-core";
 
-export const userRole = pgEnum('user_role', ['super_admin', 'barber']);
-export const bookingStatus = pgEnum('booking_status', ['confirmed', 'cancelled', 'completed', 'no_show']);
+export const userRole = pgEnum("user_role", ["super_admin", "barber"]);
+export const bookingStatus = pgEnum("booking_status", [
+  "confirmed",
+  "cancelled",
+  "completed",
+  "no_show",
+]);
 
-export const users = pgTable('users', {
-  id: serial('id').primaryKey(),
-  email: varchar('email', { length: 255 }).notNull().unique(),
-  passwordHash: text('password_hash').notNull(),
-  role: userRole('role').notNull(),
-  createdAt: timestamp('created_at').defaultNow().notNull(),
-  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+export const users = pgTable("users", {
+  id: serial("id").primaryKey(),
+  email: varchar("email", { length: 255 }).notNull().unique(),
+  passwordHash: text("password_hash").notNull(),
+  role: userRole("role").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 
-export const barbers = pgTable('barbers', {
-  id: serial('id').primaryKey(),
-  userId: integer('user_id').references(() => users.id, { onDelete: 'set null' }),
-  nameEn: varchar('name_en', { length: 100 }).notNull(),
-  nameBg: varchar('name_bg', { length: 100 }).notNull(),
-  bioEn: text('bio_en'),
-  bioBg: text('bio_bg'),
-  photoUrl: text('photo_url'),
-  displayOrder: integer('display_order').default(0).notNull(),
-  active: boolean('active').default(true).notNull(),
-  createdAt: timestamp('created_at').defaultNow().notNull(),
-  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+export const barbers = pgTable("barbers", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").references(() => users.id, { onDelete: "set null" }),
+  nameEn: varchar("name_en", { length: 100 }).notNull(),
+  nameBg: varchar("name_bg", { length: 100 }).notNull(),
+  bioEn: text("bio_en"),
+  bioBg: text("bio_bg"),
+  photoUrl: text("photo_url"),
+  displayOrder: integer("display_order").default(0).notNull(),
+  active: boolean("active").default(true).notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 
-export const services = pgTable('services', {
-  id: serial('id').primaryKey(),
-  nameEn: varchar('name_en', { length: 100 }).notNull(),
-  nameBg: varchar('name_bg', { length: 100 }).notNull(),
-  descriptionEn: text('description_en'),
-  descriptionBg: text('description_bg'),
-  durationMinutes: integer('duration_minutes').notNull(),
-  priceBgn: decimal('price_bgn', { precision: 10, scale: 2 }).notNull(),
-  displayOrder: integer('display_order').default(0).notNull(),
-  active: boolean('active').default(true).notNull(),
-  createdAt: timestamp('created_at').defaultNow().notNull(),
-  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+export const services = pgTable("services", {
+  id: serial("id").primaryKey(),
+  nameEn: varchar("name_en", { length: 100 }).notNull(),
+  nameBg: varchar("name_bg", { length: 100 }).notNull(),
+  descriptionEn: text("description_en"),
+  descriptionBg: text("description_bg"),
+  durationMinutes: integer("duration_minutes").notNull(),
+  priceBgn: decimal("price_bgn", { precision: 10, scale: 2 }).notNull(),
+  displayOrder: integer("display_order").default(0).notNull(),
+  active: boolean("active").default(true).notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 
-export const workingHours = pgTable('working_hours', {
-  id: serial('id').primaryKey(),
-  barberId: integer('barber_id').references(() => barbers.id, { onDelete: 'cascade' }).notNull(),
-  dayOfWeek: smallint('day_of_week').notNull(), // 0=Sunday, 6=Saturday
-  startTime: time('start_time').notNull(),
-  endTime: time('end_time').notNull(),
-  active: boolean('active').default(true).notNull(),
+export const workingHours = pgTable("working_hours", {
+  id: serial("id").primaryKey(),
+  barberId: integer("barber_id")
+    .references(() => barbers.id, { onDelete: "cascade" })
+    .notNull(),
+  dayOfWeek: smallint("day_of_week").notNull(), // 0=Sunday, 6=Saturday
+  startTime: time("start_time").notNull(),
+  endTime: time("end_time").notNull(),
+  active: boolean("active").default(true).notNull(),
 });
 
-export const timeOff = pgTable('time_off', {
-  id: serial('id').primaryKey(),
-  barberId: integer('barber_id').references(() => barbers.id, { onDelete: 'cascade' }).notNull(),
-  startDatetime: timestamp('start_datetime', { withTimezone: true }).notNull(),
-  endDatetime: timestamp('end_datetime', { withTimezone: true }).notNull(),
-  reason: text('reason'),
-  createdAt: timestamp('created_at').defaultNow().notNull(),
+export const timeOff = pgTable("time_off", {
+  id: serial("id").primaryKey(),
+  barberId: integer("barber_id")
+    .references(() => barbers.id, { onDelete: "cascade" })
+    .notNull(),
+  startDatetime: timestamp("start_datetime", { withTimezone: true }).notNull(),
+  endDatetime: timestamp("end_datetime", { withTimezone: true }).notNull(),
+  reason: text("reason"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
-export const bookings = pgTable('bookings', {
-  id: serial('id').primaryKey(),
-  serviceId: integer('service_id').references(() => services.id).notNull(),
-  barberId: integer('barber_id').references(() => barbers.id).notNull(),
-  customerName: varchar('customer_name', { length: 100 }).notNull(),
-  customerEmail: varchar('customer_email', { length: 255 }).notNull(),
-  customerPhone: varchar('customer_phone', { length: 30 }).notNull(),
-  startDatetime: timestamp('start_datetime', { withTimezone: true }).notNull(),
-  endDatetime: timestamp('end_datetime', { withTimezone: true }).notNull(),
-  status: bookingStatus('status').default('confirmed').notNull(),
-  cancellationToken: varchar('cancellation_token', { length: 64 }).notNull().unique(),
-  locale: varchar('locale', { length: 5 }).default('bg').notNull(),
-  notes: text('notes'),
-  reminderSent: boolean('reminder_sent').default(false).notNull(),
-  createdAt: timestamp('created_at').defaultNow().notNull(),
-  updatedAt: timestamp('updated_at').defaultNow().notNull(),
-}, (table) => ({
-  // CRITICAL: Prevent double-booking at the DB level.
-  // The partial unique index ensures only confirmed bookings count.
-  barberSlotUnique: uniqueIndex('barber_slot_unique').on(table.barberId, table.startDatetime).where(sql`status = 'confirmed'`),
-}));
+export const bookings = pgTable(
+  "bookings",
+  {
+    id: serial("id").primaryKey(),
+    serviceId: integer("service_id")
+      .references(() => services.id)
+      .notNull(),
+    barberId: integer("barber_id")
+      .references(() => barbers.id)
+      .notNull(),
+    customerName: varchar("customer_name", { length: 100 }).notNull(),
+    customerEmail: varchar("customer_email", { length: 255 }).notNull(),
+    customerPhone: varchar("customer_phone", { length: 30 }).notNull(),
+    startDatetime: timestamp("start_datetime", { withTimezone: true }).notNull(),
+    endDatetime: timestamp("end_datetime", { withTimezone: true }).notNull(),
+    status: bookingStatus("status").default("confirmed").notNull(),
+    cancellationToken: varchar("cancellation_token", { length: 64 }).notNull().unique(),
+    locale: varchar("locale", { length: 5 }).default("bg").notNull(),
+    notes: text("notes"),
+    reminderSent: boolean("reminder_sent").default(false).notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  },
+  (table) => ({
+    // CRITICAL: Prevent double-booking at the DB level.
+    // The partial unique index ensures only confirmed bookings count.
+    barberSlotUnique: uniqueIndex("barber_slot_unique")
+      .on(table.barberId, table.startDatetime)
+      .where(sql`status = 'confirmed'`),
+  }),
+);
 
-export const settings = pgTable('settings', {
-  key: varchar('key', { length: 100 }).primaryKey(),
-  value: text('value').notNull(),
-  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+export const settings = pgTable("settings", {
+  key: varchar("key", { length: 100 }).primaryKey(),
+  value: text("value").notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 
-export const emailBlacklist = pgTable('email_blacklist', {
-  id: serial('id').primaryKey(),
-  email: varchar('email', { length: 255 }).notNull().unique(),
-  reason: text('reason'),
-  createdAt: timestamp('created_at').defaultNow().notNull(),
+export const emailBlacklist = pgTable("email_blacklist", {
+  id: serial("id").primaryKey(),
+  email: varchar("email", { length: 255 }).notNull().unique(),
+  reason: text("reason"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 ```
 
 ### Default settings seeded
+
 - `buffer_minutes` = `15`
 - `cancellation_window_hours` = `24`
 - `booking_horizon_days` = `60` (how far ahead someone can book)
@@ -490,11 +551,13 @@ Each commit has: **Goal**, **Tasks**, **Files**, **Dependencies to add**, **Defi
 ### PHASE 1 — Foundation
 
 #### Commit 1: Tooling, lint, formatting, docker-compose
+
 **Goal:** Production-grade tooling on top of the existing `create-next-app` bootstrap.
 
 **Pre-condition:** Repository already exists with Next.js 15 + TypeScript + Tailwind v4 + App Router + src dir from `create-next-app`. `.nvmrc` already pinned to 20.
 
 **Tasks:**
+
 - Set TypeScript to strict in `tsconfig.json`: `strict: true`, `noUncheckedIndexedAccess: true`, `noImplicitOverride: true`, `exactOptionalPropertyTypes: true`, `noFallthroughCasesInSwitch: true`
 - Install and configure ESLint with `eslint-config-next`, `eslint-plugin-security`, `@typescript-eslint/eslint-plugin`, `eslint-config-prettier`. Use `eslint.config.mjs` flat config.
 - Install and configure Prettier with `prettier-plugin-tailwindcss`
@@ -509,6 +572,7 @@ Each commit has: **Goal**, **Tasks**, **Files**, **Dependencies to add**, **Defi
 - Verify the docker stack starts: `docker compose up -d` then verify Postgres, Redis, and Mailpit reachable
 
 **Definition of done:**
+
 - `npm run dev` opens a working homepage at localhost:3000
 - `npm run lint`, `npm run typecheck`, `npm run format:check` all pass
 - Pre-commit hook runs on a test commit (intentionally introduce a lint error, attempt commit, verify rejection)
@@ -520,9 +584,11 @@ Each commit has: **Goal**, **Tasks**, **Files**, **Dependencies to add**, **Defi
 ---
 
 #### Commit 2: Type-safe env + folder scaffolding
+
 **Goal:** Lock down env handling and lay out all directories.
 
 **Tasks:**
+
 - Install `@t3-oss/env-nextjs zod`
 - Create `src/lib/env.ts` with Zod schemas for all server and client env vars (see §4)
 - Create `.env.example` with every var listed and empty/placeholder values
@@ -531,6 +597,7 @@ Each commit has: **Goal**, **Tasks**, **Files**, **Dependencies to add**, **Defi
 - Create `src/lib/utils.ts` with `cn` helper
 
 **Definition of done:**
+
 - Importing `env` from `@/lib/env` provides typed, validated env access
 - Removing a required env var causes `npm run build` to fail with a clear error
 
@@ -539,9 +606,11 @@ Each commit has: **Goal**, **Tasks**, **Files**, **Dependencies to add**, **Defi
 ---
 
 #### Commit 3: Database schema, migrations, seed
+
 **Goal:** Drizzle wired up with the schema from §7, working against local Postgres (docker) in dev and Neon in prod.
 
 **Tasks:**
+
 - For prod: human owner signs up for Neon, creates EU project (region `eu-central-1`), provides pooled and unpooled connection strings (stored in Vercel env, not local)
 - For dev: connection strings auto-derive from docker-compose (see `.env.example` defaults)
 - Install `drizzle-orm @neondatabase/serverless`, `drizzle-kit` (dev), `postgres` (for local dev driver)
@@ -560,11 +629,13 @@ Each commit has: **Goal**, **Tasks**, **Files**, **Dependencies to add**, **Defi
 - Add scripts: `db:generate`, `db:migrate`, `db:push`, `db:studio`, `db:seed`, `db:reset` (drops and recreates dev DB only — refuses to run if DATABASE_URL points to Neon)
 
 **Definition of done:**
+
 - `npm run db:studio` shows all tables with seeded data
 - `npm run db:reset` works locally and refuses to run against a Neon URL (safety check on URL pattern)
 - Connection string is the pooled URL for runtime, unpooled for migrations
 
 **Security notes:**
+
 - Seed password must come from env, never hardcoded
 - Production database URL must be different from dev (separate Neon branch)
 - The super admin password must be changed by the human owner on first login (flag this in the README and add a TODO in the seed file)
@@ -573,9 +644,11 @@ Each commit has: **Goal**, **Tasks**, **Files**, **Dependencies to add**, **Defi
 ---
 
 #### Commit 4: Design tokens, fonts, base layout, header & footer
+
 **Goal:** The brand visual system is in place — any new page automatically looks "Puro".
 
 **Tasks:**
+
 - Add color tokens from §5 to `globals.css`
 - Configure Tailwind v4 theme to consume CSS variables
 - Add Cormorant Garamond and Inter via `next/font/google` with `display: 'swap'`
@@ -588,6 +661,7 @@ Each commit has: **Goal**, **Tasks**, **Files**, **Dependencies to add**, **Defi
 - Pre-install components we'll need: button, input, label, select, calendar, dialog, sheet, dropdown-menu, form, popover, toast (sonner), card, tabs, alert, separator
 
 **Definition of done:**
+
 - Visiting `/` shows a styled (but mostly empty) page with header, footer, and divider
 - Mobile menu works at 375px width
 - Lighthouse accessibility ≥ 95 on this empty page
@@ -599,9 +673,11 @@ Each commit has: **Goal**, **Tasks**, **Files**, **Dependencies to add**, **Defi
 ### PHASE 2 — Public site
 
 #### Commit 5: Localization foundation (next-intl)
+
 **Goal:** Full BG/EN routing with `/bg/...` and `/en/...` URLs, default BG.
 
 **Tasks:**
+
 - Install `next-intl`
 - Configure `src/i18n/routing.ts` with locales `['bg', 'en']`, default `'bg'`, `localePrefix: 'always'`
 - Implement `src/i18n/request.ts` to load the correct messages bundle
@@ -612,6 +688,7 @@ Each commit has: **Goal**, **Tasks**, **Files**, **Dependencies to add**, **Defi
 - Update Header to show "BG | EN" toggle
 
 **Definition of done:**
+
 - `/` redirects to `/bg`
 - `/en` shows English copy
 - Switching language preserves the current page
@@ -622,9 +699,11 @@ Each commit has: **Goal**, **Tasks**, **Files**, **Dependencies to add**, **Defi
 ---
 
 #### Commit 6: Homepage sections (static)
+
 **Goal:** All non-dynamic homepage sections built and copy localized.
 
 **Tasks:**
+
 - **Hero:** Full-bleed background (use a placeholder dark image, `[PLACEHOLDER:hero_image]`), logo, slogan, primary CTA "Запази час" / "Book Now" linking to `/bg/book` or `/en/book`
 - **About:** Short paragraph about the shop, image placeholder. Use `[PLACEHOLDER:about_copy_bg]` and `[PLACEHOLDER:about_copy_en]` in the translation files with descriptive placeholder values
 - **Barbers:** Pull from DB. Show name, bio, photo. If photoUrl is null, show a styled initials avatar.
@@ -634,6 +713,7 @@ Each commit has: **Goal**, **Tasks**, **Files**, **Dependencies to add**, **Defi
 - **CTA strip:** Slogan divider + big "Book Now" before footer
 
 **Definition of done:**
+
 - Homepage renders all sections in both locales
 - All copy comes from translation files
 - DB-driven sections (barbers, services) render correctly
@@ -641,12 +721,14 @@ Each commit has: **Goal**, **Tasks**, **Files**, **Dependencies to add**, **Defi
 - Mobile layout works at 375px
 
 **Security notes:**
+
 - Get directions link uses URL encoding on the address; verify no XSS vector
 - No third-party iframes loaded on the homepage by default
 
 ---
 
 #### Commit 7: Instagram gallery (click-to-load)
+
 **Goal:** Gallery section pulls from Instagram via LightWidget. Loaded only on explicit user action — no third-party content fires until the user clicks.
 
 **Why click-to-load:** LightWidget's iframe loads Instagram content, which sets third-party cookies. Under GDPR/ePrivacy, that's a consent surface. Instead of a global cookie banner, we use the well-established "click-to-load" pattern (same as YouTube embeds on privacy-friendly sites). The user clicking "Show Instagram feed" is unambiguous, specific consent for that single element.
@@ -654,6 +736,7 @@ Each commit has: **Goal**, **Tasks**, **Files**, **Dependencies to add**, **Defi
 **Approach:** **LightWidget** free tier for MVP. Embeddable widget that the barbers configure once; new IG posts appear automatically. Zero server-side IG API complexity.
 
 **Tasks:**
+
 - Human owner creates a LightWidget account, points it at the Puro IG, gets the widget ID, adds it to `.env.local` as `NEXT_PUBLIC_LIGHTWIDGET_ID`
 - Create `src/components/marketing/InstagramGallery.tsx`:
   - Default state: placeholder showing a styled card with the IG logo, copy ("Виж нашата работа в Instagram" / "See our work on Instagram"), brief notice that loading the feed connects to Instagram and may set cookies, and a "Show feed" / "Покажи лентата" button
@@ -664,6 +747,7 @@ Each commit has: **Goal**, **Tasks**, **Files**, **Dependencies to add**, **Defi
 - Set `revalidate` on the homepage to 1 hour so the page shell is cached
 
 **Definition of done:**
+
 - Gallery section shows the placeholder by default — no third-party requests are made on first page load (verify via DevTools Network tab)
 - Clicking the load button mounts the iframe and IG content appears
 - If widget ID is missing or load fails, fallback link shows instead of a broken iframe
@@ -671,6 +755,7 @@ Each commit has: **Goal**, **Tasks**, **Files**, **Dependencies to add**, **Defi
 **Upgrade path (phase 2, document but don't build):** Build a custom integration with Instagram Graph API. Cache responses for 6 hours via `unstable_cache`. Requires IG Business account, FB App, and long-lived token rotation. With this, the feed could be rendered server-side from cached data with no third-party requests at runtime, eliminating the consent question entirely.
 
 **Security notes:**
+
 - The placeholder must visually communicate that loading the feed involves a third party — this is the "informed" part of informed consent
 - LightWidget iframe (when loaded) should have `sandbox="allow-scripts allow-same-origin allow-popups"` and a strict referrer policy
 - Add the LightWidget domain to CSP `frame-src` (commit 21)
@@ -679,9 +764,11 @@ Each commit has: **Goal**, **Tasks**, **Files**, **Dependencies to add**, **Defi
 ---
 
 #### Commit 8: Legal pages (Privacy, Terms, Cookie info)
+
 **Goal:** Static legal pages rendering the template content with placeholders for legal entity info.
 
 **Tasks:**
+
 - The legal text is supplied in `docs/legal/PRIVACY_POLICY_TEMPLATE.md` and `docs/legal/TERMS_OF_SERVICE_TEMPLATE.md`. Do not rewrite this content. Render it.
 - Create `src/app/[locale]/(public)/legal/privacy/page.tsx`, `terms/page.tsx`, `cookie-info/page.tsx`
   - `cookie-info` is short — explains the small set of strictly-necessary cookies the site uses (auth session, locale preference, consent state on the IG load decision is session-only). No consent banner; this page just informs.
@@ -690,6 +777,7 @@ Each commit has: **Goal**, **Tasks**, **Files**, **Dependencies to add**, **Defi
 - Footer links: Privacy, Terms, Cookie info (in current locale)
 
 **Definition of done:**
+
 - All three pages render in both locales
 - Footer links work
 - Page has table of contents / clear sections
@@ -703,9 +791,11 @@ Each commit has: **Goal**, **Tasks**, **Files**, **Dependencies to add**, **Defi
 ### PHASE 3 — Booking system
 
 #### Commit 9: Booking availability engine
+
 **Goal:** A pure, well-tested module that given a service, barber, and date range returns available time slots.
 
 **Tasks:**
+
 - Create `src/lib/booking/availability.ts` with these pure functions:
   - `getAvailableSlots({ serviceId, barberId, date, db })` → returns array of `Date` objects (in Europe/Sofia)
   - `getAvailableSlotsForAnyBarber({ serviceId, date, db })` → returns `Array<{ slot: Date; availableBarberIds: number[] }>`
@@ -728,20 +818,24 @@ Each commit has: **Goal**, **Tasks**, **Files**, **Dependencies to add**, **Defi
   - Edge: booking exactly at end of working day
 
 **Definition of done:**
+
 - All unit tests pass
 - Function returns correct slots for hand-verified test cases
 - No DB writes from this module (pure read)
 
 **Security notes:**
+
 - Treat any input date that's beyond `booking_horizon_days` or in the past as invalid — return empty array, don't throw
 - Validate IDs as positive integers before querying
 
 ---
 
 #### Commit 10: Booking UI (multi-step form)
+
 **Goal:** A polished, mobile-first 4-step booking flow.
 
 **Tasks:**
+
 - Create `/[locale]/book/page.tsx` with a stepper component
 - Steps:
   1. **Service** — grid of service cards (name, duration, price). Click to select.
@@ -756,21 +850,25 @@ Each commit has: **Goal**, **Tasks**, **Files**, **Dependencies to add**, **Defi
 - Phone input: accept international format, validate with libphonenumber-js (lightweight, max version).
 
 **Definition of done:**
+
 - Full flow works end-to-end on mobile (375px) and desktop
 - Back button works between steps
 - Validation errors show inline and are accessible
 - Loading and error states styled
 
 **Security notes:**
+
 - Slot fetching uses a Server Action — don't expose raw barber schedules via a public API
 - Don't reveal in error messages which specific field violated rate limit (just "too many requests")
 
 ---
 
 #### Commit 11: Booking server action + double-booking prevention
+
 **Goal:** Atomic, rate-limited, validated booking creation that cannot double-book under any race condition.
 
 **Tasks:**
+
 - Create `src/actions/booking.ts` with `createBooking(input)`:
   1. Validate input with Zod (service, barber or "any", date, time, name, email, phone, consent=true, locale)
   2. Sanitize: trim whitespace, normalize email (lowercase), parse phone
@@ -790,12 +888,14 @@ Each commit has: **Goal**, **Tasks**, **Files**, **Dependencies to add**, **Defi
 - Create `src/lib/booking/tokens.ts` with `generateCancellationToken(bookingId)` and `verifyCancellationToken(token, bookingId)` using HMAC-SHA256 with `AUTH_SECRET`
 
 **Definition of done:**
+
 - Booking flow creates a row in `bookings`
 - Trying to book the same slot twice concurrently results in one success, one "slot taken"
 - Rate limits trigger after the configured threshold
 - Manual SQL `SELECT *` shows correctly formatted data
 
 **Security notes:**
+
 - The unique index in §7 IS the last line of defense — verify it exists in production DB
 - Cancellation token must NEVER be returned to the client in API responses, only sent via email
 - IP-based rate limiting must use the real client IP from Vercel headers (`x-forwarded-for` first value), not the connection IP
@@ -804,9 +904,11 @@ Each commit has: **Goal**, **Tasks**, **Files**, **Dependencies to add**, **Defi
 ---
 
 #### Commit 12: Emails + cancellation flow
+
 **Goal:** Confirmation, barber notification, and cancellation flow with signed tokens. Dev environment routes mail to Mailpit; prod uses Resend.
 
 **Tasks:**
+
 - Install `resend`, `react-email`, `nodemailer`, `@types/nodemailer`
 - Create `src/lib/email/client.ts` with an `EmailClient` interface (`send({ to, from, subject, react })`)
 - Implement `ResendEmailClient` (prod)
@@ -825,6 +927,7 @@ Each commit has: **Goal**, **Tasks**, **Files**, **Dependencies to add**, **Defi
 - Create confirmation page `/[locale]/book/confirmation/page.tsx` that accepts a signed bookingId via search param and shows the details (re-fetches from DB)
 
 **Definition of done:**
+
 - Booking sends both emails on success
 - In dev, emails appear in Mailpit UI at http://localhost:8025 within seconds
 - Emails render correctly in Gmail, Outlook, Apple Mail (use react-email preview)
@@ -833,6 +936,7 @@ Each commit has: **Goal**, **Tasks**, **Files**, **Dependencies to add**, **Defi
 - A production build with `EMAIL_TRANSPORT=smtp` refuses to start (fail loud, not silent)
 
 **Security notes:**
+
 - Tokens are HMAC, time-bound by checking booking start time
 - Cancellation page must NOT reveal whether a token is invalid vs already used vs out of window — generic "Cannot cancel this booking" message, log details server-side
 - Mask email and phone in the email previews shown on the confirmation page (`j***@example.com`, `+359 *** *** 23`) in case it's sent to the wrong person who somehow has the link
@@ -843,9 +947,11 @@ Each commit has: **Goal**, **Tasks**, **Files**, **Dependencies to add**, **Defi
 ### PHASE 4 — Admin system
 
 #### Commit 13: Auth.js setup + login
+
 **Goal:** Login with email + password, sessions, role-aware middleware.
 
 **Tasks:**
+
 - Install `next-auth@beta` (v5), `bcryptjs`, `@types/bcryptjs`
 - Create `src/lib/auth.ts`:
   - Credentials provider that looks up user by email, verifies password with bcrypt
@@ -861,12 +967,14 @@ Each commit has: **Goal**, **Tasks**, **Files**, **Dependencies to add**, **Defi
 - Add logout button to admin layout
 
 **Definition of done:**
+
 - Seeded super admin can log in
 - Visiting `/admin` without auth redirects to login
 - Logout clears session
 - Sessions expire after 8h
 
 **Security notes:**
+
 - bcrypt cost factor: 12 minimum
 - Generic error message on failed login ("Invalid credentials") — don't reveal whether email exists
 - Rate-limit login attempts: 5 per IP per 15 min, 5 per email per 15 min
@@ -878,9 +986,11 @@ Each commit has: **Goal**, **Tasks**, **Files**, **Dependencies to add**, **Defi
 ---
 
 #### Commit 14: Admin layout + dashboard
+
 **Goal:** Authenticated admin shell with navigation and the dashboard landing page.
 
 **Tasks:**
+
 - Create `src/app/[locale]/(admin)/admin/layout.tsx`:
   - Top bar: logo, current user email, role badge, logout
   - Sidebar: Dashboard, Schedule, Time Off. Super admin only: Barbers, Services, Settings.
@@ -893,20 +1003,24 @@ Each commit has: **Goal**, **Tasks**, **Files**, **Dependencies to add**, **Defi
 - All copy localized
 
 **Definition of done:**
+
 - Barber sees their own dashboard view
 - Super admin sees all bookings
 - Sidebar items hidden if user lacks permission
 
 **Security notes:**
+
 - Server components fetch data with the user's session — barbers see all bookings (per requirements) but page-level role checks block barber from clicking into super-admin pages
 - Defense in depth: every action also re-checks role; don't rely on UI hiding
 
 ---
 
 #### Commit 15: Schedule view (calendar)
+
 **Goal:** A calendar showing all barbers' bookings, with editing rights per role.
 
 **Tasks:**
+
 - Build a custom week/day calendar (don't pull in heavy libraries — `react-big-calendar` is overkill). Use a CSS grid.
 - Toggle: Day view, Week view
 - Color-coded by barber
@@ -918,20 +1032,24 @@ Each commit has: **Goal**, **Tasks**, **Files**, **Dependencies to add**, **Defi
 - "Add time off" button per barber row
 
 **Definition of done:**
+
 - Calendar renders correctly on mobile (day view default on small screens, week view on desktop)
 - Permissions enforced — barber A cannot edit barber B's booking even via the API
 - Walk-in creation works and respects double-booking constraint
 
 **Security notes:**
+
 - Every mutation Server Action re-checks: is user authenticated? what's their role? is the target booking theirs (if barber)?
 - Audit log entries written for every mutation (we'll add an audit table in a phase 2 enhancement; for now just structured logs with userId, action, targetId)
 
 ---
 
 #### Commit 16: Time off management
+
 **Goal:** Barbers add their own time off; super admin can add for anyone.
 
 **Tasks:**
+
 - Page lists current and upcoming time off entries
 - Create/edit modal: barber (super admin picks, barber locked to self), start datetime, end datetime, optional reason
 - Past entries are read-only
@@ -939,6 +1057,7 @@ Each commit has: **Goal**, **Tasks**, **Files**, **Dependencies to add**, **Defi
 - Deleting an entry is allowed but warn if it overlaps existing bookings (don't auto-cancel them; show a list and let the admin handle)
 
 **Definition of done:**
+
 - Time off entries affect availability immediately (booking flow no longer shows those slots)
 - Overlap warning works
 
@@ -947,9 +1066,11 @@ Each commit has: **Goal**, **Tasks**, **Files**, **Dependencies to add**, **Defi
 ---
 
 #### Commit 17: Super admin — barbers, services, settings management
+
 **Goal:** Full CRUD for content tables behind super admin permission.
 
 **Tasks:**
+
 - **Barbers page:**
   - List all barbers (active and inactive)
   - Create barber: name (BG/EN), bio (BG/EN), photo upload, optional working hours override, optional user account creation
@@ -969,12 +1090,14 @@ Each commit has: **Goal**, **Tasks**, **Files**, **Dependencies to add**, **Defi
 - Use Cloudinary's transformation URLs for serving (auto format, auto quality, responsive sizes)
 
 **Definition of done:**
+
 - Super admin can fully manage barbers and services
 - Changes reflect on the public site after revalidation
 - Cloudinary upload works with size/type restrictions
 - Inviting a barber via email works end-to-end
 
 **Security notes:**
+
 - Cloudinary unsigned upload preset must restrict: max file size (5 MB), allowed formats (jpg, png, webp), folder (`puro-barbershop/barbers`), max dimensions
 - Even with these restrictions, validate Cloudinary response server-side before saving the URL to the DB
 - Generated temporary passwords sent by email must be ≥ 16 chars, use crypto.randomBytes, and force change on first login
@@ -985,22 +1108,26 @@ Each commit has: **Goal**, **Tasks**, **Files**, **Dependencies to add**, **Defi
 ### PHASE 5 — Compliance & analytics
 
 #### Commit 18: Cookie info page (no banner)
+
 **Goal:** Document our minimal cookie use; no consent banner required.
 
 **Rationale:** We removed analytics. After audit, the site sets only strictly-necessary cookies (auth session for admin, locale preference for user choice). Strictly-necessary cookies are exempt from consent under ePrivacy. The single third-party content surface (Instagram embed) uses the click-to-load pattern (commit 7) where the click itself is consent. No global banner is required.
 
 **Tasks:**
+
 - Create the cookie info page (already scaffolded in commit 8). Content from `docs/legal/PRIVACY_POLICY_TEMPLATE.md` already covers this — surface it as a dedicated page for discoverability.
 - Add a footer link "Cookie info" in both locales
 - Add a small notice in the IG gallery placeholder that explicitly says: "Loading this content connects to Instagram, which may set cookies under their policy. Click to load."
 
 **Definition of done:**
+
 - Cookie info page accessible from footer
 - IG gallery placeholder has the disclosure copy
 - DevTools Network tab shows zero third-party requests on first homepage load (no analytics, no maps iframe, no IG embed)
 - Auth session and locale cookies still work normally
 
 **Security notes:**
+
 - If analytics is added later, this commit needs to be revisited and a real consent banner introduced
 - The auth cookie must be `HttpOnly`, `Secure`, `SameSite=Lax`
 - The locale cookie can be `SameSite=Lax`, not `HttpOnly` (client reads it for switching)
@@ -1009,9 +1136,11 @@ Each commit has: **Goal**, **Tasks**, **Files**, **Dependencies to add**, **Defi
 ---
 
 #### Commit 19: SEO, structured data, sitemap
+
 **Goal:** Properly indexable, rich previews on social shares.
 
 **Tasks:**
+
 - Per-page metadata via `generateMetadata`
 - Open Graph + Twitter card on homepage
 - `og-image.jpg` (1200×630) with logo + slogan — create a placeholder, the human owner can replace
@@ -1024,11 +1153,13 @@ Each commit has: **Goal**, **Tasks**, **Files**, **Dependencies to add**, **Defi
 - Hreflang tags between BG and EN versions
 
 **Definition of done:**
+
 - Rich Results Test (Google) validates LocalBusiness schema
 - Sharing the URL on Facebook/Twitter/Telegram shows correct preview
 - `robots.txt` and `sitemap.xml` accessible at root
 
 **Security notes:**
+
 - Do not include admin URLs in the sitemap
 - `robots.txt` should explicitly `Disallow: /admin/` and `Disallow: /api/` (defense in depth — security through obscurity is not security, but no need to advertise)
 
@@ -1037,9 +1168,11 @@ Each commit has: **Goal**, **Tasks**, **Files**, **Dependencies to add**, **Defi
 ### PHASE 6 — Production readiness
 
 #### Commit 20: Cron jobs (reminders + data retention)
+
 **Goal:** Daily background tasks for reminders and GDPR data retention.
 
 **Tasks:**
+
 - Use Vercel Cron Jobs (free on Hobby for 2 crons)
 - Create `src/app/api/cron/reminders/route.ts`:
   - Runs hourly
@@ -1054,11 +1187,13 @@ Each commit has: **Goal**, **Tasks**, **Files**, **Dependencies to add**, **Defi
 - Add cron schedule in `vercel.json`
 
 **Definition of done:**
+
 - Cron endpoints reject requests without correct secret with 401
 - Both crons execute on schedule (verify via Vercel dashboard)
 - Reminder emails sent at correct time
 
 **Security notes:**
+
 - `CRON_SECRET` is a server-only env var, never exposed
 - Cron endpoints rate-limit by IP as well (defense in depth)
 - Retention deletion is irreversible — test thoroughly in dev before enabling in prod
@@ -1066,9 +1201,11 @@ Each commit has: **Goal**, **Tasks**, **Files**, **Dependencies to add**, **Defi
 ---
 
 #### Commit 21: Security headers, CSP, hardening
+
 **Goal:** Production-grade security headers; passes Mozilla Observatory A or higher.
 
 **Tasks:**
+
 - Add `next.config.ts` headers configuration:
   - `Strict-Transport-Security: max-age=63072000; includeSubDomains; preload`
   - `X-Frame-Options: DENY` (except where we need iframes — adjust per route)
@@ -1092,6 +1229,7 @@ Each commit has: **Goal**, **Tasks**, **Files**, **Dependencies to add**, **Defi
   - Domain configuration
 
 **Definition of done:**
+
 - Mozilla Observatory: A or higher
 - Lighthouse: all scores ≥ 90 on homepage
 - `npm audit` clean
@@ -1101,9 +1239,11 @@ Each commit has: **Goal**, **Tasks**, **Files**, **Dependencies to add**, **Defi
 ---
 
 #### Commit 22: E2E test, CI/CD, README
+
 **Goal:** Automated checks + deployment workflow documented.
 
 **Tasks:**
+
 - Write one Playwright E2E test in `tests/e2e/booking.spec.ts`:
   - Land on homepage, click "Book Now"
   - Select first service, first barber, today + earliest slot
@@ -1125,11 +1265,13 @@ Each commit has: **Goal**, **Tasks**, **Files**, **Dependencies to add**, **Defi
 - Add `OPERATIONS.md` for the human owner — non-technical guide for everyday admin tasks
 
 **Definition of done:**
+
 - CI passes on a fresh PR
 - E2E test runs and passes
 - README and OPERATIONS clear enough that the human owner can do common tasks without the agent
 
 **Security notes:**
+
 - E2E tests use a separate test database (Neon branch)
 - CI does NOT have access to production secrets
 - Secrets only injected at deploy time via Vercel
@@ -1139,6 +1281,7 @@ Each commit has: **Goal**, **Tasks**, **Files**, **Dependencies to add**, **Defi
 ## 9. Post-launch checklist (human owner)
 
 Before going live, the human owner must:
+
 - [ ] Change the seeded super admin password
 - [ ] Replace all `[PLACEHOLDER:*]` values with real data
 - [ ] Verify privacy policy with a Bulgarian data protection professional
@@ -1157,6 +1300,7 @@ Before going live, the human owner must:
 ## 10. Phase 2 candidates (do not build now)
 
 Documented so they're not forgotten:
+
 - SMS reminders via a Bulgarian SMS provider
 - Email blacklist for no-show abusers (the table is already created)
 - Custom Instagram Graph API integration replacing LightWidget
