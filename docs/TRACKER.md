@@ -211,7 +211,35 @@
 
 ### Commit 6: Homepage sections
 
-**Status:** 🔲 TODO
+**Status:** ✅ DONE
+
+**Changes:**
+
+- `src/components/marketing/Hero.tsx` — hero section with logo, title, subtitle, CTA button (uses `next/link`)
+- `src/components/marketing/About.tsx` — about section with paragraph text
+- `src/components/marketing/BarbersSection.tsx` — DB-driven barbers grid (nullable bios handled)
+- `src/components/marketing/ServicesSection.tsx` — DB-driven services grid (nullable descriptions handled, each card links to `/book?service=<id>`)
+- `src/components/marketing/GalleryPlaceholder.tsx` — gallery placeholder with "soon" message
+- `src/components/marketing/LocationSection.tsx` — location + working hours from DB
+- `src/app/[locale]/(public)/page.tsx` — server component assembling all sections with DB queries
+- `src/db/index.ts` — fixed type mismatch: removed explicit `PostgresJsDatabase | NeonHttpDatabase` union, let conditional expression infer type
+- `messages/bg.json`, `messages/en.json` — added `servicesTitle`, `bookThisService`, `heroTitle`, `heroSubtitle` keys
+
+**Deviations / notes:**
+
+- Barber bio fields and service description fields are nullable in schema — component interfaces must use `string | null`
+- `<a href="/book">` replaced with `next/link` `Link` to pass `@next/next/no-html-link-for-pages` lint rule
+- `NeonDatabase` type from `@neondatabase/serverless` is incompatible with `NeonHttpDatabase` in the union — simplified `src/db/index.ts` to conditional expression without explicit type annotation
+- 2 lint warnings remain: `@next/next/no-img-element` for `<img>` in Hero and BarbersSection (acceptable for placeholder/external images; will resolve when real assets are in place)
+
+**Definition of Done:**
+
+- [x] `npm run build` succeeds
+- [x] `npm run lint` passes (0 errors)
+- [x] `npm run typecheck` passes
+- [x] Homepage renders all 6 sections with DB data
+- [x] Services cards link to `/book?service=<id>`
+- [x] Locale-aware content (barber names, service names, hours)
 
 ### Commit 7: Instagram gallery (click-to-load)
 
