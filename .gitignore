@@ -31,6 +31,7 @@ yarn-error.log*
 .pnpm-debug.log*
 
 # env files — .env.example IS committed; local overrides are not
+.env
 .env.local
 .env.*.local
 .env.development.local

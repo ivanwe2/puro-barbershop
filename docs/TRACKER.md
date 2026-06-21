@@ -55,13 +55,83 @@
 
 ### Commit 2: Type-safe env + folder scaffolding
 
-**Status:** 🔲 TODO
+**Status:** ✅ DONE
+
+**Changes:**
+
+- Installed `@t3-oss/env-nextjs`, `zod`
+- `src/lib/env.ts` — Zod-validated env schema for all 20+ variables (server + client)
+- `.env.example` — all vars documented with dev defaults
+- `.gitignore` — updated to only ignore `.env.local` (not `.env.example`)
+- Installed `clsx`, `tailwind-merge`; `src/lib/utils.ts` with `cn()` helper
+- Full directory tree scaffolded — every folder from §3 of the build plan exists with placeholder `export {}` files
+- `messages/bg.json` + `messages/en.json` — empty namespace stubs for next-intl
+
+**Deviations / notes:**
+
+- Added `SEED_ADMIN_PASSWORD` to env schema (Commit 3 requirement)
+
+**Definition of Done:**
+
+- [x] Importing `env` from `@/lib/env` provides typed, validated env access
+- [x] Removing a required env var causes `npm run build` to fail with a clear error
 
 ---
 
 ### Commit 3: Database schema, migrations, seed
 
-**Status:** 🔲 TODO
+**Status:** ✅ DONE
+
+**Changes:**
+
+- **Packages installed:**
+  - Production: `drizzle-orm`, `@neondatabase/serverless`, `postgres`, `bcryptjs`
+  - Dev: `drizzle-kit`, `tsx`, `@types/bcryptjs`, `dotenv`
+- **`drizzle.config.ts`** — points schema at `src/db/schema.ts`, migrations at `drizzle/migrations/`, uses `DATABASE_URL_UNPOOLED` for migration runs. Uses `dotenv/config` for env loading.
+- **`src/db/schema.ts`** — full schema from §7 verbatim:
+  - 8 tables: `users`, `barbers`, `services`, `working_hours`, `time_off`, `bookings`, `settings`, `email_blacklist`
+  - 2 enums: `user_role` (super_admin, barber), `booking_status` (confirmed, cancelled, completed, no_show)
+  - **CRITICAL:** Partial unique index `barber_slot_unique` on `(barberId, startDatetime) WHERE status = 'confirmed'` for double-booking prevention
+  - All foreign keys defined with appropriate cascade/set null behavior
+- **`src/db/index.ts`** — env-driven client:
+  - If `DATABASE_URL` contains `neon.tech` → uses `@neondatabase/serverless` + `drizzle-orm/neon-serverless`
+  - Otherwise → uses `postgres` package + `drizzle-orm/postgres-js` (for local docker)
+- **Migration generated:** `drizzle/migrations/0000_silent_ezekiel.sql`
+- **`drizzle/seed.ts`** — inserts:
+  - 1 super admin user (`admin@purobarbershop.com`, password from `SEED_ADMIN_PASSWORD` env var, bcrypt cost 12, aborts if missing or < 16 chars)
+  - 2 placeholder barbers (`[PLACEHOLDER:barber_1_name]`, `[PLACEHOLDER:barber_2_name]`)
+  - 4 services: Haircut (30min), Haircut+Beard (45min), Beard trim (20min), Kids haircut (30min) — all prices `0.00` (`[PLACEHOLDER:price]`)
+  - Working hours: Mon–Fri 09:00–19:00, Sat 09:00–17:00, Sun closed — for each barber
+  - Settings: `buffer_minutes=15`, `cancellation_window_hours=24`, `booking_horizon_days=60`, `slot_granularity_minutes=15`
+  - `TODO(human):` comment to change admin password on first login
+- **`drizzle/reset.ts`** — drops and recreates local dev DB:
+  - Refuses to run if `DATABASE_URL` contains `neon.tech` (prints error, exits 1)
+  - Drops all tables, enums, and migration tracking
+  - Re-runs migrations via `drizzle-kit migrate`
+  - Re-runs seed via `tsx drizzle/seed.ts`
+- **`.env.local`** — created with dev defaults (gitignored)
+- **`.env`** — created for drizzle-kit (gitignored; added `.env` to `.gitignore`)
+
+**Deviations / notes:**
+
+- `postgres` npm package requires URL passed as first argument (not `{ url: ... }`) — this is how the `postgres-js` driver works
+- Used `drizzle-orm/postgres-js` driver (not `node-postgres`) because the `postgres` npm package is the postgres-js driver
+- `sql` import must come from `drizzle-orm`, not `drizzle-orm/pg-core` — the partial unique index requires `sql` tagged template
+- Price placeholder `[PLACEHOLDER:price]` cannot be stored in a `decimal` column — used `0.00` with inline TODO comments
+- `noUncheckedIndexedAccess` caused `DB_URL` and `seedPassword` to be `string | undefined` — added explicit guards and `as string` casts after validation
+- `drizzle.config.ts` reads from `process.env` directly (not through `@/lib/env`) to avoid requiring all env vars for migration operations
+- Added `dotenv` as dev dependency for drizzle-kit and seed scripts to load `.env` / `.env.local`
+
+**Definition of Done:**
+
+- [x] `npm run db:generate` creates migration SQL
+- [x] `npm run db:migrate` applies migration successfully
+- [x] `npm run db:seed` inserts all seed data
+- [x] `npm run db:reset` drops, migrates, and seeds cleanly
+- [x] `npm run db:reset` refuses to run against Neon URL
+- [x] `npm run lint` passes
+- [x] `npm run typecheck` passes
+- [x] Double-booking prevention index exists in migration SQL
 
 ---
 

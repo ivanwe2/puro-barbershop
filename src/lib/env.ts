@@ -30,6 +30,9 @@ export const env = createEnv({
     // Cron
     CRON_SECRET: z.string().min(16),
 
+    // Dev seed
+    SEED_ADMIN_PASSWORD: z.string().min(16).optional(),
+
     // Node environment
     NODE_ENV: z.enum(["development", "test", "production"]).default("development"),
   },
@@ -67,6 +70,7 @@ export const env = createEnv({
     UPSTASH_REDIS_REST_URL: process.env["UPSTASH_REDIS_REST_URL"],
     UPSTASH_REDIS_REST_TOKEN: process.env["UPSTASH_REDIS_REST_TOKEN"],
     CRON_SECRET: process.env["CRON_SECRET"],
+    SEED_ADMIN_PASSWORD: process.env["SEED_ADMIN_PASSWORD"],
     NODE_ENV: process.env["NODE_ENV"],
     NEXT_PUBLIC_LIGHTWIDGET_ID: process.env["NEXT_PUBLIC_LIGHTWIDGET_ID"],
     NEXT_PUBLIC_SHOP_NAME: process.env["NEXT_PUBLIC_SHOP_NAME"],
