@@ -6,13 +6,8 @@ import * as schema from "./schema";
 
 const isNeon = env.DATABASE_URL.includes("neon.tech");
 
-let db;
-
-if (isNeon) {
-  db = drizzleNeon(env.DATABASE_URL, { schema });
-} else {
-  const client = pg(env.DATABASE_URL, { max: 10 });
-  db = drizzle(client, { schema });
-}
+const db = isNeon
+  ? drizzleNeon(env.DATABASE_URL, { schema })
+  : drizzle(pg(env.DATABASE_URL, { max: 10 }), { schema });
 
 export { db };

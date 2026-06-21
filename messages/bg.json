@@ -24,6 +24,7 @@
     "getDirections": "Посоки"
   },
   "services": {
+    "title": "Услуги",
     "haircut": "Подстрижка",
     "haircutBeard": "Подстрижка + Бръснене",
     "beardTrim": "Бръснене",

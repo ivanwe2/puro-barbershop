@@ -24,6 +24,7 @@
     "getDirections": "Get Directions"
   },
   "services": {
+    "title": "Services",
     "haircut": "Haircut",
     "haircutBeard": "Haircut + Beard",
     "beardTrim": "Beard trim",
