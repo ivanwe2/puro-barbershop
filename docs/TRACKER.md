@@ -175,7 +175,39 @@
 
 ### Commit 5: Localization (next-intl)
 
-**Status:** 🔲 TODO
+**Status:** ✅ DONE
+
+**Changes:**
+
+- Installed `next-intl`
+- `src/lib/i18n/config.ts` — locales `["bg", "en"]`, default `"bg"`, `localePrefix: "always"`
+- `i18n/request.ts` — `getRequestConfig` loading messages from `messages/{locale}.json`
+- `src/lib/i18n/routing.ts` — `createNavigation` with `Link`, `redirect`, `usePathname`, `useRouter`
+- `src/middleware.ts` — `createMiddleware` for locale routing
+- `next.config.ts` — wrapped with `createNextIntlPlugin`
+- `messages/bg.json` — full Bulgarian translations for all 11 namespaces
+- `messages/en.json` — full English translations for all 11 namespaces
+- Header: all nav labels from `nav` namespace, `LocaleSwitcher` with BG/EN toggle
+- Footer: all labels from `footer` namespace, i18n-aware links
+- SloganDivider: reads `common.slogan` and splits on `·`
+- Homepage: reads `home` namespace, CTA from `common.bookNow`
+
+**Deviations / notes:**
+
+- `i18n/request.ts` must live at repo root (not `src/lib/i18n/`) — next-intl v4 requirement
+- `localePrefix: "always"` means `/` redirects to `/bg`
+- `Link` from `createNavigation` is a client component — Header and Footer must be `"use client"`
+- `useRouter()` from `next/navigation` doesn't have `pathname` — used `usePathname()` from our routing instead
+
+**Definition of Done:**
+
+- [x] `/` redirects to `/bg`
+- [x] `/en` shows English copy
+- [x] Switching language preserves the current page
+- [x] All visible strings come from translation files, no hardcoded copy
+- [x] `npm run build` succeeds
+- [x] `npm run lint` passes
+- [x] `npm run typecheck` passes
 
 ### Commit 6: Homepage sections
 
