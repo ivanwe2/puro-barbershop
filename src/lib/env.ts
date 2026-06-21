@@ -43,6 +43,7 @@ export const env = createEnv({
    */
   client: {
     NEXT_PUBLIC_LIGHTWIDGET_ID: z.string().optional(),
+    NEXT_PUBLIC_INSTAGRAM_URL: z.string().url().optional(),
     NEXT_PUBLIC_SHOP_NAME: z.string().min(1),
     NEXT_PUBLIC_SHOP_ADDRESS: z.string().min(1),
     NEXT_PUBLIC_SHOP_PHONE: z.string().optional(),
@@ -73,6 +74,7 @@ export const env = createEnv({
     SEED_ADMIN_PASSWORD: process.env["SEED_ADMIN_PASSWORD"],
     NODE_ENV: process.env["NODE_ENV"],
     NEXT_PUBLIC_LIGHTWIDGET_ID: process.env["NEXT_PUBLIC_LIGHTWIDGET_ID"],
+    NEXT_PUBLIC_INSTAGRAM_URL: process.env["NEXT_PUBLIC_INSTAGRAM_URL"],
     NEXT_PUBLIC_SHOP_NAME: process.env["NEXT_PUBLIC_SHOP_NAME"],
     NEXT_PUBLIC_SHOP_ADDRESS: process.env["NEXT_PUBLIC_SHOP_ADDRESS"],
     NEXT_PUBLIC_SHOP_PHONE: process.env["NEXT_PUBLIC_SHOP_PHONE"],

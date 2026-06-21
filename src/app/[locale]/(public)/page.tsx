@@ -7,9 +7,11 @@ import Hero from "@/components/marketing/Hero";
 import About from "@/components/marketing/About";
 import BarbersSection from "@/components/marketing/BarbersSection";
 import ServicesSection from "@/components/marketing/ServicesSection";
-import GalleryPlaceholder from "@/components/marketing/GalleryPlaceholder";
+import InstagramGallery from "@/components/marketing/InstagramGallery";
 import LocationSection from "@/components/marketing/LocationSection";
 import SloganDivider from "@/components/shared/SloganDivider";
+
+export const revalidate = 3600;
 
 export default async function HomePage() {
   const homeT = await getTranslations("home");
@@ -40,7 +42,7 @@ export default async function HomePage() {
       <SloganDivider />
       <ServicesSection services={activeServices} t={servicesT} />
       <SloganDivider />
-      <GalleryPlaceholder />
+      <InstagramGallery />
       <SloganDivider />
       <LocationSection hoursData={hoursData} t={locationT} />
       <SloganDivider />

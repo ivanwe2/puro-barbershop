@@ -1,6 +1,7 @@
 "use client";
 
 import { useTranslations } from "next-intl";
+import { env } from "@/lib/env";
 import { Link } from "@/lib/i18n/routing";
 import SloganDivider from "./SloganDivider";
 
@@ -90,7 +91,7 @@ export default function Footer() {
         <div className="border-border text-muted-foreground mt-12 flex flex-col items-center justify-between gap-4 border-t pt-6 text-center text-xs md:flex-row">
           <p>{t("copyright", { year: currentYear })}</p>
           <a
-            href="https://www.instagram.com/"
+            href={env.NEXT_PUBLIC_INSTAGRAM_URL ?? "https://www.instagram.com/"}
             target="_blank"
             rel="noopener noreferrer"
             className="text-muted-foreground hover:text-foreground transition-colors"

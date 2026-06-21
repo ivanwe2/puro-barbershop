@@ -243,7 +243,38 @@
 
 ### Commit 7: Instagram gallery (click-to-load)
 
-**Status:** 🔲 TODO
+**Status:** ✅ DONE
+
+**Changes:**
+
+- `src/components/marketing/InstagramGallery.tsx` — click-to-load Instagram gallery:
+  - Default state: styled placeholder with IG icon, notice that loading connects to Instagram and may set cookies, "Show feed" button
+  - On click: iframe with LightWidget embed is mounted (session-only, no cookie/localStorage)
+  - "Hide feed" button to toggle back
+  - If widget ID missing: shows placeholder with fallback link
+  - If iframe fails: error state with fallback link to Instagram
+  - iframe has `sandbox="allow-scripts allow-same-origin allow-popups"` and `referrerPolicy="strict-origin-when-cross-origin"`
+- `src/lib/env.ts` — added `NEXT_PUBLIC_INSTAGRAM_URL` to client schema
+- `.env.example` — added `NEXT_PUBLIC_INSTAGRAM_URL` entry
+- `src/components/shared/Footer.tsx` — Instagram link now reads from `NEXT_PUBLIC_INSTAGRAM_URL` env var
+- `src/app/[locale]/(public)/page.tsx` — replaced `GalleryPlaceholder` with `InstagramGallery`, added `revalidate = 3600`
+
+**Deviations / notes:**
+
+- `NEXT_PUBLIC_LIGHTWIDGET_ID` was already in the env schema (optional) — no change needed
+- When widget ID is absent, the component falls back to a placeholder card with a link to Instagram (no broken iframe)
+- Session-only state (`useState`) — no cookie or localStorage used, consistent with GDPR click-to-load pattern
+- Instagram SVG icon inlined to avoid external dependency
+
+**Definition of Done:**
+
+- [x] Gallery section shows placeholder by default — no third-party requests on first page load
+- [x] Clicking "Show feed" mounts the iframe and IG content appears
+- [x] If widget ID is missing, fallback link shows instead of a broken iframe
+- [x] iframe has sandbox and referrer policy restrictions
+- [x] `npm run build` succeeds
+- [x] `npm run lint` passes (0 errors)
+- [x] `npm run typecheck` passes
 
 ### Commit 8: Legal pages
 
@@ -325,16 +356,16 @@
 
 ## Blockers / Human-action required
 
-| #   | Description                                                                                          | Status           |
-| --- | ---------------------------------------------------------------------------------------------------- | ---------------- |
-| B1  | Neon database — human must sign up and provide `DATABASE_URL` and `DATABASE_URL_UNPOOLED` (Commit 3) | 🔲 Pending human |
-| B2  | Resend API key — human must create account and provide `RESEND_API_KEY` (Commit 12)                  | 🔲 Pending human |
-| B3  | Upstash Redis credentials — human must create free account (Commit 11)                               | 🔲 Pending human |
-| B4  | Cloudinary account + upload preset — human must configure for barber photos (Commit 17)              | 🔲 Pending human |
-| B5  | LightWidget account + widget ID for Instagram embed (Commit 7)                                       | 🔲 Pending human |
-| B6  | Real photography: hero image, barber photos (Commit 6+)                                              | 🔲 Pending human |
-| B7  | Google Maps embed URL / map pin for the shop                                                         | 🔲 Pending human |
-| B8  | Shop phone, email, legal entity name, EIK/VAT, registered address                                    | 🔲 Pending human |
+| #   | Description                                                                                          | Status                                               |
+| --- | ---------------------------------------------------------------------------------------------------- | ---------------------------------------------------- |
+| B1  | Neon database — human must sign up and provide `DATABASE_URL` and `DATABASE_URL_UNPOOLED` (Commit 3) | 🔲 Pending human                                     |
+| B2  | Resend API key — human must create account and provide `RESEND_API_KEY` (Commit 12)                  | 🔲 Pending human                                     |
+| B3  | Upstash Redis credentials — human must create free account (Commit 11)                               | 🔲 Pending human                                     |
+| B4  | Cloudinary account + upload preset — human must configure for barber photos (Commit 17)              | 🔲 Pending human                                     |
+| B5  | LightWidget account + widget ID for Instagram embed (Commit 7)                                       | 🔲 Pending human (widget ID and IG URL still needed) |
+| B6  | Real photography: hero image, barber photos (Commit 6+)                                              | 🔲 Pending human                                     |
+| B7  | Google Maps embed URL / map pin for the shop                                                         | 🔲 Pending human                                     |
+| B8  | Shop phone, email, legal entity name, EIK/VAT, registered address                                    | 🔲 Pending human                                     |
 
 ---
 
