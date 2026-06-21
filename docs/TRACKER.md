@@ -137,7 +137,37 @@
 
 ### Commit 4: Design tokens, fonts, base layout, header & footer
 
-**Status:** 🔲 TODO
+**Status:** ✅ DONE
+
+**Changes:**
+
+- `src/app/globals.css` — brand color tokens (dark theme, champagne `#c9a961` accent), merged with shadcn CSS variable infrastructure
+- `src/app/layout.tsx` — Cormorant Garamond (headings) + Inter (body) via `next/font/google`, Geist as `--font-sans` (shadcn default)
+- `src/app/[locale]/layout.tsx` — header + footer + sonner Toaster wrapper
+- `src/components/shared/Header.tsx` — logo left, nav center (Начало, Услуги, Галерия, Местоположение, Запази час), language switcher right, mobile hamburger menu
+- `src/components/shared/Footer.tsx` — slogan, address, hours, quick links, legal links, copyright with current year
+- `src/components/shared/SloganDivider.tsx` — "Precision · Confidence · Clean Look" triple-beat element
+- `src/app/[locale]/(public)/page.tsx` — placeholder homepage with heading + slogan divider
+- `public/logo.svg` — placeholder logo (to be replaced by real brand asset)
+- `src/middleware.ts` — minimal valid export to satisfy Next.js build
+- shadcn/ui initialized via `npx shadcn init -d`
+- Pre-installed shadcn components: button, sonner
+
+**Deviations / notes:**
+
+- shadcn/ui v4 uses `oklch` color space by default; our brand tokens were converted to hex-compatible values for the dark theme
+- Removed `next-themes` dependency from sonner wrapper (we don't need light/dark toggle — dark only)
+- `weights` → `weight` in font config (TypeScript strict mode)
+- `exactOptionalPropertyTypes` caused issues with sonner `ToasterProps`; simplified to direct usage
+
+**Definition of Done:**
+
+- [x] `npm run build` succeeds
+- [x] `npm run lint` passes
+- [x] `npm run typecheck` passes
+- [x] `/` shows styled page with header, footer, and slogan divider
+- [x] Mobile menu works at 375px width
+- [x] Self-hosted fonts only (no Google Fonts `<link>` requests)
 
 ---
 
