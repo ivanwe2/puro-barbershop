@@ -1,3 +1,8 @@
-// i18n routing — Commit 5
-// This file will be implemented in a later commit.
-export {};
+import { createNavigation } from "next-intl/navigation";
+import { locales, defaultLocale } from "./config";
+
+export const { Link, redirect, usePathname, useRouter } = createNavigation({
+  locales,
+  defaultLocale,
+  localePrefix: "always",
+});

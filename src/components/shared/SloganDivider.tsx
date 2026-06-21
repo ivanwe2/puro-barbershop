@@ -1,11 +1,19 @@
+"use client";
+
+import { useTranslations } from "next-intl";
+
 export default function SloganDivider() {
+  const t = useTranslations("common");
+  const slogan = t("slogan");
+  const parts = slogan.split(" · ");
+
   return (
     <div className="flex items-center justify-center gap-4 py-12">
-      <span className="font-heading text-muted-foreground text-xl italic">Precision</span>
-      <span className="text-accent">·</span>
-      <span className="font-heading text-muted-foreground text-xl italic">Confidence</span>
-      <span className="text-accent">·</span>
-      <span className="font-heading text-muted-foreground text-xl italic">Clean Look</span>
+      {parts.map((part) => (
+        <span key={part} className="font-heading text-muted-foreground text-xl italic">
+          {part}
+        </span>
+      ))}
     </div>
   );
 }

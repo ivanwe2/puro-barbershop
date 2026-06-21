@@ -1,3 +1,4 @@
-// i18n config — Commit 5
-// This file will be implemented in a later commit.
-export {};
+export const locales = ["bg", "en"] as const;
+export type Locale = (typeof locales)[number];
+
+export const defaultLocale: Locale = "bg";

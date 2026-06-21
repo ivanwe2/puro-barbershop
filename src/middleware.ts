@@ -1,11 +1,14 @@
-import { NextResponse } from "next/server";
-import type { NextRequest } from "next/server";
+import createMiddleware from "next-intl/middleware";
+import { locales, defaultLocale } from "@/lib/i18n/config";
 
-// TODO: Implement locale routing + auth gating in Commits 5 & 13
-export function middleware(_request: NextRequest) {
-  return NextResponse.next();
-}
+export default createMiddleware({
+  locales,
+  defaultLocale,
+  localePrefix: "always",
+});
 
 export const config = {
-  matcher: ["/((?!api|_next/static|_next/image|favicon.ico).*)"],
+  matcher: [
+    "/((?!api|_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
+  ],
 };

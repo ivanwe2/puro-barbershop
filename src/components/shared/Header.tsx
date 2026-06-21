@@ -1,26 +1,50 @@
 "use client";
 
+import { useTranslations } from "next-intl";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
-import Link from "next/link";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
+import { Link, usePathname } from "@/lib/i18n/routing";
 
-const navLinks = [
-  { href: "/bg", label: "Начало", locale: "bg" },
-  { href: "/bg/services", label: "Услуги", locale: "bg" },
-  { href: "/bg/gallery", label: "Галерия", locale: "bg" },
-  { href: "/bg/location", label: "Местоположение", locale: "bg" },
-  { href: "/bg/book", label: "Запази час", locale: "bg" },
-];
+function LocaleSwitcher() {
+  const pathname = usePathname();
+  const router = useRouter();
+  const currentLocale = pathname.split("/")[1] ?? "bg";
+  const otherLocale = currentLocale === "bg" ? "en" : "bg";
+  const otherLabel = otherLocale.toUpperCase();
+
+  return (
+    <button
+      type="button"
+      onClick={() => router.replace(pathname.replace(currentLocale, otherLocale))}
+      className={cn(
+        "border-border text-muted-foreground hover:text-foreground rounded-md border px-2 py-1 text-xs font-medium transition-colors",
+      )}
+      aria-label="Switch language"
+    >
+      {otherLabel}
+    </button>
+  );
+}
 
 export default function Header() {
+  const t = useTranslations("nav");
   const [mobileOpen, setMobileOpen] = useState(false);
+
+  const navItems = [
+    { href: "/", label: t("home") },
+    { href: "/#services", label: t("services") },
+    { href: "/#gallery", label: t("gallery") },
+    { href: "/#location", label: t("location") },
+  ];
+
+  const bookHref = "/book";
 
   return (
     <header className="border-border bg-background/95 supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50 w-full border-b backdrop-blur">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
-        {/* Logo */}
-        <Link href="/bg" className="flex items-center gap-2">
+        <Link href="/" className="flex items-center gap-2">
           <Image
             src="/logo.svg"
             alt="Puro Barbershop"
@@ -33,31 +57,29 @@ export default function Header() {
           </span>
         </Link>
 
-        {/* Desktop nav */}
         <nav className="hidden md:flex md:items-center md:gap-6">
-          {navLinks.map((link) => (
+          {navItems.map((item) => (
             <Link
-              key={link.href}
-              href={link.href}
+              key={item.href}
+              href={item.href}
               className={cn(
                 "text-muted-foreground hover:text-foreground text-sm font-medium transition-colors",
-                link.label === "Запази час" &&
-                  "border-accent text-accent hover:bg-accent hover:text-accent-foreground rounded-md border px-3 py-1.5",
               )}
             >
-              {link.label}
+              {item.label}
             </Link>
           ))}
-          <button
-            type="button"
-            className="border-border text-muted-foreground hover:text-foreground rounded-md border px-2 py-1 text-xs font-medium transition-colors"
-            aria-label="Switch to English"
+          <Link
+            href={bookHref}
+            className={cn(
+              "border-accent text-accent hover:bg-accent hover:text-accent-foreground rounded-md border px-3 py-1.5 text-sm font-medium transition-colors",
+            )}
           >
-            EN
-          </button>
+            {t("book")}
+          </Link>
+          <LocaleSwitcher />
         </nav>
 
-        {/* Mobile hamburger */}
         <button
           type="button"
           className="border-border flex h-10 w-10 items-center justify-center rounded-md border md:hidden"
@@ -100,31 +122,32 @@ export default function Header() {
         </button>
       </div>
 
-      {/* Mobile menu */}
       {mobileOpen && (
         <div className="border-border border-t md:hidden">
           <nav className="mx-auto flex max-w-7xl flex-col gap-2 px-4 py-4 sm:px-6 lg:px-8">
-            {navLinks.map((link) => (
+            {navItems.map((item) => (
               <Link
-                key={link.href}
-                href={link.href}
+                key={item.href}
+                href={item.href}
                 onClick={() => setMobileOpen(false)}
                 className={cn(
                   "text-muted-foreground hover:bg-muted hover:text-foreground rounded-md px-3 py-2 text-sm font-medium transition-colors",
-                  link.label === "Запази час" &&
-                    "border-accent text-accent hover:bg-accent hover:text-accent-foreground border",
                 )}
               >
-                {link.label}
+                {item.label}
               </Link>
             ))}
-            <div className="mt-2 flex items-center justify-between px-3 py-2">
-              <button
-                type="button"
-                className="border-border text-muted-foreground hover:text-foreground rounded-md border px-3 py-1.5 text-xs font-medium transition-colors"
-              >
-                EN
-              </button>
+            <Link
+              href={bookHref}
+              onClick={() => setMobileOpen(false)}
+              className={cn(
+                "border-accent text-accent hover:bg-accent hover:text-accent-foreground rounded-md border px-3 py-2 text-sm font-medium transition-colors",
+              )}
+            >
+              {t("book")}
+            </Link>
+            <div className="px-3 py-2">
+              <LocaleSwitcher />
             </div>
           </nav>
         </div>
