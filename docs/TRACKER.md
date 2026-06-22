@@ -622,7 +622,33 @@
 
 ### Commit 16: Time off management
 
-**Status:** 🔲 TODO
+**Status:** ✅ DONE
+
+**Changes:**
+
+- `src/actions/admin/time-off.ts` — Server Actions for time-off CRUD:
+  - `fetchTimeOffEntries` — lists all entries, filtered by barber role
+  - `createTimeOff` — creates entry with Zod validation, barber ownership check, end > start check, overlapping booking warning
+  - `updateTimeOff` — edits entry with ownership check, barber can only edit own
+  - `deleteTimeOff` — deletes entry with ownership check, warns about overlapping bookings
+  - All actions revalidate `/admin/time-off` and `/admin/schedule`
+- `src/app/[locale]/(admin)/admin/time-off/page.tsx` — server component fetching initial data
+- `src/app/[locale]/(admin)/admin/time-off/TimeOffClient.tsx` — client component with:
+  - List of time-off entries with past/future distinction
+  - Create dialog with barber selector (super admin only), datetime-local inputs, reason textarea
+  - Edit dialog (pre-filled)
+  - Delete confirmation dialog
+  - Overlapping bookings warning dialog
+  - Toast notifications for success/error
+
+**Deviations / notes:**
+
+- `exactOptionalPropertyTypes` requires conditional spread for `barberId` prop
+- `lte`/`gte` on timestamp columns need `Date` objects, not strings
+- `Select` component from `@base-ui/react` doesn't wire to form `name` attribute — barberId is set via `defaultValue` and the form reads it from state; for create, barberId is injected server-side from session if barber role
+- Create action reloads page on success to get fresh data from server
+- Overlapping bookings check queries `bookings` table during create and delete
+- Past entries are visually dimmed and not editable/deletable
 
 ### Commit 17: Super admin CRUD
 
