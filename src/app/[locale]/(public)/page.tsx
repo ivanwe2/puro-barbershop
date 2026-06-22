@@ -1,4 +1,5 @@
 import { getTranslations } from "next-intl/server";
+import type { Metadata } from "next";
 import Link from "next/link";
 import { db } from "@/db";
 import { barbers, services, workingHours } from "@/db/schema";
@@ -13,7 +14,42 @@ import SloganDivider from "@/components/shared/SloganDivider";
 
 export const revalidate = 3600;
 
-export default async function HomePage() {
+export async function generateMetadata(props: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const params = await props.params;
+  const t = await getTranslations({ locale: params.locale, namespace: "home" });
+  const common = await getTranslations({ locale: params.locale, namespace: "common" });
+  const baseUrl = process.env.AUTH_URL || "https://purobarbershop.com";
+
+  return {
+    title: `${t("heroTitle")} — ${common("slogan")}`,
+    description: `${t("heroSubtitle")} | ${t("address")}`,
+    alternates: {
+      canonical: `${baseUrl}/${params.locale}`,
+      languages: {
+        bg: `${baseUrl}/bg`,
+        en: `${baseUrl}/en`,
+      },
+    },
+    openGraph: {
+      title: t("heroTitle"),
+      description: common("slogan"),
+      url: `${baseUrl}/${params.locale}`,
+      siteName: t("heroTitle"),
+      locale: params.locale === "bg" ? "bg_BG" : "en_US",
+      type: "website",
+    },
+    twitter: {
+      card: "summary",
+      title: t("heroTitle"),
+      description: common("slogan"),
+    },
+  };
+}
+
+export default async function HomePage(props: { params: Promise<{ locale: string }> }) {
+  const params = await props.params;
   const homeT = await getTranslations("home");
   const commonT = await getTranslations("common");
   const servicesT = await getTranslations("services");
@@ -33,8 +69,41 @@ export default async function HomePage() {
 
   const hoursData = await db.select().from(workingHours).where(eq(workingHours.active, true));
 
+  const locale = params.locale;
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "HairSalon",
+    name: locale === "bg" ? "Puro Barbershop" : "Puro Barbershop",
+    address: {
+      "@type": "PostalAddress",
+      streetAddress: locale === "bg" ? "Бул. Христо Ботев 114" : "114 Hristo Botev Blvd",
+      addressLocality: "Plovdiv",
+      addressCountry: "BG",
+    },
+    telephone: "[PLACEHOLDER:shop_phone]",
+    openingHoursSpecification: [
+      {
+        "@type": "OpeningHoursSpecification",
+        dayOfWeek: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+        opens: "09:00",
+        closes: "19:00",
+      },
+      {
+        "@type": "OpeningHoursSpecification",
+        dayOfWeek: ["Saturday"],
+        opens: "09:00",
+        closes: "17:00",
+      },
+    ],
+    priceRange: "$$",
+  };
+
   return (
     <div className="flex flex-col">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       <Hero t={homeT} common={commonT} />
       <About t={homeT} />
       <SloganDivider />
