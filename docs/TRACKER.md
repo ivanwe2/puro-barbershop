@@ -580,9 +580,45 @@
 - Week stats use Monday-Sunday range per Sofia timezone
 - Logout uses `<form action={logoutAction}>` pattern — no client-side auth import needed
 
-### Commit 15: Schedule view
+### Commit 15: Schedule view (calendar)
 
-**Status:** 🔲 TODO
+**Status:** ✅ DONE
+
+**Changes:**
+
+- `src/actions/admin/schedule.ts` — Server Actions for schedule:
+  - `fetchScheduleBookings` — fetches bookings for a date range with optional barber filter; joins services/barbers; returns barber color assignment
+  - `fetchBarbers` — fetches active barbers for filter dropdown
+  - `fetchTimeOff` — fetches time-off entries overlapping a date range
+  - `updateBookingStatus` — changes booking status (completed/cancelled/no_show) with role-based authorization (barber can only edit own bookings, super admin can edit any)
+  - All actions check auth session; barber role is filtered to their own barberId
+- `src/app/[locale]/(admin)/admin/schedule/types.ts` — `BookingRow` type definition
+- `src/app/[locale]/(admin)/admin/schedule/page.tsx` — server component that fetches initial data and passes to client component
+- `src/app/[locale]/(admin)/admin/schedule/ScheduleClient.tsx` — client component with:
+  - Day/Week view toggle via Tabs
+  - Barber filter dropdown via Select
+  - Week navigation (prev/next/today)
+  - Week view: CSS grid with 7 columns, one per day; bookings as colored cards; time-off as amber overlays
+  - Day view: vertical list of days with booking cards
+  - Booking detail dialog: click any booking → modal with full details
+  - Status actions: Mark Completed, Mark No-Show, Cancel (only for confirmed bookings)
+  - Confirmation dialog before destructive actions
+- `src/components/ui/dialog.tsx` — custom dialog component (no external dependency)
+- `src/components/ui/table.tsx` — shadcn table component (added via shadcn CLI)
+- i18n keys added: `viewDay`, `viewWeek`, `filterBarber`, `allBarbers`, `noBookings`, `bookingDetails`, `customerName`, `customerPhone`, `customerEmail`, `service`, `time`, `date`, `status`, `notes`, `markCompleted`, `markNoShowConfirm`, `cancelConfirm`, `close`, `prevWeek`, `nextWeek`, `today`, `monday`–`sunday`, `confirm`
+
+**Deviations / notes:**
+
+- No `react-big-calendar` — built with CSS grid per plan spec
+- Dialog is custom (no `@radix-ui/react-dialog` or `@base-ui/react/dialog`) to avoid extra dependency; simple open/close state
+- Barber colors assigned by ID (5 predefined, fallback to gray)
+- Week view is default; day view available via toggle
+- Status badge labels use `statusConfirmed`/`statusCompleted`/`statusCancelled`/`statusNoShow` keys from admin namespace
+- `exactOptionalPropertyTypes` requires conditional spread for `barberId` in fetch calls
+- `noUncheckedIndexedAccess` requires `!` on `dayLabels[dayOfWeek]` and `titleMap[action.action]`
+- `Select` from `@base-ui/react/select` allows `string | null` value — state typed accordingly
+- `updateBookingStatus` revalidates `/admin/schedule` path after mutation
+- Time off shown as amber overlays in week view; booking cards colored by barber
 
 ### Commit 16: Time off management
 
