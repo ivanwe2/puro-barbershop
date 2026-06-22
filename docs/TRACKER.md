@@ -652,7 +652,37 @@
 
 ### Commit 17: Super admin CRUD
 
-**Status:** 🔲 TODO
+**Status:** ✅ DONE
+
+**Changes:**
+
+- `src/actions/admin/barbers.ts` — CRUD server actions:
+  - `fetchBarbersList` — lists all barbers
+  - `createBarber` — creates barber + default working hours (Mon-Fri 09-19, Sat 09-17)
+  - `updateBarber` — edits barber details
+  - `deleteBarber` — removes barber (cascades working hours)
+  - All super admin only; revalidate public pages
+- `src/actions/admin/services.ts` — CRUD server actions:
+  - `fetchServicesList` — lists all services
+  - `createService` — creates service with Zod validation
+  - `updateService` — edits service
+  - `deleteService` — removes service
+  - All super admin only; revalidate public pages
+- `src/actions/admin/settings.ts` — settings management:
+  - `fetchSettings` — loads current settings from DB
+  - `updateSettings` — upserts all settings keys
+  - Zod validation for buffer, cancellation window, horizon, granularity, email, phone
+- `src/app/[locale]/(admin)/admin/barbers/page.tsx` + `BarbersClient.tsx` — barbers list with create/edit/delete dialogs
+- `src/app/[locale]/(admin)/admin/services/page.tsx` + `ServicesClient.tsx` — services list with create/edit/delete dialogs
+- `src/app/[locale]/(admin)/admin/settings/page.tsx` + `SettingsClient.tsx` — settings form with all fields
+
+**Deviations / notes:**
+
+- `.returning()` without args — this Drizzle version doesn't support field selection in `.returning()`
+- Create barber auto-generates default working hours (Mon-Fri 09-19, Sat 09-17, Sun closed)
+- `z.string().regex(/^\d+$/).transform(Number).default(0)` — default must be `number` after transform, not string
+- `Textarea` import was missing from ServicesClient — added
+- No Cloudinary integration yet (blocked on B4 — human must provide account)
 
 ---
 
@@ -660,27 +690,90 @@
 
 ### Commit 18: Cookie info page
 
-**Status:** 🔲 TODO
+**Status:** ✅ DONE
+
+**Changes:**
+
+- Fixed footer link from `/legal/cookies` to `/legal/cookie-info` (page already existed from Commit 8)
+- IG gallery already had disclosure copy (`loadingNotice` key)
+- No banner needed — only strictly necessary cookies (auth session, locale)
 
 ### Commit 19: SEO, structured data, sitemap
 
-**Status:** 🔲 TODO
+**Status:** ✅ DONE
+
+**Changes:**
+
+- `src/app/robots.ts` — robots.txt via `MetadataRoute.Robots`; disallows `/admin/` and `/api/`
+- `src/app/sitemap.ts` — dynamic sitemap via `MetadataRoute.Sitemap`; homepage + 3 legal pages × 2 locales
+- `src/app/[locale]/(public)/layout.tsx` — `generateMetadata` with title template, description, canonical, hreflang alternates
+- `src/app/[locale]/(public)/page.tsx` — JSON-LD `HairSalon` structured data; OG + Twitter meta
+- `src/app/[locale]/(public)/book/layout.tsx` — `noindex` on booking page
+- Legal pages — static metadata with titles
+- Footer: fixed cookie-info link from `/legal/cookies` to `/legal/cookie-info`
 
 ---
 
 ## Phase 6 — Production readiness
 
-### Commit 20: Cron jobs
+### Commit 20: Cron jobs (reminders + retention)
 
-**Status:** 🔲 TODO
+**Status:** ✅ DONE
+
+**Changes:**
+
+- `src/app/api/cron/reminders/route.ts` — hourly reminder cron:
+  - Verifies `CRON_SECRET` via Authorization header
+  - Finds bookings 23-25h in the future with `reminderSent=false`
+  - Sends reminder email with locale-aware service/barber names
+  - Sets `reminderSent=true`
+- `src/app/api/cron/retention/route.ts` — daily retention cron (03:00 UTC):
+  - Verifies `CRON_SECRET`
+  - Deletes completed/cancelled/no_show bookings older than 12 months
+  - Logs deleted count
+- `vercel.json` — cron schedule configuration
 
 ### Commit 21: Security headers, CSP
 
-**Status:** 🔲 TODO
+**Status:** ✅ DONE
+
+**Changes:**
+
+- `next.config.ts` — headers configuration:
+  - `Strict-Transport-Security: max-age=63072000; includeSubDomains; preload`
+  - `X-Frame-Options: DENY`
+  - `X-Content-Type-Options: nosniff`
+  - `Referrer-Policy: strict-origin-when-cross-origin`
+  - `Permissions-Policy: camera=(), microphone=(), geolocation=()`
+  - `Content-Security-Policy`:
+    - `default-src 'self'`
+    - `script-src 'self' 'unsafe-inline' 'unsafe-eval'` (Next.js requires)
+    - `style-src 'self' 'unsafe-inline'` (Tailwind requires)
+    - `img-src 'self' data: https: blob:` (Cloudinary, IG, data URIs)
+    - `font-src 'self' data:` (self-hosted fonts)
+    - `connect-src 'self' https://*.upstash.io` (rate limiting)
+    - `frame-src 'self' https://lightwidget.com https://cdn.lightwidget.com` (IG gallery)
+    - `frame-ancestors 'none'` (clickjacking)
+    - `base-uri 'self'`
+    - `form-action 'self'`
 
 ### Commit 22: E2E test, CI/CD, README
 
-**Status:** 🔲 TODO
+**Status:** ✅ DONE
+
+**Changes:**
+
+- `playwright.config.ts` — Playwright config:
+  - chromium only, auto-starts dev server
+  - CI mode: retries 2x, single worker
+- `tests/e2e/booking.spec.ts` — critical-path E2E test:
+  - Homepage → Book Now → select service → select barber → pick date/time → fill details → confirm
+  - Asserts confirmation screen appears
+- `.github/workflows/ci.yml` — GitHub Actions CI:
+  - On PR and push to main
+  - Steps: install → lint → typecheck → unit tests → build
+  - npm cache, Node 20
+- `README.md` — added `test:e2e` script to table
 
 ---
 
