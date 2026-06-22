@@ -458,7 +458,52 @@
 
 ### Commit 12: Emails + cancellation flow
 
-**Status:** 🔲 TODO
+**Status:** ✅ DONE
+
+**Changes:**
+
+- `src/lib/email/client.ts` — `EmailClient` interface with 2 implementations:
+  - `ResendEmailClient` (prod, uses `resend` npm package)
+  - `SmtpEmailClient` (dev, uses `nodemailer` → Mailpit on `localhost:1025`)
+  - `createEmailClient()` factory selects based on `EMAIL_TRANSPORT` env var
+- `src/lib/email/templates/` — 4 react-email templates (brand-colored, dark-on-light for inbox readability):
+  - `CustomerConfirmation.tsx` — booking details, cancellation link, shop address & phone
+  - `BarberNotification.tsx` — new booking alert for assigned barber
+  - `CustomerCancellation.tsx` — confirmation of cancellation
+  - `CustomerReminder.tsx` — 24h reminder with cancel button
+- `src/lib/email/index.tsx` — named send functions wrapping templates + client, with error logging
+- `src/actions/cancel-booking.ts` — `cancelBooking` server action:
+  1. Find booking by cancellation token
+  2. Verify HMAC token matches booking ID
+  3. Check booking is not already cancelled
+  4. Check >= 24h before start time
+  5. Update booking status to 'cancelled'
+  6. Send cancellation email (fire-and-forget)
+  7. Generic "cannotCancel" error for all failure cases (security)
+- `src/app/[locale]/(public)/book/cancel/[token]/page.tsx` — cancellation UI:
+  - Shows confirmation prompt with cancel button
+  - On success: shows "Booking cancelled" + back to home
+  - On failure: shows "Please call us" (generic, no details leaked)
+- `src/app/[locale]/(public)/book/confirmation/page.tsx` — standalone confirmation page:
+  - Fetches booking by `?id=<bookingId>` from URL
+  - Shows masked email (`j***@example.com`) and phone (`+359 *** *** 23`)
+  - Locale-aware service/barber name display
+- `src/actions/booking.ts` — wired emails into `createBooking`:
+  - Sends customer confirmation email (fire-and-forget, doesn't block response)
+  - Sends barber notification email (if barber has linked user account)
+  - Locale-aware service/barber names and address
+- `messages/bg.json`, `messages/en.json` — added `cancel` key to booking namespace
+
+**Deviations / notes:**
+
+- Email templates use inline styles (required by react-email for email client compatibility)
+- Shop address is hardcoded in locale-appropriate form (not from DB) — same as i18n keys
+- Barber notification only sent if barber has a linked `userId` with email
+- Cancellation token verification uses HMAC — token is invalidated if booking ID changes
+- Cancellation page returns generic "cannotCancel" for all failure modes (invalid token, already cancelled, <24h window)
+- Confirmation page re-fetches booking from DB (not relying on client-side state)
+- `detect-object-injection` warnings in email templates are from `params` spread — acceptable for email rendering
+- `EMAIL_TRANSPORT` env var already existed in schema from earlier commits
 
 ---
 

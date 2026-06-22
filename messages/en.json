@@ -62,7 +62,8 @@
     "confirmationBookingId": "Your booking #{id} is confirmed.",
     "confirmationEmailSent": "We've sent a confirmation to your email.",
     "backToHome": "Back to home",
-    "booking_error": "Something went wrong. Please try again."
+    "booking_error": "Something went wrong. Please try again.",
+    "cancel": "Cancel Booking"
   },
   "gallery": {
     "title": "Gallery",

@@ -4,10 +4,13 @@ import { eq, asc, and } from "drizzle-orm";
 import { db } from "@/db";
 import { getAvailableSlots, getAvailableSlotsForAnyBarber } from "@/lib/booking/availability";
 import { getSlotsSchema, bookingDetailsSchema } from "@/lib/booking/schema";
-import { barbers, services, bookings, emailBlacklist } from "@/db/schema";
+import { barbers, services, bookings, emailBlacklist, users } from "@/db/schema";
 import { generateCancellationToken } from "@/lib/booking/tokens";
 import { rateLimiters } from "@/lib/rate-limit";
 import { headers } from "next/headers";
+import { sendBookingConfirmation, sendBarberNotification } from "@/lib/email";
+import { format } from "date-fns";
+import { env } from "@/lib/env";
 import type { InferSelectModel } from "drizzle-orm";
 
 type ServiceRow = InferSelectModel<typeof services>;
@@ -245,8 +248,57 @@ export async function createBooking(input: unknown): Promise<CreateBookingResult
       .set({ cancellationToken: realToken })
       .where(eq(bookings.id, bookingId));
 
-    // Trigger emails asynchronously (don't block response)
-    // TODO(human): Wire up confirmation + barber notification emails (Commit 12)
+    // Fetch service and barber names for emails
+    const barberRows = await db.select().from(barbers).where(eq(barbers.id, resolvedBarberId));
+    const barber = barberRows.find((b) => b.id === resolvedBarberId);
+
+    const serviceName = locale === "bg" ? service.nameBg : service.nameEn;
+    const barberName = barber
+      ? locale === "bg"
+        ? barber.nameBg
+        : barber.nameEn
+      : "Puro Barbershop";
+
+    const dateStr = format(startDatetime, "EEEE, MMMM d, yyyy");
+    const timeStr = format(startDatetime, "HH:mm");
+
+    const cancellationLink = `${env.AUTH_URL}/${locale}/book/cancel/${realToken}`;
+
+    // Send emails asynchronously (don't block response)
+    sendBookingConfirmation({
+      to: sanitizedEmail,
+      name: sanitizedName,
+      date: dateStr,
+      time: timeStr,
+      serviceName,
+      barberName,
+      cancellationLink,
+      address:
+        locale === "bg"
+          ? "Бул. Христо Ботев 114, Пловдив, България"
+          : "114 Hristo Botev Blvd, Plovdiv, Bulgaria",
+      phone: env.NEXT_PUBLIC_SHOP_PHONE ?? "",
+    }).catch((err) => {
+      console.error("[booking] Failed to send confirmation email:", err);
+    });
+
+    if (barber?.userId) {
+      const userRows = await db.select().from(users).where(eq(users.id, barber.userId));
+      const user = userRows.find((u) => u.id === barber.userId);
+      if (user?.email) {
+        sendBarberNotification({
+          to: user.email,
+          barberName,
+          customerName: sanitizedName,
+          date: dateStr,
+          time: timeStr,
+          serviceName,
+          customerPhone: sanitizedPhone,
+        }).catch((err) => {
+          console.error("[booking] Failed to send barber notification:", err);
+        });
+      }
+    }
 
     return { success: true, bookingId };
   } catch (err) {
