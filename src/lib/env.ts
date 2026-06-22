@@ -26,6 +26,7 @@ export const env = createEnv({
     // Rate limiting
     UPSTASH_REDIS_REST_URL: z.string().url().optional(),
     UPSTASH_REDIS_REST_TOKEN: z.string().optional(),
+    RATE_LIMIT_DEV: z.enum(["on", "off"]).default("on"),
 
     // Cron
     CRON_SECRET: z.string().min(16),
@@ -70,6 +71,7 @@ export const env = createEnv({
     SMTP_PORT: process.env["SMTP_PORT"],
     UPSTASH_REDIS_REST_URL: process.env["UPSTASH_REDIS_REST_URL"],
     UPSTASH_REDIS_REST_TOKEN: process.env["UPSTASH_REDIS_REST_TOKEN"],
+    RATE_LIMIT_DEV: process.env["RATE_LIMIT_DEV"],
     CRON_SECRET: process.env["CRON_SECRET"],
     SEED_ADMIN_PASSWORD: process.env["SEED_ADMIN_PASSWORD"],
     NODE_ENV: process.env["NODE_ENV"],

@@ -58,7 +58,11 @@
     "cancelExpired": "Cannot cancel this booking. Please call us.",
     "tooManyRequests": "Too many requests. Please try again later.",
     "privacy": "Privacy Policy",
-    "terms": "Terms of Service"
+    "terms": "Terms of Service",
+    "confirmationBookingId": "Your booking #{id} is confirmed.",
+    "confirmationEmailSent": "We've sent a confirmation to your email.",
+    "backToHome": "Back to home",
+    "booking_error": "Something went wrong. Please try again."
   },
   "gallery": {
     "title": "Gallery",

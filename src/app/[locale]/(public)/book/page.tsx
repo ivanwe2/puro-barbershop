@@ -2,14 +2,14 @@
 
 import { useTranslations } from "next-intl";
 import { useState, useEffect, useCallback } from "react";
-import { useSearchParams, useRouter } from "next/navigation";
+import { useSearchParams, useRouter, useParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import Stepper from "@/components/booking/Stepper";
 import StepService from "@/components/booking/StepService";
 import StepBarber from "@/components/booking/StepBarber";
 import StepDateTime from "@/components/booking/StepDateTime";
 import StepDetails from "@/components/booking/StepDetails";
-import { fetchServices, fetchBarbers } from "@/actions/booking";
+import { fetchServices, fetchBarbers, createBooking } from "@/actions/booking";
 import type { InferSelectModel } from "drizzle-orm";
 import { services, barbers } from "@/db/schema";
 import { format } from "date-fns";
@@ -23,6 +23,10 @@ interface BookingState {
   barberId: number | "any";
   date: Date | null;
   time: string | null;
+}
+
+interface BookingConfirmation {
+  bookingId: number;
 }
 
 const STEPS = 4;
@@ -51,6 +55,8 @@ export default function BookPage() {
   const t = useTranslations("booking");
   const searchParams = useSearchParams();
   const router = useRouter();
+  const params = useParams();
+  const locale = (params.locale as string) ?? "bg";
 
   const [data, setData] = useState({
     services: [] as ServiceRow[],
@@ -59,6 +65,8 @@ export default function BookPage() {
   const [loading, setLoading] = useState(true);
   const [state, setState] = useState<BookingState>(() => parseInitialState(searchParams));
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
+  const [confirmation, setConfirmation] = useState<BookingConfirmation | null>(null);
 
   // Load initial data
   useEffect(() => {
@@ -119,23 +127,67 @@ export default function BookPage() {
     }
   };
 
-  const handleDetailsSubmit = (details: {
+  const handleDetailsSubmit = async (details: {
     name: string;
     email: string;
     phone: string;
     notes?: string | undefined;
+    locale: string;
   }) => {
     setIsSubmitting(true);
-    // TODO(human): Wire up createBooking server action (Commit 11)
-    setTimeout(() => {
+    setSubmitError(null);
+
+    if (!state.serviceId || !state.date || !state.time) {
+      setSubmitError("booking_error");
       setIsSubmitting(false);
-    }, 1500);
+      return;
+    }
+
+    const result = await createBooking({
+      serviceId: state.serviceId,
+      barberId: state.barberId,
+      date: format(state.date, "yyyy-MM-dd"),
+      time: state.time,
+      name: details.name,
+      email: details.email,
+      phone: details.phone,
+      notes: details.notes,
+      consent: true,
+      locale: details.locale,
+    });
+
+    setIsSubmitting(false);
+
+    if (result.success) {
+      setConfirmation({ bookingId: result.bookingId });
+    } else {
+      setSubmitError(result.error);
+    }
   };
 
   if (loading) {
     return (
       <div className="flex min-h-[60vh] items-center justify-center">
         <div className="text-muted-foreground">Loading...</div>
+      </div>
+    );
+  }
+
+  // Confirmation screen
+  if (confirmation) {
+    return (
+      <div className="mx-auto max-w-2xl px-4 py-12 text-center sm:px-6 lg:px-8">
+        <div className="mb-6 text-5xl">✓</div>
+        <h1 className="text-foreground mb-4 text-3xl font-bold tracking-tight">
+          {t("confirmationTitle")}
+        </h1>
+        <p className="text-muted-foreground mb-2">
+          {t("confirmationBookingId", { id: confirmation.bookingId })}
+        </p>
+        <p className="text-muted-foreground mb-8">{t("confirmationEmailSent")}</p>
+        <Button onClick={() => router.push("/")} variant="outline">
+          {t("backToHome")}
+        </Button>
       </div>
     );
   }
@@ -172,7 +224,12 @@ export default function BookPage() {
           />
         )}
         {state.step === 4 && (
-          <StepDetails onSubmit={handleDetailsSubmit} isSubmitting={isSubmitting} />
+          <StepDetails
+            locale={locale}
+            onSubmit={handleDetailsSubmit}
+            isSubmitting={isSubmitting}
+            error={submitError}
+          />
         )}
       </div>
 

@@ -10,6 +10,7 @@ export const bookingDetailsSchema = z.object({
   phone: z.string().min(7).max(30),
   notes: z.string().max(500).optional(),
   consent: z.literal(true),
+  locale: z.string().min(2).max(5),
 });
 
 export type BookingDetailsInput = z.infer<typeof bookingDetailsSchema>;

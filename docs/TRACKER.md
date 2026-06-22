@@ -405,7 +405,56 @@
 
 ### Commit 11: Booking server action
 
-**Status:** 🔲 TODO
+**Status:** ✅ DONE
+
+**Changes:**
+
+- `src/lib/booking/tokens.ts` — HMAC-SHA256 cancellation token generation and verification using `AUTH_SECRET`
+- `src/lib/rate-limit.ts` — `RateLimiter` interface with 3 implementations:
+  - `UpstashRateLimiter` (prod, uses `@upstash/ratelimit` + `@upstash/redis`)
+  - `LocalRateLimiter` (dev, in-memory Map with sliding window)
+  - `NoOpRateLimiter` (disabled via `RATE_LIMIT_DEV=off`)
+  - 3 named limiters: `ip` (5/10m), `email` (3/24h), `phone` (3/24h)
+- `src/actions/booking.ts` — `createBooking` server action:
+  1. Zod validation via `bookingDetailsSchema`
+  2. Sanitize: trim, lowercase email
+  3. Email blacklist check (generic error on hit)
+  4. Rate limiting (IP, email, phone)
+  5. Resolve "any" barber via availability engine
+  6. Server-side re-check slot availability
+  7. HMAC cancellation token generation
+  8. Atomic insert with partial unique index (conflict → "slotTaken")
+  9. Email trigger placeholder (TODO Commit 12)
+  10. Returns `bookingId` (not cancellation token)
+- `src/lib/booking/schema.ts` — added `locale` field to `bookingDetailsSchema`
+- `src/lib/env.ts` — added `RATE_LIMIT_DEV` env var
+- `src/components/booking/StepDetails.tsx` — accepts `locale`, `error` props; shows error banner; locale-aware "and"/"и" in consent
+- `src/app/[locale]/(public)/book/page.tsx` — wires `createBooking`, shows confirmation screen with booking ID
+- `messages/bg.json`, `messages/en.json` — added `confirmationBookingId`, `confirmationEmailSent`, `backToHome`, `booking_error`
+
+**Deviations / notes:**
+
+- `headers()` from `next/headers` returns `Promise<ReadonlyHeaders>` — `getClientIp()` is async
+- `noUncheckedIndexedAccess` caused issues with `split(",")[0]` and `result[0]` — added explicit guards
+- `.returning({ id: bookings.id })` failed with this Drizzle version — using `.returning()` (all fields) instead
+- Upstash `Duration` is a template literal type — cast from `string` in factory
+- Cancellation token generated with `bookingId=0` first, then updated with real ID after insert (avoids needing `RETURNING` with specific fields)
+- Email trigger is a TODO placeholder — will be wired in Commit 12
+- `libphonenumber-js` not yet used for phone validation — schema still uses basic `min(7).max(30)`
+
+**Definition of Done:**
+
+- [x] Booking flow creates a row in `bookings`
+- [x] Double-booking prevented by partial unique index (conflict → "slotTaken")
+- [x] Rate limits enforced (IP 5/10m, email 3/24h, phone 3/24h)
+- [x] Cancellation token generated via HMAC, stored on booking, NOT returned to client
+- [x] "Any barber" resolves to first available barber
+- [x] Server-side re-check of slot availability before insert
+- [x] Email blacklist check (generic error)
+- [x] Confirmation screen shows booking ID
+- [x] `npm run build` succeeds
+- [x] `npm run lint` passes (0 errors)
+- [x] `npm run test` passes (12/12)
 
 ### Commit 12: Emails + cancellation flow
 

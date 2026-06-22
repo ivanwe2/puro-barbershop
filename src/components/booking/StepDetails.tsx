@@ -25,11 +25,19 @@ const detailsSchema = z.object({
 type DetailsForm = z.infer<typeof detailsSchema>;
 
 interface StepDetailsProps {
-  onSubmit: (data: Omit<DetailsForm, "consent">) => void;
+  locale: string;
+  onSubmit: (data: {
+    name: string;
+    email: string;
+    phone: string;
+    notes?: string | undefined;
+    locale: string;
+  }) => void;
   isSubmitting: boolean;
+  error: string | null;
 }
 
-export default function StepDetails({ onSubmit, isSubmitting }: StepDetailsProps) {
+export default function StepDetails({ locale, onSubmit, isSubmitting, error }: StepDetailsProps) {
   const t = useTranslations("booking");
 
   const {
@@ -53,7 +61,7 @@ export default function StepDetails({ onSubmit, isSubmitting }: StepDetailsProps
 
   const onFormSubmit = handleSubmit((data) => {
     const { consent: _c, ...rest } = data;
-    onSubmit(rest);
+    onSubmit({ ...rest, locale });
   });
 
   return (
@@ -61,6 +69,13 @@ export default function StepDetails({ onSubmit, isSubmitting }: StepDetailsProps
       <h2 className="text-foreground mb-6 text-2xl font-semibold tracking-tight">
         {t("stepDetails")}
       </h2>
+      {error && (
+        <div className="border-destructive/50 bg-destructive/10 mb-6 rounded-lg border p-4">
+          <p className="text-destructive text-sm" role="alert">
+            {error === "slotTaken" ? t("slotTaken") : t("booking_error")}
+          </p>
+        </div>
+      )}
       <form onSubmit={onFormSubmit} className="mx-auto max-w-md space-y-6">
         <div className="space-y-2">
           <Label htmlFor="name">{t("name")} *</Label>
@@ -137,7 +152,7 @@ export default function StepDetails({ onSubmit, isSubmitting }: StepDetailsProps
             >
               {t("privacy")}
             </Link>{" "}
-            и{" "}
+            {locale === "bg" ? "и" : "and"}{" "}
             <Link
               href="/legal/terms"
               className="text-accent hover:text-accent/80 underline underline-offset-4"
