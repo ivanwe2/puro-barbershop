@@ -46,13 +46,19 @@
     "notes": "Notes (optional)",
     "consent": "I agree to the terms of service and privacy policy",
     "confirm": "Confirm",
+    "back": "Back",
+    "next": "Next",
     "confirmationTitle": "Booking Confirmed",
     "slotTaken": "Slot just taken, please pick another",
+    "noSlotsAvailable": "No available slots for this date.",
+    "selectDateFirst": "Select a date from the calendar to see available slots.",
     "cancelTitle": "Cancel Booking",
     "cancelConfirm": "Are you sure you want to cancel this booking?",
     "cancelSuccess": "Booking cancelled",
     "cancelExpired": "Cannot cancel this booking. Please call us.",
-    "tooManyRequests": "Too many requests. Please try again later."
+    "tooManyRequests": "Too many requests. Please try again later.",
+    "privacy": "Privacy Policy",
+    "terms": "Terms of Service"
   },
   "gallery": {
     "title": "Gallery",

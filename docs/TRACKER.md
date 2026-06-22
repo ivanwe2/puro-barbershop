@@ -321,11 +321,87 @@
 
 ### Commit 9: Availability engine
 
-**Status:** 🔲 TODO
+**Status:** ✅ DONE
+
+**Changes:**
+
+- Installed `vitest` (dev)
+- `vitest.config.ts` — configured with `@` path alias
+- `src/lib/booking/availability.ts` — pure availability engine:
+  - `getAvailableSlots({ serviceId, barberId, date, db })` → array of `Date` objects (Europe/Sofia)
+  - `getAvailableSlotsForAnyBarber({ serviceId, date, db })` → `Array<{ slot: Date; availableBarberIds: number[] }>`
+  - Loads service duration + buffer from settings
+  - Loads barber working hours for day of week
+  - Subtracts time_off periods
+  - Subtracts confirmed bookings (including buffer)
+  - Generates candidate slots at `slot_granularity_minutes` intervals
+  - Filters: `slot + duration + buffer ≤ end of working window`, no overlap, not in past, not beyond horizon
+  - Uses `Intl.DateTimeFormat` for Sofia timezone offset (not local system offset)
+- `tests/unit/availability.test.ts` — 12 unit tests covering:
+  - Empty schedule, schedule with bookings, time off, buffer enforcement
+  - Edge: booking at end of working day
+  - Mock DB maps table names via `Symbol.for("drizzle:Name")`
+- `src/db/index.ts` — exports `DB` type alias
+
+**Deviations / notes:**
+
+- `DB` type exported from `src/db/index.ts` as `typeof db` (avoids `any` in test mocks)
+- `noUncheckedIndexedAccess` requires null guards on destructured array elements — `h` and `m` from `timeStr.split(":")` must be checked
+- `Intl.DateTimeFormat` used instead of `date-fns-tz` to avoid extra dependency; computes Sofia offset directly
+- Mock DB in tests uses `as unknown as DB` to satisfy TypeScript
+
+**Definition of Done:**
+
+- [x] All unit tests pass (12/12)
+- [x] Function returns correct slots for hand-verified test cases
+- [x] No DB writes from this module (pure read)
+- [x] `npm run build` succeeds
+- [x] `npm run lint` passes (0 errors)
+- [x] `npm run typecheck` passes
 
 ### Commit 10: Booking UI
 
-**Status:** 🔲 TODO
+**Status:** ✅ DONE
+
+**Changes:**
+
+- **Packages installed:** `react-hook-form`, `@hookform/resolvers`, `date-fns`, `date-fns-tz`, `libphonenumber-js`
+- **shadcn components added:** calendar, select, input, label, textarea, checkbox, card, tabs, skeleton, separator
+- `src/lib/booking/schema.ts` — Zod validation schemas for booking input and slot fetching
+- `src/actions/booking.ts` — Server Actions:
+  - `fetchSlots` — validates input, delegates to availability engine, returns time strings
+  - `fetchServices` — returns active services from DB
+  - `fetchBarbers` — returns active barbers from DB
+- `src/components/booking/Stepper.tsx` — visual step indicator (4 steps)
+- `src/components/booking/StepService.tsx` — service card grid, click-to-select
+- `src/components/booking/StepBarber.tsx` — barber list with "Any available" option, initials avatar fallback
+- `src/components/booking/StepDateTime.tsx` — shadcn Calendar + slot grid, skeleton loading, i18n locale for calendar
+- `src/components/booking/StepDetails.tsx` — react-hook-form + Zod resolver, consent checkbox, inline validation
+- `src/app/[locale]/(public)/book/page.tsx` — 4-step booking flow, URL state persistence, back/next navigation
+- `messages/bg.json`, `messages/en.json` — added `back`, `next`, `noSlotsAvailable`, `selectDateFirst`, `privacy`, `terms` keys
+- `src/components/ui/calendar.tsx` — fixed `exactOptionalPropertyTypes` issue with `locale` prop
+
+**Deviations / notes:**
+
+- `libphonenumber-js` installed per plan but not yet used in validation — will be wired in Commit 11 with full phone validation
+- `date-fns-tz` installed per plan but not yet needed — availability engine uses `Intl.DateTimeFormat`
+- `createBooking` server action not yet implemented — placeholder wired to `setTimeout` + TODO comment (Commit 11)
+- Calendar locale uses `bg` from `date-fns/locale` for Bulgarian day/month names
+- `exactOptionalPropertyTypes` caused issues with `notes?: string` — fixed to `notes?: string | undefined`
+- `parseInt` on URL params returns `number`, but ternary with `"any"` required explicit type narrowing
+- Calendar component's `DayButton` override had `locale` type mismatch — fixed with conditional render
+
+**Definition of Done:**
+
+- [x] Full 4-step flow works on desktop
+- [x] Back button works between steps
+- [x] Validation errors show inline and are accessible
+- [x] Loading and error states styled
+- [x] State persisted in URL search params
+- [x] Pre-select service from `/book?service=<id>`
+- [x] `npm run build` succeeds
+- [x] `npm run lint` passes (0 errors)
+- [x] `npm run typecheck` passes
 
 ### Commit 11: Booking server action
 
