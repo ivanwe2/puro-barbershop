@@ -107,6 +107,7 @@ Open http://localhost:3000.
 | `npm run test:e2e`     | Run Playwright E2E tests                                                      |
 | `npm run docker:up`    | Start docker services (detached)                                              |
 | `npm run docker:down`  | Stop docker services                                                          |
+| `npx playwright test`  | Run Playwright E2E tests (starts dev server automatically)                    |
 
 ---
 
