@@ -2,7 +2,12 @@ import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import ScheduleClient from "./ScheduleClient";
-import { fetchScheduleBookings, fetchBarbers, fetchTimeOff } from "@/actions/admin/schedule";
+import {
+  fetchScheduleBookings,
+  fetchBarbers,
+  fetchTimeOff,
+  fetchServices,
+} from "@/actions/admin/schedule";
 
 export default async function SchedulePage() {
   const session = await auth();
@@ -26,7 +31,7 @@ export default async function SchedulePage() {
   const isSuperAdmin = session.user?.role === "super_admin";
   const barberId = isSuperAdmin ? undefined : session.user?.barberId;
 
-  const [bookingsResult, barbersResult, timeOffResult] = await Promise.all([
+  const [bookingsResult, barbersResult, timeOffResult, servicesResult] = await Promise.all([
     fetchScheduleBookings({
       ...(barberId ? { barberId } : {}),
       startDate: format(weekStart, "yyyy-MM-dd"),
@@ -37,6 +42,7 @@ export default async function SchedulePage() {
       startDate: format(weekStart, "yyyy-MM-dd"),
       endDate: format(weekEnd, "yyyy-MM-dd"),
     }),
+    fetchServices(),
   ]);
 
   return (
@@ -45,6 +51,9 @@ export default async function SchedulePage() {
       initialBookings={"error" in bookingsResult ? [] : bookingsResult.bookings}
       initialBarbers={"error" in barbersResult ? [] : barbersResult.barbers}
       initialTimeOff={"error" in timeOffResult ? [] : timeOffResult.timeOff}
+      initialServices={"error" in servicesResult ? [] : servicesResult.services}
+      isSuperAdmin={isSuperAdmin}
+      userBarberId={isSuperAdmin ? undefined : session.user?.barberId}
     />
   );
 }

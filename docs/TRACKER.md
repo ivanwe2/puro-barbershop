@@ -798,6 +798,41 @@ Run `grep -r "PLACEHOLDER"` at any time to find all spots awaiting human data.
 
 ---
 
+---
+
+## Post-build audit fixes
+
+**Status:** ✅ DONE (audited by Claude Sonnet 4.6)
+
+**Bug fixes:**
+
+- `src/actions/booking.ts` — Race condition in `createBooking`: initial cancellation token was `generateCancellationToken(0)` (same deterministic value for all concurrent bookings). Replaced with `crypto.randomBytes(32).toString("hex")` as a unique placeholder; HMAC token still set after insert with real bookingId.
+- `tests/unit/availability.test.ts` — Pre-existing TypeScript errors fixed: mock DB `from()` parameter typed as `any` (computed Symbol property not allowed in type literal), `slots[0]`/`results[0]` guarded for `noUncheckedIndexedAccess`.
+- `vitest.config.ts` — Added `include: ["tests/unit/**/*.test.ts"]` to prevent Vitest from picking up Playwright E2E specs (was causing false failure in `npm run test`).
+
+**Features added (from build plan deferred list):**
+
+- Phone validation: `libphonenumber-js` wired into `src/lib/booking/schema.ts` (`bookingDetailsSchema.phone` now validates with `isValidPhoneNumber(val, "BG")`). Keys `phoneInvalid` added to both message files.
+- Walk-in booking (Commit 15 deferred item):
+  - `src/actions/admin/schedule.ts` — Added `fetchServices()` and `createWalkInBooking()` server actions. Walk-ins skip rate limiting and email blacklist; slot availability still checked server-side; partial unique index still enforced.
+  - `src/app/[locale]/(admin)/admin/schedule/page.tsx` — Passes `isSuperAdmin`, `userBarberId`, `initialServices` props to `ScheduleClient`.
+  - `src/app/[locale]/(admin)/admin/schedule/ScheduleClient.tsx` — "Add walk-in" button in toolbar; `WalkInDialog` component with barber/service/date/time/name/phone/email(optional) fields.
+  - Messages: `walkInTitle`, `walkInSuccess`, `walkInSlotTaken`, `walkInError`, `emailOptional` added to admin namespace.
+- Barber invite flow (Commit 17 deferred item):
+  - `src/lib/email/templates/BarberInvite.tsx` — New email template with temp credentials.
+  - `src/lib/email/index.tsx` — `sendBarberInvite()` function.
+  - `src/actions/admin/barbers.ts` — `inviteBarber({ barberId, email })` server action: super admin only, checks barber has no existing userId, generates random 16-char temp password (bcrypt cost 12), creates users row, links barber.userId, sends invite email.
+  - `src/app/[locale]/(admin)/admin/barbers/BarbersClient.tsx` — "Invite" button shown only for barbers with `userId === null`; `hasAccount` badge shown for linked barbers; invite dialog with email input.
+  - Messages: `inviteBarber`, `inviteEmail`, `inviteSent`, `inviteError`, `inviteAlreadyInvited`, `hasAccount` added to admin namespace.
+
+**Definition of Done:**
+
+- [x] `npm run typecheck` passes (0 errors)
+- [x] `npm run lint` passes (0 errors, 23 pre-existing warnings)
+- [x] `npm run test` passes 12/12
+
+---
+
 ## Security checklist (per §6 of build plan)
 
 Checked at each commit. Full checklist in `docs/PURO_BARBERSHOP_BUILD_PLAN.md` §6.

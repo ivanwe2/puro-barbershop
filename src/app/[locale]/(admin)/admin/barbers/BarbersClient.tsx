@@ -15,7 +15,7 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
-import { createBarber, updateBarber, deleteBarber } from "@/actions/admin/barbers";
+import { createBarber, updateBarber, deleteBarber, inviteBarber } from "@/actions/admin/barbers";
 import { toast } from "sonner";
 
 interface Barber {
@@ -41,6 +41,8 @@ export default function BarbersClient({
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState<number | null>(null);
   const [deleteConfirm, setDeleteConfirm] = useState<number | null>(null);
+  const [inviteId, setInviteId] = useState<number | null>(null);
+  const [inviteEmail, setInviteEmail] = useState("");
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -84,6 +86,20 @@ export default function BarbersClient({
     setDeleteConfirm(null);
   };
 
+  const handleInvite = async () => {
+    if (!inviteId || !inviteEmail) return;
+    const result = await inviteBarber({ barberId: inviteId, email: inviteEmail });
+    if ("error" in result) {
+      const errKey = result.error === "alreadyInvited" ? "inviteAlreadyInvited" : "inviteError";
+      toast.error(t(errKey));
+      return;
+    }
+    toast.success(t("inviteSent"));
+    setInviteId(null);
+    setInviteEmail("");
+    window.location.reload();
+  };
+
   const editingBarber = editingId ? barbers.find((b) => b.id === editingId) : null;
 
   return (
@@ -118,16 +134,26 @@ export default function BarbersClient({
                       <Badge variant={b.active ? "default" : "secondary"}>
                         {b.active ? t("active") : "Inactive"}
                       </Badge>
+                      {b.userId !== null && <Badge variant="secondary">{t("hasAccount")}</Badge>}
                     </div>
                     {b.bioBg && (
                       <p className="text-muted-foreground line-clamp-1 text-xs">{b.bioBg}</p>
                     )}
-                    <p className="text-muted-foreground text-xs">
-                      Order: {b.displayOrder}
-                      {b.userId ? `, User ID: ${b.userId}` : ""}
-                    </p>
+                    <p className="text-muted-foreground text-xs">Order: {b.displayOrder}</p>
                   </div>
                   <div className="flex gap-2">
+                    {b.userId === null && (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => {
+                          setInviteId(b.id);
+                          setInviteEmail("");
+                        }}
+                      >
+                        {t("inviteBarber")}
+                      </Button>
+                    )}
                     <Button
                       variant="outline"
                       size="sm"
@@ -245,6 +271,56 @@ export default function BarbersClient({
               onClick={() => deleteConfirm && handleDelete(deleteConfirm)}
             >
               {t("delete")}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Invite Dialog */}
+      <Dialog
+        open={inviteId !== null}
+        onOpenChange={(open) => {
+          if (!open) {
+            setInviteId(null);
+            setInviteEmail("");
+          }
+        }}
+      >
+        <DialogContent
+          onOpenChange={(open) => {
+            if (!open) {
+              setInviteId(null);
+              setInviteEmail("");
+            }
+          }}
+        >
+          <DialogHeader>
+            <DialogTitle>{t("inviteBarber")}</DialogTitle>
+            <DialogDescription>
+              A temporary password will be emailed. Ask the barber to change it on first login.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-2">
+            <Label>{t("inviteEmail")}</Label>
+            <Input
+              type="email"
+              value={inviteEmail}
+              onChange={(e) => setInviteEmail(e.target.value)}
+              placeholder="barber@example.com"
+            />
+          </div>
+          <DialogFooter>
+            <Button
+              variant="ghost"
+              onClick={() => {
+                setInviteId(null);
+                setInviteEmail("");
+              }}
+            >
+              {t("close")}
+            </Button>
+            <Button onClick={handleInvite} disabled={!inviteEmail}>
+              {t("inviteBarber")}
             </Button>
           </DialogFooter>
         </DialogContent>

@@ -2,3 +2,4 @@ export { CustomerConfirmation, renderCustomerConfirmation } from "./CustomerConf
 export { BarberNotification } from "./BarberNotification";
 export { CustomerCancellation } from "./CustomerCancellation";
 export { CustomerReminder } from "./CustomerReminder";
+export { BarberInvite } from "./BarberInvite";

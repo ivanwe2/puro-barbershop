@@ -4,6 +4,7 @@ import {
   BarberNotification,
   CustomerCancellation,
   CustomerReminder,
+  BarberInvite,
 } from "./templates";
 
 const emailClient = createEmailClient();
@@ -98,5 +99,25 @@ export async function sendReminder(params: SendReminderParams): Promise<void> {
     });
   } catch (error) {
     console.error("[email] Failed to send reminder:", error);
+  }
+}
+
+interface SendBarberInviteParams {
+  to: string;
+  barberName: string;
+  email: string;
+  tempPassword: string;
+  loginUrl: string;
+}
+
+export async function sendBarberInvite(params: SendBarberInviteParams): Promise<void> {
+  try {
+    await emailClient.send({
+      to: params.to,
+      subject: "You've been added to Puro Barbershop",
+      react: <BarberInvite {...params} />,
+    });
+  } catch (error) {
+    console.error("[email] Failed to send barber invite:", error);
   }
 }

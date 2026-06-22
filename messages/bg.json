@@ -63,7 +63,8 @@
     "confirmationEmailSent": "Изпратихме потвърждение на вашия имейл.",
     "backToHome": "Назад към началото",
     "booking_error": "Нещо се обърка. Моля, опитайте отново.",
-    "cancel": "Отмени запис"
+    "cancel": "Отмени запис",
+    "phoneInvalid": "Моля, въведете валиден телефонен номер"
   },
   "gallery": {
     "title": "Галерия",
@@ -185,7 +186,18 @@
     "friday": "Пет",
     "saturday": "Съб",
     "sunday": "Нед",
-    "confirm": "Потвърди"
+    "confirm": "Потвърди",
+    "inviteBarber": "Покани козметик",
+    "inviteEmail": "Имейл за достъп",
+    "inviteSent": "Поканата е изпратена успешно",
+    "inviteError": "Нещо се обърка при изпращането",
+    "inviteAlreadyInvited": "Козметикът вече има акаунт",
+    "hasAccount": "Има акаунт",
+    "walkInTitle": "Добави посетител",
+    "walkInSuccess": "Записът е създаден",
+    "walkInSlotTaken": "Часът е зает. Изберете друг.",
+    "walkInError": "Нещо се обърка. Опитайте отново.",
+    "emailOptional": "Имейл (по желание)"
   },
   "email": {
     "confirmationSubject": "Потвърждение за запис — Puro Barbershop",

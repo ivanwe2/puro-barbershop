@@ -5,6 +5,10 @@ import { db } from "@/db";
 import { bookings, barbers, services, timeOff } from "@/db/schema";
 import { and, eq, gte, lte, asc } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
+import crypto from "crypto";
+import { z } from "zod";
+import { getAvailableSlots } from "@/lib/booking/availability";
+import { generateCancellationToken } from "@/lib/booking/tokens";
 
 const barberColors: Record<number, string> = {
   1: "bg-blue-500/20 border-blue-500/40 text-blue-300",
@@ -115,6 +119,100 @@ export async function fetchTimeOff({ startDate, endDate }: { startDate: string; 
     .orderBy(asc(timeOff.startDatetime));
 
   return { timeOff: rows } as const;
+}
+
+export async function fetchServices() {
+  const session = await auth();
+  if (!session) return { error: "unauthorized" } as const;
+
+  const rows = await db
+    .select({ id: services.id, nameBg: services.nameBg, nameEn: services.nameEn })
+    .from(services)
+    .where(eq(services.active, true))
+    .orderBy(asc(services.displayOrder));
+
+  return { services: rows } as const;
+}
+
+const walkInSchema = z.object({
+  barberId: z.number().int().positive(),
+  serviceId: z.number().int().positive(),
+  date: z.string().date(),
+  time: z.string().regex(/^\d{2}:\d{2}$/),
+  customerName: z.string().min(2).max(100),
+  customerPhone: z.string().min(7).max(30),
+  customerEmail: z.string().email().max(255).optional(),
+});
+
+export async function createWalkInBooking(input: unknown) {
+  const session = await auth();
+  if (!session) return { error: "unauthorized" } as const;
+
+  const parsed = walkInSchema.safeParse(input);
+  if (!parsed.success) return { error: "validation_error" } as const;
+
+  const { barberId, serviceId, date, time, customerName, customerPhone, customerEmail } =
+    parsed.data;
+
+  const isSuperAdmin = session.user?.role === "super_admin";
+  if (!isSuperAdmin && barberId !== session.user?.barberId) {
+    return { error: "forbidden" } as const;
+  }
+
+  // Server-side slot availability check
+  const dateObj = new Date(`${date}T${time}:00+03:00`);
+  const slots = await getAvailableSlots({ serviceId, barberId, date: dateObj, db });
+  const isAvailable = slots.some((s) => s.toTimeString().slice(0, 5) === time);
+  if (!isAvailable) return { error: "slotTaken" } as const;
+
+  const serviceRows = await db
+    .select()
+    .from(services)
+    .where(and(eq(services.id, serviceId), eq(services.active, true)));
+  const service = serviceRows[0];
+  if (!service) return { error: "notFound" } as const;
+
+  const startDatetime = new Date(`${date}T${time}:00+03:00`);
+  const endDatetime = new Date(startDatetime.getTime() + service.durationMinutes * 60000);
+  // Random placeholder token — updated with HMAC after insert
+  const placeholderToken = crypto.randomBytes(32).toString("hex");
+  const email = customerEmail ?? `walkin-${Date.now()}@internal.local`;
+
+  try {
+    const result = await db
+      .insert(bookings)
+      .values({
+        serviceId,
+        barberId,
+        customerName: customerName.trim(),
+        customerEmail: email,
+        customerPhone: customerPhone.trim(),
+        startDatetime,
+        endDatetime,
+        status: "confirmed",
+        cancellationToken: placeholderToken,
+        locale: "bg",
+        notes: "[Walk-in]",
+      })
+      .returning();
+
+    const booking = result[0];
+    if (!booking) return { error: "failed" } as const;
+
+    const realToken = generateCancellationToken(booking.id);
+    await db
+      .update(bookings)
+      .set({ cancellationToken: realToken })
+      .where(eq(bookings.id, booking.id));
+
+    revalidatePath("/admin/schedule");
+    return { success: true, bookingId: booking.id } as const;
+  } catch (err) {
+    if (err instanceof Error && err.message.includes("duplicate key")) {
+      return { error: "slotTaken" } as const;
+    }
+    return { error: "failed" } as const;
+  }
 }
 
 export async function updateBookingStatus(

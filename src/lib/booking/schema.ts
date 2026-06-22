@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { isValidPhoneNumber } from "libphonenumber-js";
 
 export const bookingDetailsSchema = z.object({
   serviceId: z.number().int().positive(),
@@ -7,7 +8,11 @@ export const bookingDetailsSchema = z.object({
   time: z.string().refine((v) => /^\d{2}:\d{2}$/.test(v), "Invalid time format"),
   name: z.string().min(2).max(100),
   email: z.string().email().max(255),
-  phone: z.string().min(7).max(30),
+  phone: z
+    .string()
+    .min(7)
+    .max(30)
+    .refine((val) => isValidPhoneNumber(val, "BG"), { message: "booking.phoneInvalid" }),
   notes: z.string().max(500).optional(),
   consent: z.literal(true),
   locale: z.string().min(2).max(5),

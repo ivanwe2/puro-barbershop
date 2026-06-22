@@ -2,10 +2,14 @@
 
 import { auth } from "@/lib/auth";
 import { db } from "@/db";
-import { barbers, workingHours } from "@/db/schema";
+import { barbers, workingHours, users } from "@/db/schema";
 import { eq, asc } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
+import bcrypt from "bcryptjs";
+import crypto from "crypto";
+import { env } from "@/lib/env";
+import { sendBarberInvite } from "@/lib/email";
 
 const barberSchema = z.object({
   nameBg: z.string().min(1).max(100),
@@ -151,5 +155,54 @@ export async function deleteBarber(id: number) {
   revalidatePath("/admin/barbers");
   revalidatePath("/[locale]", "layout");
 
+  return { success: true } as const;
+}
+
+const inviteSchema = z.object({
+  barberId: z.number().int().positive(),
+  email: z.string().email().max(255),
+});
+
+export async function inviteBarber(input: { barberId: number; email: string }) {
+  const session = await auth();
+  if (!session || session.user?.role !== "super_admin") return { error: "forbidden" } as const;
+
+  const parsed = inviteSchema.safeParse(input);
+  if (!parsed.success) return { error: "validation_error" } as const;
+
+  const { barberId, email } = parsed.data;
+  const normalizedEmail = email.trim().toLowerCase();
+
+  const [barber] = await db.select().from(barbers).where(eq(barbers.id, barberId));
+  if (!barber) return { error: "notFound" } as const;
+  if (barber.userId !== null) return { error: "alreadyInvited" } as const;
+
+  // Generate a secure temporary password (16 url-safe chars)
+  const tempPassword = crypto.randomBytes(16).toString("base64url").slice(0, 16);
+  const passwordHash = await bcrypt.hash(tempPassword, 12);
+
+  const userResult = await db
+    .insert(users)
+    .values({ email: normalizedEmail, passwordHash, role: "barber" })
+    .returning();
+
+  const newUser = userResult[0];
+  if (!newUser) return { error: "failed" } as const;
+
+  await db
+    .update(barbers)
+    .set({ userId: newUser.id, updatedAt: new Date() })
+    .where(eq(barbers.id, barberId));
+
+  const loginUrl = `${env.AUTH_URL}/bg/admin/login`;
+  sendBarberInvite({
+    to: normalizedEmail,
+    barberName: barber.nameBg,
+    email: normalizedEmail,
+    tempPassword,
+    loginUrl,
+  }).catch((err) => console.error("[invite] Failed to send invite email:", err));
+
+  revalidatePath("/admin/barbers");
   return { success: true } as const;
 }

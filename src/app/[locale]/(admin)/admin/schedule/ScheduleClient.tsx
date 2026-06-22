@@ -30,7 +30,9 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
-import { updateBookingStatus } from "@/actions/admin/schedule";
+import { updateBookingStatus, createWalkInBooking } from "@/actions/admin/schedule";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import type { BookingRow } from "./types";
 
 const dayLabels: Record<number, string> = {
@@ -48,6 +50,9 @@ export default function ScheduleClient({
   initialBookings,
   initialBarbers,
   initialTimeOff,
+  initialServices,
+  isSuperAdmin,
+  userBarberId,
 }: {
   t: (key: string) => string;
   initialBookings: BookingRow[];
@@ -59,6 +64,9 @@ export default function ScheduleClient({
     endDatetime: Date;
     reason?: string | null;
   }[];
+  initialServices: { id: number; nameBg: string; nameEn: string }[];
+  isSuperAdmin: boolean;
+  userBarberId: number | undefined;
 }) {
   const [view, setView] = useState<"day" | "week">("week");
   const [weekStart, setWeekStart] = useState(startOfWeek(new Date(), { weekStartsOn: 1 }));
@@ -70,6 +78,10 @@ export default function ScheduleClient({
     bookingId: number;
     action: "cancel" | "noShow" | "complete";
   } | null>(null);
+  const [walkInOpen, setWalkInOpen] = useState(false);
+  const [walkInMsg, setWalkInMsg] = useState<{ type: "success" | "error"; text: string } | null>(
+    null,
+  );
 
   const weekEnd = endOfWeek(weekStart, { weekStartsOn: 1 });
 
@@ -165,7 +177,10 @@ export default function ScheduleClient({
       <div className="space-y-4">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <h1 className="font-heading text-foreground text-2xl">{t("schedule")}</h1>
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
+            <Button size="sm" onClick={() => setWalkInOpen(true)}>
+              + {t("addWalkIn")}
+            </Button>
             <Select value={selectedBarberId} onValueChange={setSelectedBarberId}>
               <SelectTrigger className="w-[180px]">
                 <SelectValue placeholder={t("filterBarber")} />
@@ -272,6 +287,26 @@ export default function ScheduleClient({
           onConfirm={handleAction}
           t={t}
         />
+
+        <WalkInDialog
+          open={walkInOpen}
+          onClose={() => {
+            setWalkInOpen(false);
+            setWalkInMsg(null);
+          }}
+          message={walkInMsg}
+          t={t}
+          barbers={initialBarbers}
+          services={initialServices}
+          isSuperAdmin={isSuperAdmin}
+          userBarberId={userBarberId}
+          onSuccess={(msg) => {
+            setWalkInMsg({ type: "success", text: msg });
+          }}
+          onError={(msg) => {
+            setWalkInMsg({ type: "error", text: msg });
+          }}
+        />
       </div>
     );
   }
@@ -281,7 +316,10 @@ export default function ScheduleClient({
     <div className="space-y-4">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <h1 className="font-heading text-foreground text-2xl">{t("schedule")}</h1>
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
+          <Button size="sm" onClick={() => setWalkInOpen(true)}>
+            + {t("addWalkIn")}
+          </Button>
           <Select value={selectedBarberId} onValueChange={setSelectedBarberId}>
             <SelectTrigger className="w-[180px]">
               <SelectValue placeholder={t("filterBarber")} />
@@ -384,6 +422,22 @@ export default function ScheduleClient({
         onClose={() => setConfirmAction(null)}
         onConfirm={handleAction}
         t={t}
+      />
+
+      <WalkInDialog
+        open={walkInOpen}
+        onClose={() => {
+          setWalkInOpen(false);
+          setWalkInMsg(null);
+        }}
+        message={walkInMsg}
+        t={t}
+        barbers={initialBarbers}
+        services={initialServices}
+        isSuperAdmin={isSuperAdmin}
+        userBarberId={userBarberId}
+        onSuccess={(msg) => setWalkInMsg({ type: "success", text: msg })}
+        onError={(msg) => setWalkInMsg({ type: "error", text: msg })}
       />
     </div>
   );
@@ -506,6 +560,179 @@ function ConfirmActionDialog({
           <Button
             variant={action.action === "cancel" ? "destructive" : "default"}
             onClick={() => onConfirm(action.bookingId, action.action)}
+          >
+            {t("confirm")}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+function WalkInDialog({
+  open,
+  onClose,
+  message,
+  t,
+  barbers,
+  services,
+  isSuperAdmin,
+  userBarberId,
+  onSuccess,
+  onError,
+}: {
+  open: boolean;
+  onClose: () => void;
+  message: { type: "success" | "error"; text: string } | null;
+  t: (key: string) => string;
+  barbers: { id: number; nameBg: string }[];
+  services: { id: number; nameBg: string; nameEn: string }[];
+  isSuperAdmin: boolean;
+  userBarberId: number | undefined;
+  onSuccess: (msg: string) => void;
+  onError: (msg: string) => void;
+}) {
+  const today = format(new Date(), "yyyy-MM-dd");
+  const [barberId, setBarberId] = useState<string>(
+    isSuperAdmin ? (barbers[0] ? String(barbers[0].id) : "") : String(userBarberId ?? ""),
+  );
+  const [serviceId, setServiceId] = useState<string>(services[0] ? String(services[0].id) : "");
+  const [date, setDate] = useState(today);
+  const [time, setTime] = useState("09:00");
+  const [customerName, setCustomerName] = useState("");
+  const [customerPhone, setCustomerPhone] = useState("");
+  const [customerEmail, setCustomerEmail] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+
+  const handleSubmit = async () => {
+    if (!barberId || !serviceId || !date || !time || !customerName || !customerPhone) return;
+
+    setSubmitting(true);
+    const result = await createWalkInBooking({
+      barberId: Number(barberId),
+      serviceId: Number(serviceId),
+      date,
+      time,
+      customerName,
+      customerPhone,
+      ...(customerEmail ? { customerEmail } : {}),
+    });
+    setSubmitting(false);
+
+    if ("success" in result && result.success) {
+      onSuccess(t("walkInSuccess"));
+    } else if ("error" in result) {
+      const errKey = result.error === "slotTaken" ? "walkInSlotTaken" : "walkInError";
+      onError(t(errKey));
+    }
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={onClose}>
+      <DialogContent onOpenChange={onClose}>
+        <DialogHeader>
+          <DialogTitle>{t("walkInTitle")}</DialogTitle>
+        </DialogHeader>
+
+        {message && (
+          <div
+            className={`rounded p-2 text-sm ${message.type === "success" ? "bg-emerald-500/20 text-emerald-300" : "bg-red-500/20 text-red-300"}`}
+          >
+            {message.text}
+          </div>
+        )}
+
+        <div className="space-y-3">
+          {isSuperAdmin && (
+            <div className="space-y-1">
+              <Label>{t("barbers")}</Label>
+              <Select value={barberId} onValueChange={(v) => setBarberId(v ?? "")}>
+                <SelectTrigger>
+                  <SelectValue placeholder={t("filterBarber")} />
+                </SelectTrigger>
+                <SelectContent>
+                  {barbers.map((b) => (
+                    <SelectItem key={b.id} value={String(b.id)}>
+                      {b.nameBg}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          )}
+
+          <div className="space-y-1">
+            <Label>{t("service")}</Label>
+            <Select value={serviceId} onValueChange={(v) => setServiceId(v ?? "")}>
+              <SelectTrigger>
+                <SelectValue placeholder={t("service")} />
+              </SelectTrigger>
+              <SelectContent>
+                {services.map((s) => (
+                  <SelectItem key={s.id} value={String(s.id)}>
+                    {s.nameBg}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="grid grid-cols-2 gap-3">
+            <div className="space-y-1">
+              <Label>{t("date")}</Label>
+              <Input type="date" value={date} onChange={(e) => setDate(e.target.value)} />
+            </div>
+            <div className="space-y-1">
+              <Label>{t("time")}</Label>
+              <Input type="time" value={time} onChange={(e) => setTime(e.target.value)} />
+            </div>
+          </div>
+
+          <div className="space-y-1">
+            <Label>{t("customerName")}</Label>
+            <Input
+              value={customerName}
+              onChange={(e) => setCustomerName(e.target.value)}
+              placeholder={t("customerName")}
+            />
+          </div>
+
+          <div className="space-y-1">
+            <Label>{t("customerPhone")}</Label>
+            <Input
+              type="tel"
+              value={customerPhone}
+              onChange={(e) => setCustomerPhone(e.target.value)}
+              placeholder="+359..."
+            />
+          </div>
+
+          <div className="space-y-1">
+            <Label>{t("emailOptional")}</Label>
+            <Input
+              type="email"
+              value={customerEmail}
+              onChange={(e) => setCustomerEmail(e.target.value)}
+              placeholder="email@example.com"
+            />
+          </div>
+        </div>
+
+        <DialogFooter>
+          <Button variant="ghost" onClick={onClose}>
+            {t("cancel")}
+          </Button>
+          <Button
+            onClick={handleSubmit}
+            disabled={
+              submitting ||
+              !barberId ||
+              !serviceId ||
+              !date ||
+              !time ||
+              !customerName ||
+              !customerPhone
+            }
           >
             {t("confirm")}
           </Button>

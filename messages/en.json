@@ -63,7 +63,8 @@
     "confirmationEmailSent": "We've sent a confirmation to your email.",
     "backToHome": "Back to home",
     "booking_error": "Something went wrong. Please try again.",
-    "cancel": "Cancel Booking"
+    "cancel": "Cancel Booking",
+    "phoneInvalid": "Please enter a valid phone number"
   },
   "gallery": {
     "title": "Gallery",
@@ -185,7 +186,18 @@
     "friday": "Fri",
     "saturday": "Sat",
     "sunday": "Sun",
-    "confirm": "Confirm"
+    "confirm": "Confirm",
+    "inviteBarber": "Invite Barber",
+    "inviteEmail": "Login Email",
+    "inviteSent": "Invite sent successfully",
+    "inviteError": "Something went wrong sending the invite",
+    "inviteAlreadyInvited": "Barber already has an account",
+    "hasAccount": "Has account",
+    "walkInTitle": "Add Walk-in",
+    "walkInSuccess": "Walk-in booking created",
+    "walkInSlotTaken": "Slot is no longer available. Please choose another.",
+    "walkInError": "Something went wrong. Please try again.",
+    "emailOptional": "Email (optional)"
   },
   "email": {
     "confirmationSubject": "Booking Confirmation — Puro Barbershop",

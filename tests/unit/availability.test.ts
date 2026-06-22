@@ -15,8 +15,12 @@ function createMockDB(fromMap: Record<string, Row[]>) {
   return {
     select() {
       return {
-        from(table: { [Symbol.for("drizzle:Name")]?: string; tableName?: string }) {
-          currentTable = table[Symbol.for("drizzle:Name")] || table.tableName || "unknown";
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        from(table: any) {
+          currentTable =
+            (table[Symbol.for("drizzle:Name")] as string | undefined) ??
+            (table.tableName as string | undefined) ??
+            "unknown";
           return {
             where() {
               return {
@@ -141,8 +145,10 @@ describe("availability engine", () => {
     });
 
     expect(slots.length).toBeGreaterThan(0);
-    expect(slots[0].getUTCHours()).toBe(9);
-    expect(slots[0].getUTCMinutes()).toBe(0);
+    const firstSlot = slots[0];
+    if (!firstSlot) throw new Error("Expected at least one slot");
+    expect(firstSlot.getUTCHours()).toBe(9);
+    expect(firstSlot.getUTCMinutes()).toBe(0);
   });
 
   it("respects existing bookings and buffer", async () => {
@@ -261,6 +267,7 @@ describe("availability engine", () => {
 
     expect(results.length).toBeGreaterThan(0);
     const firstSlot = results[0];
+    if (!firstSlot) throw new Error("Expected at least one slot result");
     expect(firstSlot.availableBarberIds).toContain(1);
     expect(firstSlot.availableBarberIds).toContain(2);
   });

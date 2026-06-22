@@ -8,6 +8,7 @@ import { barbers, services, bookings, emailBlacklist, users } from "@/db/schema"
 import { generateCancellationToken } from "@/lib/booking/tokens";
 import { rateLimiters } from "@/lib/rate-limit";
 import { headers } from "next/headers";
+import crypto from "crypto";
 import { sendBookingConfirmation, sendBarberNotification } from "@/lib/email";
 import { format } from "date-fns";
 import { env } from "@/lib/env";
@@ -208,8 +209,9 @@ export async function createBooking(input: unknown): Promise<CreateBookingResult
   const startDatetime = new Date(`${date}T${time}:00+03:00`);
   const endDatetime = new Date(startDatetime.getTime() + service.durationMinutes * 60000);
 
-  // Generate cancellation token
-  const cancellationToken = generateCancellationToken(0);
+  // Generate a random placeholder token to avoid unique constraint collisions under concurrency.
+  // The real HMAC token (keyed on the actual bookingId) is set after insert.
+  const cancellationToken = crypto.randomBytes(32).toString("hex");
 
   // Insert booking
   try {
