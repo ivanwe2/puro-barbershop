@@ -149,7 +149,14 @@
     "slotGranularityMinutes": "Slot step (minutes)",
     "shopEmail": "Shop Email",
     "shopPhone": "Shop Phone",
-    "defaultWorkingHours": "Default Working Hours"
+    "defaultWorkingHours": "Default Working Hours",
+    "noBookingsToday": "No bookings today",
+    "noBookingsTodayBarber": "You have no bookings today",
+    "noTimeOff": "No upcoming time off",
+    "statusConfirmed": "Confirmed",
+    "statusCompleted": "Completed",
+    "statusCancelled": "Cancelled",
+    "statusNoShow": "No-show"
   },
   "email": {
     "confirmationSubject": "Booking Confirmation — Puro Barbershop",

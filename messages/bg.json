@@ -149,7 +149,14 @@
     "slotGranularityMinutes": "Стъпка на часовете (минути)",
     "shopEmail": "Имейл на магазина",
     "shopPhone": "Телефон на магазина",
-    "defaultWorkingHours": "Стандартно работно време"
+    "defaultWorkingHours": "Стандартно работно време",
+    "noBookingsToday": "Няма записи за днес",
+    "noBookingsTodayBarber": "Нямате записи за днес",
+    "noTimeOff": "Няма предстоящи отсъствия",
+    "statusConfirmed": "Потвърдени",
+    "statusCompleted": "Завършени",
+    "statusCancelled": "Отменени",
+    "statusNoShow": "No-show"
   },
   "email": {
     "confirmationSubject": "Потвърждение за запис — Puro Barbershop",

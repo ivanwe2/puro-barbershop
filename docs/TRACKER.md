@@ -552,7 +552,33 @@
 
 ### Commit 14: Admin layout + dashboard
 
-**Status:** 🔲 TODO
+**Status:** ✅ DONE
+
+**Changes:**
+
+- `src/app/[locale]/(admin)/admin/layout.tsx` — admin shell layout:
+  - Desktop sidebar with navigation links (Dashboard, Schedule, Time Off; Barbers, Services, Settings for super admin only)
+  - Mobile: Sheet overlay sidebar with same nav
+  - Top bar: user email, role badge, logout button
+  - Role-based nav: barbers only see Dashboard, Schedule, Time Off
+  - Logout via Server Action — no client-side `signOut` import
+- `src/app/[locale]/(admin)/admin/page.tsx` — dashboard landing page:
+  - Today's bookings card (filtered by barber for barber role)
+  - Week stats card (confirmed, completed, cancelled, no-show counts)
+  - Upcoming time off card (limited to 5 entries)
+  - Quick links card (role-aware)
+  - All copy localized via i18n keys
+  - `noUncheckedIndexedAccess` safe: `weekStats[0] ?? { confirmed: 0, ... }`
+- `src/actions/admin/logout.ts` — Server Action calling `signOut()`
+- i18n keys added: `noBookingsToday`, `noBookingsTodayBarber`, `noTimeOff`, `statusConfirmed`, `statusCompleted`, `statusCancelled`, `statusNoShow`
+
+**Deviations / notes:**
+
+- Used `@base-ui/react` shadcn components (not Radix) — no `asChild` prop on `SheetTrigger`, so button is passed as children
+- `SidebarNav` extracted as a sub-component to share between desktop sidebar and mobile Sheet
+- Dashboard queries use `leftJoin` for services/barbers — barber name can be null if barber was deleted (userId set null on cascade)
+- Week stats use Monday-Sunday range per Sofia timezone
+- Logout uses `<form action={logoutAction}>` pattern — no client-side auth import needed
 
 ### Commit 15: Schedule view
 
