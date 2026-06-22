@@ -11,3 +11,4 @@ const db = isNeon
   : drizzle(pg(env.DATABASE_URL, { max: 10 }), { schema });
 
 export { db };
+export type DB = typeof db;
