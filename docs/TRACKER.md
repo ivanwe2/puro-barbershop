@@ -511,7 +511,44 @@
 
 ### Commit 13: Auth.js setup + login
 
-**Status:** 🔲 TODO
+**Status:** ✅ DONE
+
+**Changes:**
+
+- `src/lib/auth.ts` — Auth.js v5 config with Credentials provider:
+  - Looks up user by email, verifies password with bcrypt (cost 12)
+  - JWT strategy (no DB session table)
+  - Custom callbacks attach `role` and `barberId` to session
+  - 8h session max age
+  - Generic "Invalid credentials" on all failure modes (doesn't reveal whether email exists)
+- `src/lib/auth-edge.ts` — Lightweight auth config for Edge middleware (no DB, no providers)
+  - Same JWT/session callbacks to read role+barberId from token
+  - Only used by `src/middleware.ts`
+- `src/app/api/auth/[...nextauth]/route.ts` — re-exports `GET`/`POST` from `handlers`
+  - `runtime = "nodejs"` (postgres-js not Edge-compatible)
+- `src/middleware.ts` — combined locale + auth protection:
+  - Runs next-intl locale routing
+  - Blocks `/[locale]/admin/**` for unauthenticated users → redirect to login
+  - Blocks super-admin-only routes (`/barbers`, `/services`, `/settings`) for barbers → redirect to dashboard
+  - Uses `auth()` from `auth-edge.ts` (Edge-compatible)
+- `src/actions/admin/login.ts` — Server Action for login form
+  - Calls `signIn("credentials", ...)` with email/password from FormData
+  - Returns `invalidCredentials` error on failure (generic, no details leaked)
+- `src/app/[locale]/(admin)/admin/login/page.tsx` — login form UI:
+  - Uses `useActionState` + Server Action (no client-side `signIn` import)
+  - Email + password fields with `autoComplete` hints
+  - Hidden `callbackUrl` field for post-login redirect
+  - Error banner for failed login
+- `src/types/next-auth.d.ts` — module augmentation for `Session.user.role`, `Session.user.barberId`, `User.role`, `User.barberId`, `JWT.role`, `JWT.barberId`
+
+**Deviations / notes:**
+
+- Split auth config into two files (`auth.ts` for Node.js route handler, `auth-edge.ts` for Edge middleware) because `postgres` package is not Edge-compatible
+- Used Server Action (`loginAction`) instead of client-side `signIn()` to avoid bundling `postgres` in client JS
+- `barberId` is optional in `Session.user` — conditionally included to satisfy `exactOptionalPropertyTypes`
+- `name` in `authorize` uses `email.split("@")[0]` as fallback (no name field in users table)
+- `pages.signIn` set to `/bg/admin/login` as fallback (middleware handles actual redirect with locale awareness)
+- `detect-object-injection` warning in `auth.ts` from `user.email.split("@")[0]` — acceptable
 
 ### Commit 14: Admin layout + dashboard
 
