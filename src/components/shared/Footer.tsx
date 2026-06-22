@@ -79,7 +79,7 @@ export default function Footer() {
                 {t("terms")}
               </Link>
               <Link
-                href="/legal/cookies"
+                href="/legal/cookie-info"
                 className="text-muted-foreground hover:text-foreground transition-colors"
               >
                 {t("cookies")}
