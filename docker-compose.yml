@@ -1,4 +1,46 @@
 services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    container_name: puro_app
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    volumes:
+      - .:/app
+      - node_modules:/app/node_modules
+      - next_build:/app/.next
+    environment:
+      NODE_ENV: development
+      # Database — use service name, not localhost
+      DATABASE_URL: postgresql://puro:puro_dev_only@postgres:5432/puro_barbershop
+      DATABASE_URL_UNPOOLED: postgresql://puro:puro_dev_only@postgres:5432/puro_barbershop
+      # Auth
+      AUTH_SECRET: dev-secret-change-in-production-0123456789abcdef
+      AUTH_URL: http://localhost:3000
+      # Email — SMTP transport to Mailpit
+      RESEND_API_KEY: dev-placeholder-key
+      EMAIL_FROM: "Puro Barbershop <no-reply@purobarbershop.com>"
+      EMAIL_REPLY_TO: test@example.com
+      EMAIL_TRANSPORT: smtp
+      SMTP_HOST: mailpit
+      SMTP_PORT: "1025"
+      # Cron
+      CRON_SECRET: dev-cron-secret-change-in-production-0123456789ab
+      # Seed
+      SEED_ADMIN_PASSWORD: DevPuroAdmin2026!Secure
+      # Public
+      NEXT_PUBLIC_SHOP_NAME: Puro Barbershop
+      NEXT_PUBLIC_SHOP_ADDRESS: "Бул. Христо Ботев 114, Plovdiv, Bulgaria"
+      NEXT_PUBLIC_SHOP_LAT: "42.1354"
+      NEXT_PUBLIC_SHOP_LNG: "24.7453"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      mailpit:
+        condition: service_healthy
+
   postgres:
     image: postgres:16-alpine
     container_name: puro_postgres
@@ -50,3 +92,5 @@ services:
 volumes:
   postgres_data:
   redis_data:
+  node_modules:
+  next_build:

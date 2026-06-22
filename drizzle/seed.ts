@@ -2,6 +2,7 @@ import "dotenv/config";
 import bcrypt from "bcryptjs";
 import pg from "postgres";
 import { drizzle } from "drizzle-orm/postgres-js";
+import { eq } from "drizzle-orm";
 import * as schema from "../src/db/schema";
 
 const DB_URL = process.env.DATABASE_URL || process.env.DATABASE_URL_UNPOOLED;
@@ -21,6 +22,18 @@ if (!seedPassword || seedPassword.length < 16) {
 async function main() {
   const client = pg(DB_URL as string);
   const db = drizzle(client, { schema });
+
+  const existing = await db
+    .select({ id: schema.users.id })
+    .from(schema.users)
+    .where(eq(schema.users.email, "admin@purobarbershop.com"))
+    .limit(1);
+
+  if (existing.length > 0) {
+    console.log("Already seeded — skipping.");
+    await client.end();
+    return;
+  }
 
   console.log("Seeding database...");
 
