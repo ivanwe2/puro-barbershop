@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { logoutAction } from "@/actions/admin/logout";
 import { Link } from "@/lib/i18n/routing";
+import Wordmark from "@/components/shared/Wordmark";
 
 const adminNavItems = [
   { href: "/admin", labelKey: "dashboard" },
@@ -43,11 +44,18 @@ function SidebarNav({
   );
 }
 
-export default async function AdminLayout({ children }: { children: ReactNode }) {
+export default async function AdminLayout({
+  children,
+  params,
+}: {
+  children: ReactNode;
+  params: Promise<{ locale: string }>;
+}) {
+  const { locale } = await params;
   const session = await auth();
 
   if (!session) {
-    redirect("/bg/admin/login");
+    redirect(`/${locale}/admin/login`);
   }
 
   const t = await getTranslations("admin");
@@ -60,8 +68,8 @@ export default async function AdminLayout({ children }: { children: ReactNode })
       <aside className="hidden w-64 border-r lg:block">
         <div className="bg-muted/40 flex h-full flex-col border-r">
           <div className="flex h-14 items-center border-b px-6">
-            <Link href="/bg" className="font-heading text-foreground text-xl">
-              Puro
+            <Link href="/" className="text-foreground">
+              <Wordmark className="text-2xl" />
             </Link>
           </div>
           <SidebarNav navItems={navItems} t={t} />
@@ -98,7 +106,7 @@ export default async function AdminLayout({ children }: { children: ReactNode })
               <SheetContent side="left" className="w-64 p-0">
                 <div className="flex h-full flex-col">
                   <div className="flex h-14 items-center border-b px-6">
-                    <Link href="/bg" className="font-heading text-foreground text-xl">
+                    <Link href="/" className="font-heading text-foreground text-xl">
                       Puro
                     </Link>
                   </div>
