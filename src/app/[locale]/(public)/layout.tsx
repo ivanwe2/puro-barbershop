@@ -1,6 +1,8 @@
 import type { ReactNode } from "react";
 import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
+import Header from "@/components/shared/Header";
+import Footer from "@/components/shared/Footer";
 
 export async function generateMetadata(props: {
   params: Promise<{ locale: string }>;
@@ -27,5 +29,11 @@ export async function generateMetadata(props: {
 }
 
 export default async function PublicLayout({ children }: { children: ReactNode }) {
-  return <>{children}</>;
+  return (
+    <>
+      <Header />
+      <main className="flex min-h-[calc(100vh-4rem)] flex-1 flex-col">{children}</main>
+      <Footer />
+    </>
+  );
 }
