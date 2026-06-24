@@ -1,64 +1,37 @@
 import { test, expect } from "@playwright/test";
+import { format } from "date-fns";
 
-test("booking flow — select service, barber, date/time, submit details", async ({ page }) => {
+test("booking flow — single-screen form", async ({ page }) => {
   // Land on homepage
   await page.goto("/bg");
   await expect(page).toHaveTitle(/Puro Barbershop/);
 
-  // Click "Book Now"
+  // Click "Book Now" → dedicated booking page
   await page
     .getByRole("link", { name: /Запази час/i })
     .first()
     .click();
   await expect(page).toHaveURL(/\/book/);
 
-  // Step 1: Select first service
-  const serviceCards = page.getByRole("button").filter({ hasText: /мин/i });
-  await expect(serviceCards.first()).toBeVisible();
-  await serviceCards.first().click();
+  // Service + barber default to sensible values (first service / no preference).
+  // Pick today's date to load available time slots.
+  const today = format(new Date(), "yyyy-MM-dd");
+  await page.locator('input[type="date"]').fill(today);
 
-  // Click Next
-  await page.getByRole("button", { name: /Напред/i }).click();
+  // Wait for slots and choose the first available time chip.
+  const timeChip = page.getByRole("button", { name: /^\d{2}:\d{2}$/ });
+  await expect(timeChip.first()).toBeVisible({ timeout: 10000 });
+  await timeChip.first().click();
 
-  // Step 2: Select first barber
-  const barberButtons = page.getByRole("button").filter({ hasText: /Козметик/i });
-  await expect(barberButtons.first()).toBeVisible();
-  await barberButtons.first().click();
+  // Fill contact details.
+  await page.getByPlaceholder(/Име/i).fill("Иван Иванов");
+  await page.getByPlaceholder(/\+359/).fill("+359888123456");
+  await page.getByPlaceholder(/example/i).fill("test@example.com");
 
-  // Click Next
-  await page.getByRole("button", { name: /Напред/i }).click();
-
-  // Step 3: Select today's date and first available time slot
-  // The calendar should be visible
-  await page.waitForSelector('[data-slot="calendar"]', { timeout: 10000 });
-
-  // Click on today's date cell
-  const today = new Date();
-  const todayFormatted = today.getDate().toString();
-  await page.getByRole("gridcell", { name: todayFormatted }).first().click();
-
-  // Wait for slots to load and click the first one
-  await page.waitForSelector('[data-slot="slot"]', { timeout: 10000 });
-  await page
-    .getByRole("button", { name: /\d{2}:\d{2}/ })
-    .first()
-    .click();
-
-  // Click Next
-  await page.getByRole("button", { name: /Напред/i }).click();
-
-  // Step 4: Fill details and submit
-  await expect(page.getByLabel(/Име/i)).toBeVisible();
-  await page.getByLabel(/Име/i).fill("Иван Иванов");
-  await page.getByLabel(/Имейл/i).fill("test@example.com");
-  await page.getByLabel(/Телефон/i).fill("+359888123456");
-
-  // Check consent
+  // Consent + submit.
   await page.getByRole("checkbox").check();
-
-  // Submit
   await page.getByRole("button", { name: /Потвърди/i }).click();
 
-  // Assert confirmation page shows
+  // Assert confirmation shows.
   await expect(page.getByText(/потвърден/i)).toBeVisible({ timeout: 15000 });
 });
