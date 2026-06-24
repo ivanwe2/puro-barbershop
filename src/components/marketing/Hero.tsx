@@ -48,9 +48,10 @@ export default function Hero({ t, common }: HeroProps) {
         <div className="pole-rail absolute inset-0" />
       </div>
 
-      {/* Hero content, bottom-left */}
+      {/* Hero content, bottom-left. Left padding clears the pole rail (which
+          sits at clamp(18px,5vw,54px) + 9px wide) at every viewport width. */}
       <div className="absolute bottom-0 left-0 z-[3] w-full">
-        <div className="mx-auto box-border max-w-[1280px] px-[clamp(22px,5vw,40px)] pb-[clamp(56px,9vw,86px)]">
+        <div className="mx-auto box-border max-w-[1280px] pr-[clamp(22px,5vw,40px)] pb-[clamp(56px,9vw,86px)] pl-[clamp(46px,calc(5vw+26px),84px)]">
           <div className="mb-[26px] text-[13px] font-semibold tracking-[0.26em] text-[#f4f0e9]/70 uppercase">
             {t("heroKicker")}
           </div>

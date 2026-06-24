@@ -98,7 +98,11 @@ export default async function HomePage(props: { params: Promise<{ locale: string
       <Hero t={homeT} common={commonT} />
       {/* Sentinel at the hero's bottom drives the nav's transparent→solid state. */}
       <div id="nav-sentinel" className="relative h-px w-full" />
-      <Statement t={homeT} barberCount={activeBarbers.length} />
+      <Statement
+        t={homeT}
+        barberCount={activeBarbers.length}
+        serviceCount={activeServices.length}
+      />
       <ServicesSection services={activeServices} t={servicesT} />
       <BarbersSection barbers={activeBarbers} t={homeT} />
       <InstagramGallery />

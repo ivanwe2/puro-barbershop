@@ -5,11 +5,12 @@ interface T {
 interface StatementProps {
   t: T;
   barberCount: number;
+  serviceCount: number;
 }
 
-export default function Statement({ t, barberCount }: StatementProps) {
+export default function Statement({ t, barberCount, serviceCount }: StatementProps) {
   const stats = [
-    { value: t("statYearsValue"), label: t("statYearsLabel") },
+    { value: String(serviceCount), label: t("statServicesLabel") },
     { value: String(barberCount), label: t("statBarbersLabel") },
     { value: t("statDaysValue"), label: t("statDaysLabel") },
   ];

@@ -109,14 +109,14 @@ async function main() {
     },
     {
       nameEn: "Haircut + Beard",
-      nameBg: "Подстрижка + Бръснене",
+      nameBg: "Подстрижка + Брада",
       durationMinutes: 45,
       priceBgn: "0.00", // [PLACEHOLDER:price]
       displayOrder: 2,
     },
     {
       nameEn: "Beard trim",
-      nameBg: "Бръснене",
+      nameBg: "Оформяне на брада",
       durationMinutes: 20,
       priceBgn: "0.00", // [PLACEHOLDER:price]
       displayOrder: 3,

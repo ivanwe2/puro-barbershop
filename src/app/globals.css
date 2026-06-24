@@ -96,6 +96,18 @@
   --radius-4xl: calc(var(--radius) * 2.6);
 }
 
+html {
+  /* Smooth in-page anchor scrolling; offset for the fixed 78px nav. */
+  scroll-behavior: smooth;
+  scroll-padding-top: 92px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+
 body {
   background: var(--background);
   color: var(--foreground);
