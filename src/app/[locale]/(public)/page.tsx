@@ -1,16 +1,15 @@
 import { getTranslations } from "next-intl/server";
 import type { Metadata } from "next";
-import Link from "next/link";
 import { db } from "@/db";
-import { barbers, services, workingHours } from "@/db/schema";
+import { barbers, services } from "@/db/schema";
 import { eq, asc } from "drizzle-orm";
 import Hero from "@/components/marketing/Hero";
-import About from "@/components/marketing/About";
+import Statement from "@/components/marketing/Statement";
 import BarbersSection from "@/components/marketing/BarbersSection";
 import ServicesSection from "@/components/marketing/ServicesSection";
 import InstagramGallery from "@/components/marketing/InstagramGallery";
-import LocationSection from "@/components/marketing/LocationSection";
-import SloganDivider from "@/components/shared/SloganDivider";
+import ReviewsSection from "@/components/marketing/ReviewsSection";
+import BookingCta from "@/components/marketing/BookingCta";
 
 export const revalidate = 3600;
 
@@ -53,7 +52,7 @@ export default async function HomePage(props: { params: Promise<{ locale: string
   const homeT = await getTranslations("home");
   const commonT = await getTranslations("common");
   const servicesT = await getTranslations("services");
-  const locationT = await getTranslations("location");
+  const bookingT = await getTranslations("booking");
 
   const activeBarbers = await db
     .select()
@@ -67,65 +66,44 @@ export default async function HomePage(props: { params: Promise<{ locale: string
     .where(eq(services.active, true))
     .orderBy(asc(services.displayOrder));
 
-  const hoursData = await db.select().from(workingHours).where(eq(workingHours.active, true));
-
   const locale = params.locale;
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "HairSalon",
-    name: locale === "bg" ? "Puro Barbershop" : "Puro Barbershop",
+    name: "Puro Barbershop",
     address: {
       "@type": "PostalAddress",
       streetAddress: locale === "bg" ? "Бул. Христо Ботев 114" : "114 Hristo Botev Blvd",
       addressLocality: "Plovdiv",
       addressCountry: "BG",
     },
-    telephone: "[PLACEHOLDER:shop_phone]",
+    telephone: process.env.NEXT_PUBLIC_SHOP_PHONE || "[PLACEHOLDER:shop_phone]",
     openingHoursSpecification: [
       {
         "@type": "OpeningHoursSpecification",
-        dayOfWeek: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
-        opens: "09:00",
-        closes: "19:00",
-      },
-      {
-        "@type": "OpeningHoursSpecification",
-        dayOfWeek: ["Saturday"],
-        opens: "09:00",
-        closes: "17:00",
+        dayOfWeek: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
+        opens: "10:00",
+        closes: "19:30",
       },
     ],
     priceRange: "$$",
   };
 
   return (
-    <div className="flex flex-col">
+    <>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
       <Hero t={homeT} common={commonT} />
-      <About t={homeT} />
-      <SloganDivider />
-      <BarbersSection barbers={activeBarbers} t={homeT} />
-      <SloganDivider />
+      {/* Sentinel at the hero's bottom drives the nav's transparent→solid state. */}
+      <div id="nav-sentinel" className="relative h-px w-full" />
+      <Statement t={homeT} barberCount={activeBarbers.length} />
       <ServicesSection services={activeServices} t={servicesT} />
-      <SloganDivider />
+      <BarbersSection barbers={activeBarbers} t={homeT} />
       <InstagramGallery />
-      <SloganDivider />
-      <LocationSection hoursData={hoursData} t={locationT} />
-      <SloganDivider />
-      <div className="flex flex-col items-center justify-center px-4 py-16 text-center">
-        <h2 className="font-heading text-foreground text-3xl font-semibold sm:text-4xl">
-          {homeT("heroTitle")}
-        </h2>
-        <Link
-          href="/book"
-          className="border-accent text-accent hover:bg-accent hover:text-accent-foreground mt-6 rounded-md border px-8 py-4 text-xl font-medium transition-colors"
-        >
-          {commonT("bookNow")}
-        </Link>
-      </div>
-    </div>
+      <ReviewsSection />
+      <BookingCta t={bookingT} common={commonT} />
+    </>
   );
 }

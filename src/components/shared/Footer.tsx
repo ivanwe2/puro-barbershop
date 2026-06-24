@@ -31,6 +31,14 @@ export default function Footer() {
             <address className="text-sm leading-[1.8] text-[var(--paper)]/85 not-italic">
               {t("address")}
             </address>
+            <a
+              href={`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(t("address"))}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-2 inline-block border-b border-[var(--paper)]/30 pb-0.5 text-sm text-[var(--paper)]/85 transition-colors hover:text-[var(--paper)]"
+            >
+              {t("directions")} →
+            </a>
           </div>
 
           <div>

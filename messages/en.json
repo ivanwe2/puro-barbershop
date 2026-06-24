@@ -52,6 +52,9 @@
   },
   "booking": {
     "title": "Book an Appointment",
+    "ctaKicker": "Reserve your chair",
+    "ctaCall": "Prefer to talk? Call",
+    "walkins": "Walk-ins welcome",
     "stepService": "Choose Service",
     "stepBarber": "Choose Barber",
     "stepDateTime": "Choose Date & Time",
@@ -121,6 +124,7 @@
     "slogan": "Precision · Confidence · Clean Look",
     "blurb": "Premium barbering, the old way. Precision, confidence, a clean look — every single visit.",
     "visit": "Visit",
+    "directions": "Get directions",
     "address": "114 Hristo Botev Blvd, Plovdiv, Bulgaria",
     "hours": "Hours",
     "hoursDaily": "Daily · 10:00–19:30",
