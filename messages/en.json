@@ -39,6 +39,9 @@
   },
   "services": {
     "title": "Services",
+    "kicker": "Services & Pricing",
+    "menuTitle": "The Menu",
+    "intro": "Every service finishes with a hot towel and a straight-razor lineup. No rushing the chair.",
     "haircut": "Haircut",
     "haircutBeard": "Haircut + Beard",
     "beardTrim": "Beard trim",
