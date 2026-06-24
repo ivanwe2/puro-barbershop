@@ -79,14 +79,15 @@ export async function createBarber(formData: FormData) {
   const barberId = result[0]?.id;
 
   if (barberId) {
-    // Set default working hours for the new barber
+    // Set default working hours for the new barber: every day 10:00-19:30
     const defaultHours = [
-      { dayOfWeek: 1, startTime: "09:00", endTime: "19:00" },
-      { dayOfWeek: 2, startTime: "09:00", endTime: "19:00" },
-      { dayOfWeek: 3, startTime: "09:00", endTime: "19:00" },
-      { dayOfWeek: 4, startTime: "09:00", endTime: "19:00" },
-      { dayOfWeek: 5, startTime: "09:00", endTime: "19:00" },
-      { dayOfWeek: 6, startTime: "09:00", endTime: "17:00" },
+      { dayOfWeek: 0, startTime: "10:00", endTime: "19:30" },
+      { dayOfWeek: 1, startTime: "10:00", endTime: "19:30" },
+      { dayOfWeek: 2, startTime: "10:00", endTime: "19:30" },
+      { dayOfWeek: 3, startTime: "10:00", endTime: "19:30" },
+      { dayOfWeek: 4, startTime: "10:00", endTime: "19:30" },
+      { dayOfWeek: 5, startTime: "10:00", endTime: "19:30" },
+      { dayOfWeek: 6, startTime: "10:00", endTime: "19:30" },
     ];
 
     await db.insert(workingHours).values(

@@ -135,15 +135,16 @@ async function main() {
     console.log(`  Created service: ${s.nameEn}`);
   }
 
-  // 4. Working hours: Mon-Fri 09:00-19:00, Sat 09:00-17:00, Sun closed
+  // 4. Working hours: every day 10:00-19:30
   const barberIds = [barber1.id, barber2.id];
   const hours = [
-    { dayOfWeek: 1, startTime: "09:00", endTime: "19:00" }, // Mon
-    { dayOfWeek: 2, startTime: "09:00", endTime: "19:00" }, // Tue
-    { dayOfWeek: 3, startTime: "09:00", endTime: "19:00" }, // Wed
-    { dayOfWeek: 4, startTime: "09:00", endTime: "19:00" }, // Thu
-    { dayOfWeek: 5, startTime: "09:00", endTime: "19:00" }, // Fri
-    { dayOfWeek: 6, startTime: "09:00", endTime: "17:00" }, // Sat
+    { dayOfWeek: 0, startTime: "10:00", endTime: "19:30" }, // Sun
+    { dayOfWeek: 1, startTime: "10:00", endTime: "19:30" }, // Mon
+    { dayOfWeek: 2, startTime: "10:00", endTime: "19:30" }, // Tue
+    { dayOfWeek: 3, startTime: "10:00", endTime: "19:30" }, // Wed
+    { dayOfWeek: 4, startTime: "10:00", endTime: "19:30" }, // Thu
+    { dayOfWeek: 5, startTime: "10:00", endTime: "19:30" }, // Fri
+    { dayOfWeek: 6, startTime: "10:00", endTime: "19:30" }, // Sat
   ];
 
   for (const barberId of barberIds) {
