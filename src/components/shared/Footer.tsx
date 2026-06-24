@@ -3,116 +3,75 @@
 import { useTranslations } from "next-intl";
 import { env } from "@/lib/env";
 import { Link } from "@/lib/i18n/routing";
-import SloganDivider from "./SloganDivider";
+import Wordmark from "@/components/shared/Wordmark";
 
 export default function Footer() {
   const t = useTranslations("footer");
   const currentYear = new Date().getFullYear();
+  const instagramUrl = env.NEXT_PUBLIC_INSTAGRAM_URL ?? "https://www.instagram.com/";
 
   return (
-    <footer className="border-border bg-muted border-t">
-      <SloganDivider />
+    <footer className="bg-[var(--ink)] text-[var(--paper)]">
+      <div className="mx-auto max-w-[1280px] px-[clamp(22px,5vw,40px)] pt-[clamp(56px,9vw,84px)] pb-10">
+        {/* Thin pole rule — the second and final appearance of the swirl. */}
+        <div className="pole-rule mb-16 h-1 w-full rounded-[2px] opacity-85" />
 
-      <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 gap-8 md:grid-cols-3">
+        <div className="grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-4">
           <div>
-            <h3 className="font-heading text-foreground mb-4 text-lg font-semibold">
-              Puro Barbershop
+            <Wordmark className="mb-[18px] block text-[42px]" />
+            <p className="max-w-[30ch] text-sm leading-relaxed text-[var(--paper)]/60">
+              {t("blurb")}
+            </p>
+          </div>
+
+          <div>
+            <h3 className="mb-[18px] text-xs font-bold tracking-[0.14em] text-[var(--paper)]/50 uppercase">
+              {t("visit")}
             </h3>
-            <address className="text-muted-foreground text-sm not-italic">
-              <p>{t("address")}</p>
+            <address className="text-sm leading-[1.8] text-[var(--paper)]/85 not-italic">
+              {t("address")}
             </address>
-            <div className="text-muted-foreground mt-4 text-sm">
-              <p>{t("weekdays")}</p>
-              <p>{t("saturday")}</p>
-              <p>{t("sunday")}</p>
-            </div>
           </div>
 
           <div>
-            <h3 className="font-heading text-foreground mb-4 text-lg font-semibold">
-              {t("navigation")}
+            <h3 className="mb-[18px] text-xs font-bold tracking-[0.14em] text-[var(--paper)]/50 uppercase">
+              {t("hours")}
             </h3>
-            <nav className="flex flex-col gap-2 text-sm">
-              <Link
-                href="/book"
-                className="text-muted-foreground hover:text-foreground transition-colors"
-              >
-                {t("book")}
-              </Link>
-              <Link
-                href="/#services"
-                className="text-muted-foreground hover:text-foreground transition-colors"
-              >
-                {t("services")}
-              </Link>
-              <Link
-                href="/#gallery"
-                className="text-muted-foreground hover:text-foreground transition-colors"
-              >
-                {t("gallery")}
-              </Link>
-              <Link
-                href="/#location"
-                className="text-muted-foreground hover:text-foreground transition-colors"
-              >
-                {t("location")}
-              </Link>
-            </nav>
+            <p className="text-sm leading-[1.8] text-[var(--paper)]/85">{t("hoursDaily")}</p>
           </div>
 
           <div>
-            <h3 className="font-heading text-foreground mb-4 text-lg font-semibold">
-              {t("legal")}
+            <h3 className="mb-[18px] text-xs font-bold tracking-[0.14em] text-[var(--paper)]/50 uppercase">
+              {t("connect")}
             </h3>
-            <nav className="flex flex-col gap-2 text-sm">
-              <Link
-                href="/legal/privacy"
-                className="text-muted-foreground hover:text-foreground transition-colors"
+            <nav className="flex flex-col gap-1 text-sm leading-[1.8] text-[var(--paper)]/85">
+              <a
+                href={instagramUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="transition-colors hover:text-[var(--paper)]"
               >
-                {t("privacy")}
-              </Link>
-              <Link
-                href="/legal/terms"
-                className="text-muted-foreground hover:text-foreground transition-colors"
-              >
-                {t("terms")}
-              </Link>
-              <Link
-                href="/legal/cookie-info"
-                className="text-muted-foreground hover:text-foreground transition-colors"
-              >
-                {t("cookies")}
-              </Link>
+                {t("instagram")}
+              </a>
+              <span>{t("phone")}</span>
             </nav>
           </div>
         </div>
 
-        <div className="border-border text-muted-foreground mt-12 flex flex-col items-center justify-between gap-4 border-t pt-6 text-center text-xs md:flex-row">
-          <p>{t("copyright", { year: currentYear })}</p>
-          <a
-            href={env.NEXT_PUBLIC_INSTAGRAM_URL ?? "https://www.instagram.com/"}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-muted-foreground hover:text-foreground transition-colors"
-            aria-label="Instagram"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="18"
-              height="18"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <rect width="20" height="20" x="2" y="2" rx="5" ry="5" />
-              <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
-              <line x1="17.5" x2="17.51" y1="6.5" y2="6.5" />
-            </svg>
-          </a>
+        <div className="mt-16 flex flex-col items-center justify-between gap-3 border-t border-[var(--paper)]/12 pt-6 text-xs text-[var(--paper)]/40 md:flex-row">
+          <span>{t("copyright", { year: currentYear })}</span>
+          <nav className="flex items-center gap-4">
+            <Link href="/legal/privacy" className="transition-colors hover:text-[var(--paper)]">
+              {t("privacy")}
+            </Link>
+            <Link href="/legal/terms" className="transition-colors hover:text-[var(--paper)]">
+              {t("terms")}
+            </Link>
+            <Link href="/legal/cookie-info" className="transition-colors hover:text-[var(--paper)]">
+              {t("cookies")}
+            </Link>
+          </nav>
+          <span className="hidden md:inline">{t("slogan")}</span>
         </div>
       </div>
     </footer>
