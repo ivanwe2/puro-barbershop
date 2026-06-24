@@ -85,10 +85,27 @@
   },
   "gallery": {
     "title": "Галерия",
+    "kicker": "Работата",
+    "heading": "От стола",
+    "handle": "@puro.barbershop",
     "showFeed": "Покажи лентата",
     "hideFeed": "Скрий лентата",
     "loadingNotice": "Зареждането на тази лента свързва с Instagram и може да постави бисквитки.",
     "seeMoreOnInstagram": "Виж повече в Instagram"
+  },
+  "reviews": {
+    "kicker": "Какво казват",
+    "title": "С доверието на редовните клиенти",
+    "since": "Редовен клиент от {year}",
+    "r1Quote": "[PLACEHOLDER:review_quote_1]",
+    "r1Name": "[PLACEHOLDER:reviewer_1]",
+    "r1Since": "[PLACEHOLDER:year]",
+    "r2Quote": "[PLACEHOLDER:review_quote_2]",
+    "r2Name": "[PLACEHOLDER:reviewer_2]",
+    "r2Since": "[PLACEHOLDER:year]",
+    "r3Quote": "[PLACEHOLDER:review_quote_3]",
+    "r3Name": "[PLACEHOLDER:reviewer_3]",
+    "r3Since": "[PLACEHOLDER:year]"
   },
   "location": {
     "title": "Местоположение",

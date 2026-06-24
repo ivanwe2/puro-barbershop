@@ -85,10 +85,27 @@
   },
   "gallery": {
     "title": "Gallery",
+    "kicker": "The Work",
+    "heading": "From the chair",
+    "handle": "@puro.barbershop",
     "showFeed": "Show feed",
     "hideFeed": "Hide feed",
     "loadingNotice": "Loading this feed connects to Instagram and may set cookies.",
     "seeMoreOnInstagram": "See more on Instagram"
+  },
+  "reviews": {
+    "kicker": "What they say",
+    "title": "Trusted by the regulars",
+    "since": "Regular since {year}",
+    "r1Quote": "[PLACEHOLDER:review_quote_1]",
+    "r1Name": "[PLACEHOLDER:reviewer_1]",
+    "r1Since": "[PLACEHOLDER:year]",
+    "r2Quote": "[PLACEHOLDER:review_quote_2]",
+    "r2Name": "[PLACEHOLDER:reviewer_2]",
+    "r2Since": "[PLACEHOLDER:year]",
+    "r3Quote": "[PLACEHOLDER:review_quote_3]",
+    "r3Name": "[PLACEHOLDER:reviewer_3]",
+    "r3Since": "[PLACEHOLDER:year]"
   },
   "location": {
     "title": "Location",
