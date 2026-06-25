@@ -62,7 +62,7 @@ export default function Hero({ t, common }: HeroProps) {
             {lines.map((line) => (
               <span
                 key={line}
-                className="block text-[clamp(48px,8.5vw,116px)] leading-[0.94] font-bold tracking-[-0.01em]"
+                className="block text-[clamp(40px,8.5vw,116px)] leading-[0.94] font-bold tracking-[-0.01em] whitespace-nowrap"
               >
                 {line}.
               </span>

@@ -138,12 +138,14 @@ h6 {
 }
 
 /* ============ The signature: animated barber-pole ============ */
+/* The stripes repeat every 44px along the 60° gradient axis. A seamless loop
+   needs a vertical shift of one full period: 44 / cos(60°) = 88px. */
 @keyframes poleSpin {
   from {
     background-position: 0 0;
   }
   to {
-    background-position: 0 -44px;
+    background-position: 0 -88px;
   }
 }
 
@@ -171,7 +173,7 @@ h6 {
    scrolling upward forever, with subtle cylindrical inset shadows. */
 .pole-rail {
   background: repeating-linear-gradient(
-    62deg,
+    60deg,
     var(--pole-red) 0 11px,
     var(--paper) 11px 21px,
     var(--pole-blue) 21px 32px,
@@ -180,7 +182,7 @@ h6 {
   box-shadow:
     inset -3px 0 6px rgba(0, 0, 0, 0.4),
     inset 3px 0 5px rgba(255, 255, 255, 0.25);
-  animation: poleSpin 2.4s linear infinite;
+  animation: poleSpin 4.8s linear infinite;
 }
 
 /* Horizontal echo of the pole — a thin rule above the footer columns. */

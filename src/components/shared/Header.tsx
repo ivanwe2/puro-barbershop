@@ -86,7 +86,7 @@ export default function Header() {
           "fixed top-0 left-0 z-50 flex h-[78px] w-full items-center transition-[background,color,border-color,box-shadow,backdrop-filter] duration-[400ms] ease-in-out",
           scrolled
             ? "border-b border-[var(--hairline)] bg-[rgba(247,244,239,0.9)] text-[var(--ink)] shadow-[0_6px_24px_rgba(21,18,14,0.06)] backdrop-blur-[14px] backdrop-saturate-[1.3]"
-            : "border-b border-[#f4f0e9]/[0.14] text-[#f4f0e9]",
+            : "border-b border-[#f4f0e9]/[0.14] text-[#f4f0e9] backdrop-blur-[2px]",
         )}
       >
         <div className="mx-auto flex w-full max-w-[1280px] items-center justify-between px-[clamp(20px,5vw,40px)]">
