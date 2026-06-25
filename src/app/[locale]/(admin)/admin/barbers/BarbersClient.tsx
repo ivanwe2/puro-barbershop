@@ -122,9 +122,12 @@ export default function BarbersClient({ initialBarbers }: { initialBarbers: Barb
           ) : (
             <div className="space-y-3">
               {barbers.map((b) => (
-                <div key={b.id} className="flex items-center justify-between rounded-lg border p-3">
+                <div
+                  key={b.id}
+                  className="flex flex-col gap-3 rounded-lg border p-3 sm:flex-row sm:items-center sm:justify-between"
+                >
                   <div className="space-y-1">
-                    <div className="flex items-center gap-2">
+                    <div className="flex flex-wrap items-center gap-2">
                       <p className="text-foreground text-sm font-medium">{b.nameBg}</p>
                       <span className="text-muted-foreground text-xs">({b.nameEn})</span>
                       <Badge variant={b.active ? "default" : "secondary"}>
@@ -137,7 +140,7 @@ export default function BarbersClient({ initialBarbers }: { initialBarbers: Barb
                     )}
                     <p className="text-muted-foreground text-xs">Order: {b.displayOrder}</p>
                   </div>
-                  <div className="flex gap-2">
+                  <div className="flex flex-wrap gap-2">
                     {b.userId === null && (
                       <Button
                         variant="outline"

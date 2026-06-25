@@ -66,6 +66,13 @@ export default function TimeOffClient({
     const form = e.currentTarget;
     const formData = new FormData(form);
 
+    // datetime-local fields are "YYYY-MM-DDTHH:mm" (no seconds/zone); the server
+    // schema expects a full ISO datetime. Convert from the admin's local time.
+    for (const field of ["startDatetime", "endDatetime"]) {
+      const v = formData.get(field) as string | null;
+      if (v) formData.set(field, new Date(v).toISOString());
+    }
+
     if (editingId) {
       formData.set("id", String(editingId));
       const result = await updateTimeOff(editingId, formData);
@@ -169,10 +176,10 @@ export default function TimeOffClient({
               {entries.map((entry) => (
                 <div
                   key={entry.id}
-                  className={`flex items-center justify-between rounded-lg border p-3 ${isPast(entry) ? "opacity-50" : ""}`}
+                  className={`flex flex-col gap-3 rounded-lg border p-3 sm:flex-row sm:items-center sm:justify-between ${isPast(entry) ? "opacity-50" : ""}`}
                 >
                   <div className="space-y-1">
-                    <div className="flex items-center gap-2">
+                    <div className="flex flex-wrap items-center gap-2">
                       <p className="text-foreground text-sm font-medium">{entry.barberName}</p>
                       {isPast(entry) && <Badge variant="secondary">Past</Badge>}
                     </div>
@@ -185,7 +192,7 @@ export default function TimeOffClient({
                     )}
                   </div>
                   {!isPast(entry) && (
-                    <div className="flex gap-2">
+                    <div className="flex flex-wrap gap-2">
                       <Button variant="outline" size="sm" onClick={() => handleEdit(entry)}>
                         {t("edit")}
                       </Button>

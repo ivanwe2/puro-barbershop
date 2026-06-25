@@ -101,9 +101,12 @@ export default function ServicesClient({ initialServices }: { initialServices: S
           ) : (
             <div className="space-y-3">
               {services.map((s) => (
-                <div key={s.id} className="flex items-center justify-between rounded-lg border p-3">
+                <div
+                  key={s.id}
+                  className="flex flex-col gap-3 rounded-lg border p-3 sm:flex-row sm:items-center sm:justify-between"
+                >
                   <div className="space-y-1">
-                    <div className="flex items-center gap-2">
+                    <div className="flex flex-wrap items-center gap-2">
                       <p className="text-foreground text-sm font-medium">{s.nameBg}</p>
                       <span className="text-muted-foreground text-xs">({s.nameEn})</span>
                       <Badge variant={s.active ? "default" : "secondary"}>
@@ -114,7 +117,7 @@ export default function ServicesClient({ initialServices }: { initialServices: S
                       {s.durationMinutes} min · {s.priceBgn} лв · Order: {s.displayOrder}
                     </p>
                   </div>
-                  <div className="flex gap-2">
+                  <div className="flex flex-wrap gap-2">
                     <Button
                       variant="outline"
                       size="sm"

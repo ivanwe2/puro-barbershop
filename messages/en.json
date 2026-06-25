@@ -171,6 +171,7 @@
     "services": "Services",
     "settings": "Settings",
     "logout": "Logout",
+    "error": "Something went wrong. Please try again.",
     "roleSuperAdmin": "Administrator",
     "roleBarber": "Barber",
     "todayBookings": "Today's Bookings",

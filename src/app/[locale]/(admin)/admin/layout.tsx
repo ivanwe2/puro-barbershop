@@ -79,8 +79,8 @@ export default async function AdminLayout({
       {/* Main content */}
       <div className="flex flex-1 flex-col">
         {/* Top bar */}
-        <header className="bg-background flex h-14 items-center justify-between border-b px-4 lg:px-6">
-          <div className="flex items-center gap-4">
+        <header className="bg-background flex h-14 items-center justify-between gap-2 border-b px-4 lg:px-6">
+          <div className="flex min-w-0 items-center gap-2 sm:gap-4">
             {/* Mobile sidebar trigger */}
             <Sheet>
               <SheetTrigger render={<Button variant="ghost" size="icon" className="lg:hidden" />}>
@@ -104,8 +104,8 @@ export default async function AdminLayout({
               <SheetContent side="left" className="w-64 p-0">
                 <div className="flex h-full flex-col">
                   <div className="flex h-14 items-center border-b px-6">
-                    <Link href="/" className="font-heading text-foreground text-xl">
-                      Puro
+                    <Link href="/" className="text-foreground">
+                      <Wordmark className="text-2xl" />
                     </Link>
                   </div>
                   <SidebarNav navItems={navItems} t={t} />
@@ -113,8 +113,10 @@ export default async function AdminLayout({
               </SheetContent>
             </Sheet>
 
-            <span className="text-muted-foreground text-sm">{session.user?.email}</span>
-            <Badge variant={isSuperAdmin ? "default" : "secondary"}>
+            <span className="text-muted-foreground hidden truncate text-sm sm:inline">
+              {session.user?.email}
+            </span>
+            <Badge variant={isSuperAdmin ? "default" : "secondary"} className="shrink-0">
               {isSuperAdmin ? t("roleSuperAdmin") : t("roleBarber")}
             </Badge>
           </div>
