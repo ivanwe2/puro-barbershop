@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Dialog,
   DialogContent,
@@ -37,11 +38,13 @@ export default function ServicesClient({ initialServices }: { initialServices: S
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState<number | null>(null);
   const [deleteConfirm, setDeleteConfirm] = useState<number | null>(null);
+  const [formActive, setFormActive] = useState(true);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const form = e.currentTarget;
     const formData = new FormData(form);
+    formData.set("active", formActive ? "on" : "off");
 
     if (editingId) {
       const result = await updateService(editingId, formData);
@@ -84,6 +87,7 @@ export default function ServicesClient({ initialServices }: { initialServices: S
         <Button
           onClick={() => {
             setEditingId(null);
+            setFormActive(true);
             setShowForm(true);
           }}
         >
@@ -120,6 +124,7 @@ export default function ServicesClient({ initialServices }: { initialServices: S
                       size="sm"
                       onClick={() => {
                         setEditingId(s.id);
+                        setFormActive(s.active);
                         setShowForm(true);
                       }}
                     >
@@ -210,6 +215,14 @@ export default function ServicesClient({ initialServices }: { initialServices: S
                 type="number"
                 defaultValue={editingService?.displayOrder ?? 0}
               />
+            </div>
+            <div className="flex items-center gap-2">
+              <Checkbox
+                id="service-active"
+                checked={formActive}
+                onCheckedChange={(c) => setFormActive(c === true)}
+              />
+              <Label htmlFor="service-active">{t("active")}</Label>
             </div>
             <DialogFooter>
               <Button

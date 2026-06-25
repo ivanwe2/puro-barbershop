@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Dialog,
   DialogContent,
@@ -39,11 +40,15 @@ export default function BarbersClient({ initialBarbers }: { initialBarbers: Barb
   const [deleteConfirm, setDeleteConfirm] = useState<number | null>(null);
   const [inviteId, setInviteId] = useState<number | null>(null);
   const [inviteEmail, setInviteEmail] = useState("");
+  const [formActive, setFormActive] = useState(true);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const form = e.currentTarget;
     const formData = new FormData(form);
+    // Active is a controlled checkbox (base-ui checkboxes don't reliably submit
+    // a native "on" value), so set it explicitly.
+    formData.set("active", formActive ? "on" : "off");
 
     if (editingId) {
       const result = await updateBarber(editingId, formData);
@@ -105,6 +110,7 @@ export default function BarbersClient({ initialBarbers }: { initialBarbers: Barb
         <Button
           onClick={() => {
             setEditingId(null);
+            setFormActive(true);
             setShowForm(true);
           }}
         >
@@ -155,6 +161,7 @@ export default function BarbersClient({ initialBarbers }: { initialBarbers: Barb
                       size="sm"
                       onClick={() => {
                         setEditingId(b.id);
+                        setFormActive(b.active);
                         setShowForm(true);
                       }}
                     >
@@ -222,6 +229,14 @@ export default function BarbersClient({ initialBarbers }: { initialBarbers: Barb
                 type="number"
                 defaultValue={editingBarber?.displayOrder ?? 0}
               />
+            </div>
+            <div className="flex items-center gap-2">
+              <Checkbox
+                id="barber-active"
+                checked={formActive}
+                onCheckedChange={(c) => setFormActive(c === true)}
+              />
+              <Label htmlFor="barber-active">{t("active")}</Label>
             </div>
             <DialogFooter>
               <Button

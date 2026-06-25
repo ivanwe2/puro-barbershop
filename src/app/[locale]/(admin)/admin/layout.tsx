@@ -38,7 +38,11 @@ function SidebarNav({
       {navItems.map((item) =>
         // Inside the mobile drawer, clicking a link should also close it.
         inSheet ? (
-          <SheetClose key={item.href} render={<Link href={item.href} className={linkClass} />}>
+          <SheetClose
+            key={item.href}
+            nativeButton={false}
+            render={<Link href={item.href} className={linkClass} />}
+          >
             {t(item.labelKey)}
           </SheetClose>
         ) : (
