@@ -24,8 +24,10 @@ const settingsSchema = z.object({
     .regex(/^\d+$/)
     .transform(Number)
     .pipe(z.number().int().min(5).max(60)),
-  shopEmail: z.string().email().max(255),
-  shopPhone: z.string().min(7).max(30),
+  // Optional so other booking settings can be saved before the shop fills
+  // in its real contact details.
+  shopEmail: z.union([z.string().email().max(255), z.literal("")]).optional(),
+  shopPhone: z.union([z.string().min(7).max(30), z.literal("")]).optional(),
 });
 
 export async function fetchSettings() {
@@ -74,8 +76,8 @@ export async function updateSettings(formData: FormData) {
     { key: "cancellation_window_hours", value: String(cancellationWindowHours), updatedAt: now },
     { key: "booking_horizon_days", value: String(bookingHorizonDays), updatedAt: now },
     { key: "slot_granularity_minutes", value: String(slotGranularityMinutes), updatedAt: now },
-    { key: "shop_email", value: shopEmail, updatedAt: now },
-    { key: "shop_phone", value: shopPhone, updatedAt: now },
+    { key: "shop_email", value: shopEmail ?? "", updatedAt: now },
+    { key: "shop_phone", value: shopPhone ?? "", updatedAt: now },
   ];
 
   for (const update of updates) {

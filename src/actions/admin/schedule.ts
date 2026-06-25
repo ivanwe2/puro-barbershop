@@ -5,10 +5,13 @@ import { db } from "@/db";
 import { bookings, barbers, services, timeOff } from "@/db/schema";
 import { and, eq, gte, lte, asc } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
+import { after } from "next/server";
 import crypto from "crypto";
 import { z } from "zod";
+import { format } from "date-fns";
 import { getAvailableSlots } from "@/lib/booking/availability";
 import { generateCancellationToken } from "@/lib/booking/tokens";
+import { sendCancellationEmail } from "@/lib/email";
 
 const barberColors: Record<number, string> = {
   1: "bg-blue-500/20 border-blue-500/40 text-blue-300",
@@ -224,10 +227,20 @@ export async function updateBookingStatus(
 
   const isSuperAdmin = session.user?.role === "super_admin";
 
-  // Fetch the booking to check ownership
+  // Fetch the booking (with service name) to check ownership + email on cancel
   const [existing] = await db
-    .select({ barberId: bookings.barberId })
+    .select({
+      barberId: bookings.barberId,
+      customerName: bookings.customerName,
+      customerEmail: bookings.customerEmail,
+      startDatetime: bookings.startDatetime,
+      endDatetime: bookings.endDatetime,
+      locale: bookings.locale,
+      serviceNameBg: services.nameBg,
+      serviceNameEn: services.nameEn,
+    })
     .from(bookings)
+    .leftJoin(services, eq(bookings.serviceId, services.id))
     .where(eq(bookings.id, bookingId));
 
   if (!existing) return { error: "notFound" } as const;
@@ -241,6 +254,24 @@ export async function updateBookingStatus(
     .update(bookings)
     .set({ status, updatedAt: new Date() })
     .where(eq(bookings.id, bookingId));
+
+  // Notify the customer when an admin cancels (skip internal walk-in emails).
+  if (status === "cancelled" && !existing.customerEmail.endsWith("@internal.local")) {
+    const isBg = existing.locale === "bg";
+    after(async () => {
+      await sendCancellationEmail({
+        to: existing.customerEmail,
+        name: existing.customerName,
+        date: format(existing.startDatetime, "EEEE, MMMM d, yyyy"),
+        time: format(existing.startDatetime, "HH:mm"),
+        serviceName: (isBg ? existing.serviceNameBg : existing.serviceNameEn) ?? "",
+        address: isBg
+          ? "Бул. Христо Ботев 114, Пловдив, България"
+          : "114 Hristo Botev Blvd, Plovdiv, Bulgaria",
+        phone: process.env.NEXT_PUBLIC_SHOP_PHONE ?? "",
+      });
+    });
+  }
 
   revalidatePath("/admin/schedule");
 

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useTranslations } from "next-intl";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -49,10 +49,7 @@ export default function SettingsClient({ initialSettings }: { initialSettings: S
       <h1 className="font-heading text-foreground text-2xl">{t("settings")}</h1>
 
       <Card>
-        <CardHeader>
-          <CardTitle>{t("settings")}</CardTitle>
-        </CardHeader>
-        <CardContent>
+        <CardContent className="pt-6">
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
               <Label>{t("bufferMinutes")}</Label>

@@ -33,5 +33,5 @@ test("booking flow — single-screen form", async ({ page }) => {
   await page.getByRole("button", { name: /Потвърди/i }).click();
 
   // Assert confirmation shows.
-  await expect(page.getByText(/потвърден/i)).toBeVisible({ timeout: 15000 });
+  await expect(page.getByRole("heading", { name: /потвърден/i })).toBeVisible({ timeout: 15000 });
 });

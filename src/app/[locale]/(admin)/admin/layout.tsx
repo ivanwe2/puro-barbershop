@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetTrigger, SheetClose } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { logoutAction } from "@/actions/admin/logout";
@@ -25,21 +25,28 @@ const superAdminNavItems = [
 function SidebarNav({
   navItems,
   t,
+  inSheet = false,
 }: {
   navItems: { href: string; labelKey: string }[];
   t: (key: string) => string;
+  inSheet?: boolean;
 }) {
+  const linkClass =
+    "text-muted-foreground hover:bg-accent hover:text-accent-foreground block rounded-lg px-3 py-2 text-sm font-medium transition-colors";
   return (
     <nav className="flex-1 space-y-1 px-3 py-4">
-      {navItems.map((item) => (
-        <Link
-          key={item.href}
-          href={item.href}
-          className="text-muted-foreground hover:bg-accent hover:text-accent-foreground block rounded-lg px-3 py-2 text-sm font-medium transition-colors"
-        >
-          {t(item.labelKey)}
-        </Link>
-      ))}
+      {navItems.map((item) =>
+        // Inside the mobile drawer, clicking a link should also close it.
+        inSheet ? (
+          <SheetClose key={item.href} render={<Link href={item.href} className={linkClass} />}>
+            {t(item.labelKey)}
+          </SheetClose>
+        ) : (
+          <Link key={item.href} href={item.href} className={linkClass}>
+            {t(item.labelKey)}
+          </Link>
+        ),
+      )}
     </nav>
   );
 }
@@ -108,7 +115,7 @@ export default async function AdminLayout({
                       <Wordmark className="text-2xl" />
                     </Link>
                   </div>
-                  <SidebarNav navItems={navItems} t={t} />
+                  <SidebarNav navItems={navItems} t={t} inSheet />
                 </div>
               </SheetContent>
             </Sheet>

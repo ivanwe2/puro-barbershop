@@ -195,7 +195,7 @@ export default function BookPage() {
                   >
                     {serviceList.map((s) => (
                       <option key={s.id} value={s.id}>
-                        {serviceName(s)} — {priceLabel(s)} лв
+                        {serviceName(s)} — €{priceLabel(s)}
                       </option>
                     ))}
                   </select>

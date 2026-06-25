@@ -86,8 +86,10 @@ export default function ScheduleClient({
   const weekEnd = endOfWeek(weekStart, { weekStartsOn: 1 });
 
   const filteredBookings = useMemo(() => {
-    if (selectedBarberId === "all") return bookings;
-    return bookings.filter((b) => b.barberId === Number(selectedBarberId));
+    // Cancelled bookings free their slot — drop them from the calendar.
+    const visible = bookings.filter((b) => b.status !== "cancelled");
+    if (selectedBarberId === "all") return visible;
+    return visible.filter((b) => b.barberId === Number(selectedBarberId));
   }, [bookings, selectedBarberId]);
 
   const filteredTimeOff = useMemo(() => {

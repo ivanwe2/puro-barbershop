@@ -8,6 +8,7 @@ import { barbers, services, bookings, emailBlacklist, users } from "@/db/schema"
 import { generateCancellationToken } from "@/lib/booking/tokens";
 import { rateLimiters } from "@/lib/rate-limit";
 import { headers } from "next/headers";
+import { after } from "next/server";
 import crypto from "crypto";
 import { sendBookingConfirmation, sendBarberNotification } from "@/lib/email";
 import { format } from "date-fns";
@@ -266,41 +267,41 @@ export async function createBooking(input: unknown): Promise<CreateBookingResult
 
     const cancellationLink = `${env.AUTH_URL}/${locale}/book/cancel/${realToken}`;
 
-    // Send emails asynchronously (don't block response)
-    sendBookingConfirmation({
-      to: sanitizedEmail,
-      name: sanitizedName,
-      date: dateStr,
-      time: timeStr,
-      serviceName,
-      barberName,
-      cancellationLink,
-      address:
-        locale === "bg"
-          ? "Бул. Христо Ботев 114, Пловдив, България"
-          : "114 Hristo Botev Blvd, Plovdiv, Bulgaria",
-      phone: env.NEXT_PUBLIC_SHOP_PHONE ?? "",
-    }).catch((err) => {
-      console.error("[booking] Failed to send confirmation email:", err);
-    });
-
+    let barberUserEmail: string | null = null;
     if (barber?.userId) {
       const userRows = await db.select().from(users).where(eq(users.id, barber.userId));
-      const user = userRows.find((u) => u.id === barber.userId);
-      if (user?.email) {
-        sendBarberNotification({
-          to: user.email,
+      barberUserEmail = userRows.find((u) => u.id === barber.userId)?.email ?? null;
+    }
+
+    // Send emails after the response flushes (reliable in the same process;
+    // a bare fire-and-forget promise can be dropped when the action returns).
+    after(async () => {
+      await sendBookingConfirmation({
+        to: sanitizedEmail,
+        name: sanitizedName,
+        date: dateStr,
+        time: timeStr,
+        serviceName,
+        barberName,
+        cancellationLink,
+        address:
+          locale === "bg"
+            ? "Бул. Христо Ботев 114, Пловдив, България"
+            : "114 Hristo Botev Blvd, Plovdiv, Bulgaria",
+        phone: env.NEXT_PUBLIC_SHOP_PHONE ?? "",
+      });
+      if (barberUserEmail) {
+        await sendBarberNotification({
+          to: barberUserEmail,
           barberName,
           customerName: sanitizedName,
           date: dateStr,
           time: timeStr,
           serviceName,
           customerPhone: sanitizedPhone,
-        }).catch((err) => {
-          console.error("[booking] Failed to send barber notification:", err);
         });
       }
-    }
+    });
 
     return { success: true, bookingId };
   } catch (err) {

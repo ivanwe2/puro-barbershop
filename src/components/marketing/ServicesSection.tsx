@@ -60,7 +60,7 @@ export default async function ServicesSection({ services: serviceList, t }: Serv
                 {name(service)}
               </span>
               <span className="flex-1 -translate-y-1 border-b border-dotted border-[rgba(21,18,14,0.25)]" />
-              <span className="text-base font-semibold text-[var(--ink)]">{price(service)} лв</span>
+              <span className="text-base font-semibold text-[var(--ink)]">€{price(service)}</span>
             </Link>
           ))}
         </div>

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useTranslations } from "next-intl";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -92,10 +92,7 @@ export default function ServicesClient({ initialServices }: { initialServices: S
       </div>
 
       <Card>
-        <CardHeader>
-          <CardTitle>{t("services")}</CardTitle>
-        </CardHeader>
-        <CardContent>
+        <CardContent className="pt-6">
           {services.length === 0 ? (
             <p className="text-muted-foreground text-sm">No services found</p>
           ) : (
@@ -114,7 +111,7 @@ export default function ServicesClient({ initialServices }: { initialServices: S
                       </Badge>
                     </div>
                     <p className="text-muted-foreground text-xs">
-                      {s.durationMinutes} min · {s.priceBgn} лв · Order: {s.displayOrder}
+                      {s.durationMinutes} min · €{s.priceBgn} · Order: {s.displayOrder}
                     </p>
                   </div>
                   <div className="flex flex-wrap gap-2">
@@ -197,7 +194,7 @@ export default function ServicesClient({ initialServices }: { initialServices: S
               />
             </div>
             <div className="space-y-2">
-              <Label>{t("price")} (лв)</Label>
+              <Label>{t("price")} (€)</Label>
               <Input
                 name="priceBgn"
                 type="number"

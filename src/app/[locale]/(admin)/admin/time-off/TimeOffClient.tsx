@@ -53,6 +53,7 @@ export default function TimeOffClient({
   const [entries, setEntries] = useState(initialEntries);
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState<number | null>(null);
+  const [formBarberId, setFormBarberId] = useState("");
   const [deleteConfirm, setDeleteConfirm] = useState<number | null>(null);
   const [overlappingWarning, setOverlappingWarning] = useState<{
     message: string;
@@ -71,6 +72,16 @@ export default function TimeOffClient({
     for (const field of ["startDatetime", "endDatetime"]) {
       const v = formData.get(field) as string | null;
       if (v) formData.set(field, new Date(v).toISOString());
+    }
+
+    // Barber is a controlled Select (a required, visually-hidden native control
+    // can silently block submit), so supply its value explicitly.
+    if (isSuperAdmin) {
+      if (!formBarberId) {
+        toast.error(t("error"));
+        return;
+      }
+      formData.set("barberId", formBarberId);
     }
 
     if (editingId) {
@@ -145,6 +156,7 @@ export default function TimeOffClient({
 
   const handleEdit = (entry: TimeOffEntry) => {
     setEditingId(entry.id);
+    setFormBarberId(String(entry.barberId));
     setShowForm(true);
   };
 
@@ -157,6 +169,7 @@ export default function TimeOffClient({
         <Button
           onClick={() => {
             setEditingId(null);
+            setFormBarberId("");
             setShowForm(true);
           }}
         >
@@ -241,12 +254,8 @@ export default function TimeOffClient({
             {isSuperAdmin && (
               <div className="space-y-2">
                 <Label>{t("name")}</Label>
-                <Select
-                  name="barberId"
-                  defaultValue={editingEntry ? String(editingEntry.barberId) : ""}
-                  required
-                >
-                  <SelectTrigger>
+                <Select value={formBarberId} onValueChange={(v) => setFormBarberId(v ?? "")}>
+                  <SelectTrigger className="w-full">
                     <SelectValue placeholder="Select barber" />
                   </SelectTrigger>
                   <SelectContent>
