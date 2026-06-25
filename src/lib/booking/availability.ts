@@ -132,14 +132,21 @@ async function getAvailableSlots({
   const endMinutes = timeStrToMinutes(hour.endTime);
   if (startMinutes === null || endMinutes === null) return [];
 
+  // Generated slots live in a "wall-clock-as-UTC" basis (sofiaMidnight is UTC
+  // midnight of the Sofia date), but bookings/time-off are stored as true
+  // instants. Shift stored instants into the same basis before comparing.
+  const toWallMs = (d: Date) => d.getTime() + getSofiaOffsetMs(d);
+
+  // Overlap (not containment) so multi-day time-off and any entry touching the
+  // day are caught.
   const timeOffRows = await db
     .select()
     .from(timeOff)
     .where(
       and(
         eq(timeOff.barberId, barberId),
-        lte(timeOff.endDatetime, sofiaEndOfDay),
-        gte(timeOff.startDatetime, sofiaMidnight),
+        lte(timeOff.startDatetime, sofiaEndOfDay),
+        gte(timeOff.endDatetime, sofiaMidnight),
       ),
     );
 
@@ -149,34 +156,25 @@ async function getAvailableSlots({
     .where(
       and(
         eq(bookings.barberId, barberId),
-        lte(bookings.endDatetime, sofiaEndOfDay),
-        gte(bookings.startDatetime, sofiaMidnight),
+        lte(bookings.startDatetime, sofiaEndOfDay),
+        gte(bookings.endDatetime, sofiaMidnight),
         or(eq(bookings.status, "confirmed"), eq(bookings.status, "completed")),
       ),
     );
 
   const occupiedIntervals: Array<{ start: number; end: number }> = [];
 
-  for (const to of timeOffRows.filter(
-    (t) =>
-      t.barberId === barberId && t.endDatetime <= sofiaEndOfDay && t.startDatetime >= sofiaMidnight,
-  )) {
+  for (const to of timeOffRows) {
     occupiedIntervals.push({
-      start: to.startDatetime.getTime(),
-      end: to.endDatetime.getTime(),
+      start: toWallMs(to.startDatetime),
+      end: toWallMs(to.endDatetime),
     });
   }
 
-  for (const b of bookingRows.filter(
-    (bk) =>
-      bk.barberId === barberId &&
-      bk.endDatetime <= sofiaEndOfDay &&
-      bk.startDatetime >= sofiaMidnight &&
-      (bk.status === "confirmed" || bk.status === "completed"),
-  )) {
+  for (const b of bookingRows) {
     occupiedIntervals.push({
-      start: b.startDatetime.getTime(),
-      end: b.endDatetime.getTime() + bufferMinutes * 60000,
+      start: toWallMs(b.startDatetime),
+      end: toWallMs(b.endDatetime) + bufferMinutes * 60000,
     });
   }
 

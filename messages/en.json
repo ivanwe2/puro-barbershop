@@ -92,7 +92,8 @@
     "backToHome": "Back to home",
     "booking_error": "Something went wrong. Please try again.",
     "cancel": "Cancel Booking",
-    "phoneInvalid": "Please enter a valid phone number"
+    "phoneInvalid": "Please enter a valid phone number",
+    "emailInvalid": "Please enter a valid email"
   },
   "gallery": {
     "title": "Gallery",

@@ -6,6 +6,7 @@ import { useSearchParams } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import { isValidPhoneNumber } from "libphonenumber-js";
 import { format, addDays } from "date-fns";
 import { fetchServices, fetchBarbers, fetchSlots, createBooking } from "@/actions/booking";
 import { Link } from "@/lib/i18n/routing";
@@ -18,7 +19,12 @@ type BarberRow = InferSelectModel<typeof barbers>;
 const detailsSchema = z.object({
   name: z.string().min(2).max(100),
   email: z.string().email().max(255),
-  phone: z.string().min(7).max(30),
+  // Match the server: a real, dialable number (defaults to BG region).
+  phone: z
+    .string()
+    .min(7)
+    .max(30)
+    .refine((v) => isValidPhoneNumber(v, "BG"), { message: "phoneInvalid" }),
   consent: z.literal(true),
 });
 type DetailsForm = z.infer<typeof detailsSchema>;
@@ -317,7 +323,7 @@ export default function BookPage() {
                   />
                   {errors.email && (
                     <p className="mt-1 text-sm text-[var(--destructive)]" role="alert">
-                      {t("required")}
+                      {t("emailInvalid")}
                     </p>
                   )}
                 </label>
