@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useMemo } from "react";
+import { useTranslations } from "next-intl";
 import {
   format,
   addWeeks,
@@ -46,7 +47,6 @@ const dayLabels: Record<number, string> = {
 };
 
 export default function ScheduleClient({
-  t,
   initialBookings,
   initialBarbers,
   initialTimeOff,
@@ -54,7 +54,6 @@ export default function ScheduleClient({
   isSuperAdmin,
   userBarberId,
 }: {
-  t: (key: string) => string;
   initialBookings: BookingRow[];
   initialBarbers: { id: number; nameBg: string }[];
   initialTimeOff: {
@@ -68,6 +67,7 @@ export default function ScheduleClient({
   isSuperAdmin: boolean;
   userBarberId: number | undefined;
 }) {
+  const t = useTranslations("admin");
   const [view, setView] = useState<"day" | "week">("week");
   const [weekStart, setWeekStart] = useState(startOfWeek(new Date(), { weekStartsOn: 1 }));
   const [selectedBarberId, setSelectedBarberId] = useState<string | null>("all");

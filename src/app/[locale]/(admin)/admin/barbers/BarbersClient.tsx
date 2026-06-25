@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -30,13 +31,8 @@ interface Barber {
   userId: number | null;
 }
 
-export default function BarbersClient({
-  t,
-  initialBarbers,
-}: {
-  t: (key: string) => string;
-  initialBarbers: Barber[];
-}) {
+export default function BarbersClient({ initialBarbers }: { initialBarbers: Barber[] }) {
+  const t = useTranslations("admin");
   const [barbers, setBarbers] = useState(initialBarbers);
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState<number | null>(null);

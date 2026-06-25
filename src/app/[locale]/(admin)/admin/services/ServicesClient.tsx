@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -30,13 +31,8 @@ interface Service {
   active: boolean;
 }
 
-export default function ServicesClient({
-  t,
-  initialServices,
-}: {
-  t: (key: string) => string;
-  initialServices: Service[];
-}) {
+export default function ServicesClient({ initialServices }: { initialServices: Service[] }) {
+  const t = useTranslations("admin");
   const [services, setServices] = useState(initialServices);
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState<number | null>(null);

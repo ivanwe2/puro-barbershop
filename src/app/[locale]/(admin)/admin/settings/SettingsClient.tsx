@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -10,13 +11,8 @@ import { toast } from "sonner";
 
 type SettingsObj = Record<string, string>;
 
-export default function SettingsClient({
-  t,
-  initialSettings,
-}: {
-  t: (key: string) => string;
-  initialSettings: SettingsObj;
-}) {
+export default function SettingsClient({ initialSettings }: { initialSettings: SettingsObj }) {
+  const t = useTranslations("admin");
   const [bufferMinutes, setBufferMinutes] = useState(initialSettings.buffer_minutes ?? "15");
   const [cancellationWindowHours, setCancellationWindowHours] = useState(
     initialSettings.cancellation_window_hours ?? "24",

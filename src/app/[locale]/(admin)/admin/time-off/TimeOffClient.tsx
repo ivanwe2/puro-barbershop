@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { format } from "date-fns";
 import { bg } from "date-fns/locale";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -38,18 +39,17 @@ interface TimeOffEntry {
 }
 
 export default function TimeOffClient({
-  t,
   initialEntries,
   initialBarbers,
   isSuperAdmin,
   barberId,
 }: {
-  t: (key: string) => string;
   initialEntries: TimeOffEntry[];
   initialBarbers: { id: number; nameBg: string }[];
   isSuperAdmin: boolean;
   barberId?: number;
 }) {
+  const t = useTranslations("admin");
   const [entries, setEntries] = useState(initialEntries);
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState<number | null>(null);
