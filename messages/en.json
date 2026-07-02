@@ -52,7 +52,8 @@
   "booking": {
     "title": "Book an Appointment",
     "ctaKicker": "Reserve your chair",
-    "ctaCall": "Prefer to talk? Call",
+    "ctaCall": "Prefer to talk?",
+    "call": "Call us",
     "walkins": "Walk-ins welcome",
     "subtitle": "Reserve your chair",
     "service": "Service",
@@ -134,7 +135,6 @@
     "whatsapp": "WhatsApp",
     "tiktok": "TikTok",
     "call": "Call us",
-    "phone": "+359 892 919 649",
     "book": "Book Now",
     "navigation": "Navigation",
     "services": "Services",

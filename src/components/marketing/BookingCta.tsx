@@ -37,7 +37,7 @@ export default function BookingCta({ t, common }: BookingCtaProps) {
             href={shop.phoneHref}
             className="font-semibold text-[var(--paper)] underline underline-offset-4 hover:text-white"
           >
-            {shop.phoneDisplay}
+            {t("call")}
           </a>{" "}
           · {t("walkins")}
         </p>

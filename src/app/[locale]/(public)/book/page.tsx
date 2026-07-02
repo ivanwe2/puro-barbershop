@@ -390,7 +390,7 @@ export default function BookPage() {
                   href={shop.phoneHref}
                   className="font-semibold text-[var(--ink)] underline underline-offset-4"
                 >
-                  {shop.phoneDisplay}
+                  {t("call")}
                 </a>{" "}
                 · {t("walkins")}
               </p>
