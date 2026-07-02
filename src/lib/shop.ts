@@ -21,14 +21,14 @@ export const shop = {
   lng: 24.755346576487906,
   // Official "Embed a map" src from the Google Business listing.
   mapsEmbed:
-    "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2958.6653864137274!2d24.755346576487906!3d42.13604614922421!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x14acd1127ec62ce1%3A0x125e0f977733e0a8!2sPuro%20Barbershop!5e0!3m2!1sbg!2sbg!4v1783029277055!5m2!1sbg!2sbg",
+    "https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d2958.6653864137274!2d24.755346576487906!3d42.13604614922421!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x14acd1127ec62ce1%3A0x125e0f977733e0a8!2sPuro%20Barbershop!5e0!3m2!1sbg!2sbg!4v1783030206431!5m2!1sbg!2sbg",
   // Route to the named listing (shows "Puro Barbershop" as the destination),
   // pinned to the exact coordinates via destination_place_id-free lat/lng.
   mapsDirections: `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(
     "Puro Barbershop, Бул. Христо Ботев 114, Пловдив",
   )}`,
-  mapsLink:
-    "https://www.google.com/maps/place/Puro+Barbershop/@42.13604614922421,24.755346576487906,17z",
+  // Canonical Google Maps share link for the business listing.
+  mapsLink: "https://maps.app.goo.gl/2FXN2S8dZhwmGZR59",
 } as const;
 
 export function shopAddress(locale: string): string {
