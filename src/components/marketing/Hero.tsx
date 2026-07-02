@@ -10,7 +10,7 @@ interface HeroProps {
 }
 
 export default function Hero({ t, common }: HeroProps) {
-  // Slogan rendered as stacked Bodoni lines: "Precision." / "Confidence." / ...
+  // Slogan rendered as stacked serif lines: "Precision." / "Confidence." / ...
   const lines = common("slogan")
     .split("·")
     .map((part) => part.trim())
