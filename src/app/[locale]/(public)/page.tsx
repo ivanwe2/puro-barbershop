@@ -80,6 +80,8 @@ export default async function HomePage(props: { params: Promise<{ locale: string
     },
     telephone: shop.phone,
     sameAs: [shop.instagram, shop.tiktok],
+    geo: { "@type": "GeoCoordinates", latitude: shop.lat, longitude: shop.lng },
+    hasMap: shop.mapsLink,
     openingHoursSpecification: [
       {
         "@type": "OpeningHoursSpecification",

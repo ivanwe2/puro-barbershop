@@ -16,10 +16,16 @@ export const shop = {
   instagram: "https://www.instagram.com/puro.barbershop/",
   tiktok: "https://www.tiktok.com/@puro.barbershop",
   address: { bg: addressBg, en: addressEn },
-  // Query-based embed works without an API key and centres on the address.
-  mapsEmbed: `https://maps.google.com/maps?q=${encodeURIComponent(addressBg)}&z=16&hl=bg&output=embed`,
-  mapsDirections: `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(addressBg)}`,
-  mapsLink: `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(addressBg)}`,
+  // Exact Google Business listing coordinates.
+  lat: 42.13604614922421,
+  lng: 24.755346576487906,
+  // Official "Embed a map" src from the Google Business listing.
+  mapsEmbed:
+    "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2958.6653864137274!2d24.755346576487906!3d42.13604614922421!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x14acd1127ec62ce1%3A0x125e0f977733e0a8!2sPuro%20Barbershop!5e0!3m2!1sbg!2sbg!4v1783029277055!5m2!1sbg!2sbg",
+  mapsDirections:
+    "https://www.google.com/maps/dir/?api=1&destination=42.13604614922421,24.755346576487906",
+  mapsLink:
+    "https://www.google.com/maps/place/Puro+Barbershop/@42.13604614922421,24.755346576487906,17z",
 } as const;
 
 export function shopAddress(locale: string): string {
