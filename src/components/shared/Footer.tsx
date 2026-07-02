@@ -1,14 +1,13 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import { env } from "@/lib/env";
 import { Link } from "@/lib/i18n/routing";
 import Wordmark from "@/components/shared/Wordmark";
+import { shop } from "@/lib/shop";
 
 export default function Footer() {
   const t = useTranslations("footer");
   const currentYear = new Date().getFullYear();
-  const instagramUrl = env.NEXT_PUBLIC_INSTAGRAM_URL ?? "https://www.instagram.com/";
 
   return (
     <footer className="bg-[var(--ink)] text-[var(--paper)]">
@@ -32,7 +31,7 @@ export default function Footer() {
               {t("address")}
             </address>
             <a
-              href={`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(t("address"))}`}
+              href={shop.mapsDirections}
               target="_blank"
               rel="noopener noreferrer"
               className="mt-2 inline-block border-b border-[var(--paper)]/30 pb-0.5 text-sm text-[var(--paper)]/85 transition-colors hover:text-[var(--paper)]"
@@ -54,14 +53,32 @@ export default function Footer() {
             </h3>
             <nav className="flex flex-col gap-1 text-sm leading-[1.8] text-[var(--paper)]/85">
               <a
-                href={instagramUrl}
+                href={shop.instagram}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="transition-colors hover:text-[var(--paper)]"
               >
                 {t("instagram")}
               </a>
-              <span>{t("phone")}</span>
+              <a
+                href={shop.tiktok}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="transition-colors hover:text-[var(--paper)]"
+              >
+                {t("tiktok")}
+              </a>
+              <a
+                href={shop.whatsappHref}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="transition-colors hover:text-[var(--paper)]"
+              >
+                {t("whatsapp")}
+              </a>
+              <a href={shop.phoneHref} className="transition-colors hover:text-[var(--paper)]">
+                {shop.phoneDisplay}
+              </a>
             </nav>
           </div>
         </div>

@@ -63,8 +63,8 @@ async function main() {
   const [barber1] = await db
     .insert(schema.barbers)
     .values({
-      nameEn: "[PLACEHOLDER:barber_1_name]",
-      nameBg: "[PLACEHOLDER:barber_1_name]",
+      nameEn: "Seney",
+      nameBg: "Сеней",
       displayOrder: 1,
       active: true,
       userId: adminUser.id,
@@ -82,8 +82,8 @@ async function main() {
   const [barber2] = await db
     .insert(schema.barbers)
     .values({
-      nameEn: "[PLACEHOLDER:barber_2_name]",
-      nameBg: "[PLACEHOLDER:barber_2_name]",
+      nameEn: "Andrey",
+      nameBg: "Андрей",
       displayOrder: 2,
       active: true,
     })

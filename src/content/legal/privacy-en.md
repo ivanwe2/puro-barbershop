@@ -37,7 +37,7 @@ This privacy policy describes how `[PLACEHOLDER:legal_entity_name]` ("we", "us",
 - **Registered address:** `[PLACEHOLDER:registered_address]`
 - **Trading address:** Бул. Христо Ботев 114, Plovdiv, Bulgaria
 - **Email:** `[PLACEHOLDER:shop_email]`
-- **Phone:** `[PLACEHOLDER:shop_phone]`
+- **Phone:** `+359 892 919 649`
 
 We are the data controller for all personal data described in this policy, meaning we determine why and how it is processed.
 
@@ -164,16 +164,16 @@ After the retention period, the records are deleted automatically by a scheduled
 
 We do not sell or rent your personal data. We share it only with the following categories of processors who help us run the service. Each operates under a Data Processing Agreement that requires them to process the data only on our instructions and to apply appropriate security measures.
 
-| Recipient                             | Role                                                      | What they see                                                                                    | Location of processing                                        |
-| ------------------------------------- | --------------------------------------------------------- | ------------------------------------------------------------------------------------------------ | ------------------------------------------------------------- |
-| Neon, Inc. (USA)                      | Database hosting (Postgres)                               | All booking and account data, stored at rest                                                     | EU region (`[PLACEHOLDER:neon_region]`)                       |
-| Vercel Inc. (USA)                     | Website hosting and request routing                       | All website traffic; processes data in memory during request handling                            | EU region (`[PLACEHOLDER:vercel_region]`)                     |
-| Resend (USA)                          | Transactional email delivery                              | Recipient email address, subject line, and email body (name, booking details, cancellation link) | EU region where available (`[PLACEHOLDER:resend_region]`)     |
-| Upstash, Inc. (USA)                   | Rate-limiting state (Redis)                               | Hashed identifiers of recent booking attempts (IP, email, phone) — short-lived                   | EU region (`[PLACEHOLDER:upstash_region]`)                    |
-| Cloudinary Ltd. (Israel)              | Image hosting for barber portraits and any uploaded media | Images we upload (not customer data)                                                             | EU region where available (`[PLACEHOLDER:cloudinary_region]`) |
-| LightWidget Sp. z o.o. (Poland)       | Instagram feed embed                                      | No customer data — only loads when a visitor clicks to load the Instagram feed                   | EU                                                            |
-| Cloudflare, Inc. (USA)                | Domain registrar and DNS                                  | DNS resolution traffic only (not customer data)                                                  | Global                                                        |
-| Meta Platforms Ireland Ltd. (Ireland) | Instagram content (loaded only on visitor click)          | The visitor's IP and browser metadata, when they click to load                                   | EU / global                                                   |
+| Recipient                             | Role                                             | What they see                                                                                    | Location of processing                                    |
+| ------------------------------------- | ------------------------------------------------ | ------------------------------------------------------------------------------------------------ | --------------------------------------------------------- |
+| Neon, Inc. (USA)                      | Database hosting (Postgres)                      | All booking and account data, stored at rest                                                     | EU region (`[PLACEHOLDER:neon_region]`)                   |
+| Vercel Inc. (USA)                     | Website hosting and request routing              | All website traffic; processes data in memory during request handling                            | EU region (`[PLACEHOLDER:vercel_region]`)                 |
+| Resend (USA)                          | Transactional email delivery                     | Recipient email address, subject line, and email body (name, booking details, cancellation link) | EU region where available (`[PLACEHOLDER:resend_region]`) |
+| Upstash, Inc. (USA)                   | Rate-limiting state (Redis)                      | Hashed identifiers of recent booking attempts (IP, email, phone) — short-lived                   | EU region (`[PLACEHOLDER:upstash_region]`)                |
+| LightWidget Sp. z o.o. (Poland)       | Instagram feed embed                             | No customer data — only loads when a visitor clicks to load the Instagram feed                   | EU                                                        |
+| Google Ireland Ltd. (Ireland)         | Map embed (loaded only on visitor click)         | The visitor's IP and browser metadata, when they click to load the map                           | EU / global                                               |
+| Cloudflare, Inc. (USA)                | Domain registrar and DNS                         | DNS resolution traffic only (not customer data)                                                  | Global                                                    |
+| Meta Platforms Ireland Ltd. (Ireland) | Instagram content (loaded only on visitor click) | The visitor's IP and browser metadata, when they click to load                                   | EU / global                                               |
 
 If a court or competent authority in Bulgaria orders us to disclose data (for example, in connection with a criminal investigation), we may have to do so. Such requests are rare and we will challenge any that we consider unlawful or disproportionate.
 
@@ -286,7 +286,7 @@ Previous versions of this policy are kept on file and available on request.
 For any question about this policy or about how we handle your personal data:
 
 - **Email:** `[PLACEHOLDER:shop_email]`
-- **Phone:** `[PLACEHOLDER:shop_phone]`
+- **Phone:** `+359 892 919 649`
 - **Address:** `[PLACEHOLDER:registered_address]`
 
 ---

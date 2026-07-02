@@ -121,13 +121,19 @@
   },
   "location": {
     "title": "Location",
+    "kicker": "Come by",
+    "findUs": "Find us",
     "address": "114 Hristo Botev Blvd, Plovdiv, Bulgaria",
     "hours": "Working Hours",
+    "hoursDaily": "Daily · 10:00–19:30",
     "weekdays": "Mon–Fri",
     "saturday": "Sat",
     "sunday": "Sun",
     "closed": "Closed",
-    "getDirections": "Get Directions"
+    "getDirections": "Get Directions",
+    "showMap": "Show map",
+    "mapNotice": "Loading the map connects to Google Maps, which may set cookies.",
+    "openInMaps": "Open in Google Maps"
   },
   "footer": {
     "slogan": "Precision · Confidence · Clean Look",
@@ -140,7 +146,8 @@
     "connect": "Connect",
     "instagram": "Instagram",
     "whatsapp": "WhatsApp",
-    "phone": "[PLACEHOLDER:shop_phone]",
+    "tiktok": "TikTok",
+    "phone": "+359 892 919 649",
     "book": "Book Now",
     "navigation": "Navigation",
     "services": "Services",

@@ -1,4 +1,5 @@
 import { Link } from "@/lib/i18n/routing";
+import { shop } from "@/lib/shop";
 
 interface T {
   (key: string, params?: Record<string, string | number | Date>): string;
@@ -10,8 +11,6 @@ interface BookingCtaProps {
 }
 
 export default function BookingCta({ t, common }: BookingCtaProps) {
-  const phone = process.env.NEXT_PUBLIC_SHOP_PHONE || "[PLACEHOLDER:shop_phone]";
-
   return (
     <section
       id="book"
@@ -33,8 +32,14 @@ export default function BookingCta({ t, common }: BookingCtaProps) {
           </Link>
         </div>
         <p className="mt-[18px] text-[13px] text-[var(--paper)]/50">
-          {t("ctaCall")} <span className="font-semibold text-[var(--paper)]">{phone}</span> ·{" "}
-          {t("walkins")}
+          {t("ctaCall")}{" "}
+          <a
+            href={shop.phoneHref}
+            className="font-semibold text-[var(--paper)] underline underline-offset-4 hover:text-white"
+          >
+            {shop.phoneDisplay}
+          </a>{" "}
+          · {t("walkins")}
         </p>
       </div>
     </section>

@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { env } from "@/lib/env";
+import { shop } from "@/lib/shop";
 
 const LIGHTWIDGET_EMBED_URL = "https://lightwidget.com/w/widgets/";
 
@@ -25,7 +26,7 @@ export default function InstagramGallery() {
   const [error, setError] = useState(false);
 
   const widgetId = env.NEXT_PUBLIC_LIGHTWIDGET_ID;
-  const instagramUrl = env.NEXT_PUBLIC_INSTAGRAM_URL ?? "https://www.instagram.com/";
+  const instagramUrl = shop.instagram;
   const showFeed = loaded && widgetId && !error;
 
   return (
@@ -43,14 +44,24 @@ export default function InstagramGallery() {
               {t("heading")}
             </h2>
           </div>
-          <a
-            href={instagramUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="border-b border-[var(--paper)]/30 pb-1 text-[13px] font-semibold tracking-[0.08em] text-[var(--paper)]/80 uppercase transition-colors hover:text-[var(--paper)]"
-          >
-            {t("handle")} →
-          </a>
+          <div className="flex items-center gap-5">
+            <a
+              href={instagramUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="border-b border-[var(--paper)]/30 pb-1 text-[13px] font-semibold tracking-[0.08em] text-[var(--paper)]/80 uppercase transition-colors hover:text-[var(--paper)]"
+            >
+              {t("handle")} →
+            </a>
+            <a
+              href={shop.tiktok}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="border-b border-[var(--paper)]/30 pb-1 text-[13px] font-semibold tracking-[0.08em] text-[var(--paper)]/80 uppercase transition-colors hover:text-[var(--paper)]"
+            >
+              TikTok →
+            </a>
+          </div>
         </div>
 
         {showFeed ? (

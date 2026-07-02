@@ -10,6 +10,7 @@ import { isValidPhoneNumber } from "libphonenumber-js";
 import { format, addDays } from "date-fns";
 import { fetchServices, fetchBarbers, fetchSlots, createBooking } from "@/actions/booking";
 import { Link } from "@/lib/i18n/routing";
+import { shop } from "@/lib/shop";
 import type { InferSelectModel } from "drizzle-orm";
 import { services, barbers } from "@/db/schema";
 
@@ -385,9 +386,12 @@ export default function BookPage() {
 
               <p className="mt-[18px] text-center text-[13px] text-[var(--muted-foreground)]">
                 {t("ctaCall")}{" "}
-                <strong className="text-[var(--ink)]">
-                  {process.env.NEXT_PUBLIC_SHOP_PHONE || "[PLACEHOLDER:shop_phone]"}
-                </strong>{" "}
+                <a
+                  href={shop.phoneHref}
+                  className="font-semibold text-[var(--ink)] underline underline-offset-4"
+                >
+                  {shop.phoneDisplay}
+                </a>{" "}
                 · {t("walkins")}
               </p>
             </form>

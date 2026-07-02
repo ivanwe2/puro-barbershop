@@ -121,13 +121,19 @@
   },
   "location": {
     "title": "Местоположение",
+    "kicker": "Заповядайте",
+    "findUs": "Намерете ни",
     "address": "Бул. Христо Ботев 114, Пловдив, България",
     "hours": "Работно време",
+    "hoursDaily": "Всеки ден · 10:00–19:30",
     "weekdays": "Пон–Пет",
     "saturday": "Съб",
     "sunday": "Нед",
     "closed": "Затворено",
-    "getDirections": "Посоки"
+    "getDirections": "Посоки",
+    "showMap": "Покажи картата",
+    "mapNotice": "Зареждането на картата се свързва с Google Maps и може да постави бисквитки.",
+    "openInMaps": "Отвори в Google Maps"
   },
   "footer": {
     "slogan": "Прецизност · Увереност · Стил",
@@ -140,7 +146,8 @@
     "connect": "Свържете се",
     "instagram": "Instagram",
     "whatsapp": "WhatsApp",
-    "phone": "[PLACEHOLDER:shop_phone]",
+    "tiktok": "TikTok",
+    "phone": "+359 892 919 649",
     "book": "Запази час",
     "navigation": "Навигация",
     "services": "Услуги",

@@ -10,6 +10,8 @@ import ServicesSection from "@/components/marketing/ServicesSection";
 import InstagramGallery from "@/components/marketing/InstagramGallery";
 import ReviewsSection from "@/components/marketing/ReviewsSection";
 import BookingCta from "@/components/marketing/BookingCta";
+import LocationSection from "@/components/marketing/LocationSection";
+import { shop } from "@/lib/shop";
 
 export const revalidate = 3600;
 
@@ -77,7 +79,8 @@ export default async function HomePage(props: { params: Promise<{ locale: string
       addressLocality: "Plovdiv",
       addressCountry: "BG",
     },
-    telephone: process.env.NEXT_PUBLIC_SHOP_PHONE || "[PLACEHOLDER:shop_phone]",
+    telephone: shop.phone,
+    sameAs: [shop.instagram, shop.tiktok],
     openingHoursSpecification: [
       {
         "@type": "OpeningHoursSpecification",
@@ -107,6 +110,7 @@ export default async function HomePage(props: { params: Promise<{ locale: string
       <BarbersSection barbers={activeBarbers} t={homeT} />
       <InstagramGallery />
       <ReviewsSection />
+      <LocationSection locale={locale} />
       <BookingCta t={bookingT} common={commonT} />
     </>
   );

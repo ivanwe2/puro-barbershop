@@ -40,7 +40,7 @@ const nextConfig: NextConfig = {
               "img-src 'self' data: https: blob:",
               "font-src 'self' data:",
               "connect-src 'self' https://*.upstash.io",
-              "frame-src 'self' https://lightwidget.com https://cdn.lightwidget.com",
+              "frame-src 'self' https://lightwidget.com https://cdn.lightwidget.com https://www.google.com https://maps.google.com",
               "frame-ancestors 'none'",
               "base-uri 'self'",
               "form-action 'self'",

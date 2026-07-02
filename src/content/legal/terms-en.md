@@ -74,7 +74,7 @@ We may change prices from time to time. The price in effect at the time you make
 
 You may cancel a confirmed booking free of charge **up to 24 hours before its scheduled start time**, by clicking the cancellation link in your confirmation email.
 
-If you need to cancel **within the 24-hour window** before your appointment, please call us at `[PLACEHOLDER:shop_phone]` so we can adjust the schedule. We may, at our discretion, decline to take future bookings from you if late cancellations or no-shows become a pattern.
+If you need to cancel **within the 24-hour window** before your appointment, please call us at `+359 892 919 649` so we can adjust the schedule. We may, at our discretion, decline to take future bookings from you if late cancellations or no-shows become a pattern.
 
 To reschedule, please cancel the existing booking (if possible) and make a new one for your preferred time.
 
@@ -155,7 +155,7 @@ If any provision of these Terms is found to be unenforceable, the rest will rema
 `[PLACEHOLDER:legal_entity_name]`
 `[PLACEHOLDER:registered_address]`
 Email: `[PLACEHOLDER:shop_email]`
-Phone: `[PLACEHOLDER:shop_phone]`
+Phone: `+359 892 919 649`
 
 ---
 

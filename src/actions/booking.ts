@@ -13,6 +13,7 @@ import crypto from "crypto";
 import { sendBookingConfirmation, sendBarberNotification } from "@/lib/email";
 import { format } from "date-fns";
 import { env } from "@/lib/env";
+import { shop } from "@/lib/shop";
 import type { InferSelectModel } from "drizzle-orm";
 
 type ServiceRow = InferSelectModel<typeof services>;
@@ -288,7 +289,7 @@ export async function createBooking(input: unknown): Promise<CreateBookingResult
           locale === "bg"
             ? "Бул. Христо Ботев 114, Пловдив, България"
             : "114 Hristo Botev Blvd, Plovdiv, Bulgaria",
-        phone: env.NEXT_PUBLIC_SHOP_PHONE ?? "",
+        phone: shop.phone,
       });
       if (barberUserEmail) {
         await sendBarberNotification({

@@ -12,6 +12,7 @@ import { format } from "date-fns";
 import { getAvailableSlots } from "@/lib/booking/availability";
 import { generateCancellationToken } from "@/lib/booking/tokens";
 import { sendCancellationEmail } from "@/lib/email";
+import { shop } from "@/lib/shop";
 
 const barberColors: Record<number, string> = {
   1: "bg-blue-500/20 border-blue-500/40 text-blue-300",
@@ -268,7 +269,7 @@ export async function updateBookingStatus(
         address: isBg
           ? "Бул. Христо Ботев 114, Пловдив, България"
           : "114 Hristo Botev Blvd, Plovdiv, Bulgaria",
-        phone: process.env.NEXT_PUBLIC_SHOP_PHONE ?? "",
+        phone: shop.phone,
       });
     });
   }
