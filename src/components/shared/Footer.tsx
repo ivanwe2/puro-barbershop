@@ -68,16 +68,8 @@ export default function Footer() {
               >
                 {t("tiktok")}
               </a>
-              <a
-                href={shop.whatsappHref}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="transition-colors hover:text-[var(--paper)]"
-              >
-                {t("whatsapp")}
-              </a>
               <a href={shop.phoneHref} className="transition-colors hover:text-[var(--paper)]">
-                {shop.phoneDisplay}
+                {t("call")}
               </a>
             </nav>
           </div>
