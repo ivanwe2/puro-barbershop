@@ -11,6 +11,7 @@ import InstagramGallery from "@/components/marketing/InstagramGallery";
 import BookingCta from "@/components/marketing/BookingCta";
 import LocationSection from "@/components/marketing/LocationSection";
 import { shop } from "@/lib/shop";
+import { resolveHeroImage, resolveBarberPhoto } from "@/lib/assets";
 
 export const revalidate = 3600;
 
@@ -67,6 +68,15 @@ export default async function HomePage(props: { params: Promise<{ locale: string
     .where(eq(services.active, true))
     .orderBy(asc(services.displayOrder));
 
+  // Fall back to a portrait dropped in public/barbers/<name>.jpg when the
+  // barber has no explicit photoUrl set in the admin panel.
+  const barbersWithPhotos = activeBarbers.map((b) => ({
+    ...b,
+    photoUrl: b.photoUrl ?? resolveBarberPhoto(b.nameEn),
+  }));
+
+  const heroImage = resolveHeroImage();
+
   const locale = params.locale;
   const jsonLd = {
     "@context": "https://schema.org",
@@ -99,7 +109,7 @@ export default async function HomePage(props: { params: Promise<{ locale: string
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      <Hero t={homeT} common={commonT} />
+      <Hero t={homeT} common={commonT} imageSrc={heroImage} />
       {/* Sentinel at the hero's bottom drives the nav's transparent→solid state. */}
       <div id="nav-sentinel" className="relative h-px w-full" />
       <Statement
@@ -108,7 +118,7 @@ export default async function HomePage(props: { params: Promise<{ locale: string
         serviceCount={activeServices.length}
       />
       <ServicesSection services={activeServices} t={servicesT} />
-      <BarbersSection barbers={activeBarbers} t={homeT} />
+      <BarbersSection barbers={barbersWithPhotos} t={homeT} />
       <InstagramGallery />
       <LocationSection locale={locale} />
       <BookingCta t={bookingT} common={commonT} />

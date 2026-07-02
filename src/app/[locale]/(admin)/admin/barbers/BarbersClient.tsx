@@ -220,7 +220,11 @@ export default function BarbersClient({ initialBarbers }: { initialBarbers: Barb
             </div>
             <div className="space-y-2">
               <Label>{t("photo")} URL</Label>
-              <Input name="photoUrl" defaultValue={editingBarber?.photoUrl ?? ""} />
+              <Input
+                name="photoUrl"
+                defaultValue={editingBarber?.photoUrl ?? ""}
+                placeholder="/barbers/name.jpg  ·  https://…"
+              />
             </div>
             <div className="space-y-2">
               <Label>{t("displayOrder")}</Label>

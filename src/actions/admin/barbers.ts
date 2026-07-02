@@ -16,7 +16,9 @@ const barberSchema = z.object({
   nameEn: z.string().min(1).max(100),
   bioBg: z.string().max(2000).optional(),
   bioEn: z.string().max(2000).optional(),
-  photoUrl: z.string().url().optional().or(z.literal("")),
+  // Accept a full URL, a root-relative local path (e.g. "/barbers/seney.jpg"
+  // for an image dropped into /public), or empty.
+  photoUrl: z.union([z.string().url(), z.string().regex(/^\/[^\s]+$/), z.literal("")]).optional(),
   displayOrder: z.string().regex(/^\d+$/).transform(Number).default(0),
   active: z.coerce.boolean().default(true),
 });

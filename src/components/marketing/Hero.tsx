@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { Link } from "@/lib/i18n/routing";
 
 interface T {
@@ -7,9 +8,12 @@ interface T {
 interface HeroProps {
   t: T;
   common: T;
+  /** Optional background image (e.g. "/hero.jpg"). Falls back to a
+   *  Ken-Burns gradient placeholder when absent. */
+  imageSrc?: string | null;
 }
 
-export default function Hero({ t, common }: HeroProps) {
+export default function Hero({ t, common, imageSrc }: HeroProps) {
   // Slogan rendered as stacked serif lines: "Precision." / "Confidence." / ...
   const lines = common("slogan")
     .split("·")
@@ -21,16 +25,27 @@ export default function Hero({ t, common }: HeroProps) {
       id="top"
       className="relative h-screen min-h-[680px] w-full overflow-hidden bg-[#100d0a]"
     >
-      {/* Hero media. Drop a real loop in by replacing this block with:
-          <video autoPlay muted loop playsInline poster="/hero-poster.jpg" …>
-          For now a Ken-Burns gradient placeholder stands in. */}
-      <div
-        className="ken-burns absolute inset-0"
-        style={{
-          background:
-            "radial-gradient(120% 90% at 70% 20%, rgba(60,52,44,0.55), rgba(0,0,0,0) 60%), repeating-linear-gradient(135deg, #1a1612 0 22px, #161310 22px 44px)",
-        }}
-      />
+      {/* Hero media. Drop `public/hero.jpg` (or .png/.webp) to set the real
+          background — it is picked up automatically. Until then a Ken-Burns
+          gradient placeholder stands in. */}
+      {imageSrc ? (
+        <Image
+          src={imageSrc}
+          alt=""
+          fill
+          priority
+          sizes="100vw"
+          className="ken-burns object-cover"
+        />
+      ) : (
+        <div
+          className="ken-burns absolute inset-0"
+          style={{
+            background:
+              "radial-gradient(120% 90% at 70% 20%, rgba(60,52,44,0.55), rgba(0,0,0,0) 60%), repeating-linear-gradient(135deg, #1a1612 0 22px, #161310 22px 44px)",
+          }}
+        />
+      )}
       {/* Legibility scrim, top & bottom */}
       <div
         className="absolute inset-0"
@@ -39,9 +54,11 @@ export default function Hero({ t, common }: HeroProps) {
             "linear-gradient(180deg, rgba(16,13,10,0.55) 0%, rgba(16,13,10,0.15) 35%, rgba(16,13,10,0.55) 78%, rgba(16,13,10,0.92) 100%)",
         }}
       />
-      <div className="pointer-events-none absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 font-mono text-xs tracking-[0.14em] text-[#f4f0e9]/30 uppercase">
-        ▶ {t("videoPlaceholder")}
-      </div>
+      {!imageSrc && (
+        <div className="pointer-events-none absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 font-mono text-xs tracking-[0.14em] text-[#f4f0e9]/30 uppercase">
+          ▶ {t("videoPlaceholder")}
+        </div>
+      )}
 
       {/* Signature animated barber-pole rail, pinned left */}
       <div className="absolute top-0 left-[clamp(18px,5vw,54px)] z-[2] h-full w-[9px]">
