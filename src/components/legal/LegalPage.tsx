@@ -2,6 +2,7 @@ import { getTranslations } from "next-intl/server";
 import fs from "node:fs";
 import path from "node:path";
 import { remark } from "remark";
+import remarkGfm from "remark-gfm";
 import html from "remark-html";
 
 interface LegalPageProps {
@@ -37,7 +38,7 @@ function stripTemplateMeta(md: string): string {
 }
 
 async function renderMarkdown(content: string): Promise<string> {
-  const result = await remark().use(html).process(stripTemplateMeta(content));
+  const result = await remark().use(remarkGfm).use(html).process(stripTemplateMeta(content));
   return String(result);
 }
 

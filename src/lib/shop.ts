@@ -6,6 +6,9 @@ const addressBg = "Бул. Христо Ботев 114, Пловдив, Бълг
 const addressEn = "114 Hristo Botev Blvd, Plovdiv, Bulgaria";
 
 export const shop = {
+  legalName: "EXACTO Ltd (ЕКСАКТО ЕООД)",
+  uic: "208808320",
+  email: "seneymurad111@gmail.com",
   phone: "+359892919649",
   phoneDisplay: "+359 892 919 649",
   phoneHref: "tel:+359892919649",
