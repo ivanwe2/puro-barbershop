@@ -171,7 +171,7 @@ We do not sell or rent your personal data. We share it only with the following c
 | Resend (USA)                          | Transactional email delivery                     | Recipient email address, subject line, and email body (name, booking details, cancellation link) | EU region where available (`EU`)       |
 | Upstash, Inc. (USA)                   | Rate-limiting state (Redis)                      | Hashed identifiers of recent booking attempts (IP, email, phone) — short-lived                   | EU region (`EU`)                       |
 | LightWidget Sp. z o.o. (Poland)       | Instagram feed embed                             | No customer data — only loads when a visitor clicks to load the Instagram feed                   | EU                                     |
-| Google Ireland Ltd. (Ireland)         | Map embed (loaded only on visitor click)         | The visitor's IP and browser metadata, when they click to load the map                           | EU / global                            |
+| Google Ireland Ltd. (Ireland)         | Map embed in the "Find us" section               | The visitor's IP and browser metadata when the map loads (as they scroll to that section)        | EU / global                            |
 | Cloudflare, Inc. (USA)                | Domain registrar and DNS                         | DNS resolution traffic only (not customer data)                                                  | Global                                 |
 | Meta Platforms Ireland Ltd. (Ireland) | Instagram content (loaded only on visitor click) | The visitor's IP and browser metadata, when they click to load                                   | EU / global                            |
 

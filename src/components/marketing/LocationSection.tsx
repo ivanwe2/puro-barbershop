@@ -1,12 +1,8 @@
-"use client";
-
-import { useState } from "react";
-import { useTranslations } from "next-intl";
+import { getTranslations } from "next-intl/server";
 import { shop, shopAddress } from "@/lib/shop";
 
-export default function LocationSection({ locale }: { locale: string }) {
-  const t = useTranslations("location");
-  const [showMap, setShowMap] = useState(false);
+export default async function LocationSection({ locale }: { locale: string }) {
+  const t = await getTranslations("location");
   const address = shopAddress(locale);
 
   return (
@@ -27,76 +23,38 @@ export default function LocationSection({ locale }: { locale: string }) {
             {address}
           </address>
           <p className="mt-1 text-sm text-[var(--muted-foreground)]">{t("hoursDaily")}</p>
-          <a
-            href={shop.mapsDirections}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="mt-6 inline-flex items-center gap-2 rounded-[2px] bg-[var(--ink)] px-6 py-3 text-sm font-bold tracking-[0.04em] text-[var(--paper)] uppercase transition-colors hover:bg-black"
-          >
-            {t("getDirections")} →
-          </a>
+          <div className="mt-6 flex flex-wrap items-center gap-x-6 gap-y-3">
+            <a
+              href={shop.mapsDirections}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 rounded-[2px] bg-[var(--ink)] px-6 py-3 text-sm font-bold tracking-[0.04em] text-[var(--paper)] uppercase transition-colors hover:bg-black"
+            >
+              {t("getDirections")} →
+            </a>
+            <a
+              href={shop.mapsLink}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-sm text-[var(--muted-foreground)] underline underline-offset-4 hover:text-[var(--ink)]"
+            >
+              {t("openInMaps")} →
+            </a>
+          </div>
         </div>
 
-        {/* Right: click-to-load Google map (no third-party request until asked) */}
+        {/* Right: embedded Google map (lazy — loads when scrolled into view) */}
         <div className="relative aspect-[4/3] w-full overflow-hidden rounded-[4px] border border-[var(--hairline)]">
-          {showMap ? (
-            <iframe
-              title="Google map — Puro Barbershop"
-              src={shop.mapsEmbed}
-              className="h-full w-full border-0"
-              loading="lazy"
-              referrerPolicy="no-referrer-when-downgrade"
-              sandbox="allow-scripts allow-same-origin allow-popups"
-            />
-          ) : (
-            <button
-              type="button"
-              onClick={() => setShowMap(true)}
-              className="flex h-full w-full flex-col items-center justify-center gap-3 bg-[var(--paper)] p-6 text-center"
-              style={{
-                backgroundImage:
-                  "repeating-linear-gradient(135deg, #efeae1 0 18px, #eae4d9 18px 36px)",
-              }}
-            >
-              <span className="text-[var(--ink)]" aria-hidden>
-                {/* map-pin icon */}
-                <svg
-                  width="34"
-                  height="34"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="1.5"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z" />
-                  <circle cx="12" cy="10" r="3" />
-                </svg>
-              </span>
-              <span className="rounded-[2px] border border-[var(--ink)] px-5 py-2.5 text-[13px] font-bold tracking-[0.08em] text-[var(--ink)] uppercase">
-                {t("showMap")}
-              </span>
-              <span className="max-w-[36ch] text-xs text-[var(--muted-foreground)]">
-                {t("mapNotice")}
-              </span>
-            </button>
-          )}
+          <iframe
+            title="Google map — Puro Barbershop"
+            src={shop.mapsEmbed}
+            className="h-full w-full border-0"
+            loading="lazy"
+            referrerPolicy="no-referrer-when-downgrade"
+            sandbox="allow-scripts allow-same-origin allow-popups"
+          />
         </div>
       </div>
-
-      {showMap && (
-        <div className="mx-auto mt-4 max-w-[1280px] text-right">
-          <a
-            href={shop.mapsLink}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-sm text-[var(--muted-foreground)] underline underline-offset-4 hover:text-[var(--ink)]"
-          >
-            {t("openInMaps")} →
-          </a>
-        </div>
-      )}
     </section>
   );
 }

@@ -8,7 +8,6 @@ import Statement from "@/components/marketing/Statement";
 import BarbersSection from "@/components/marketing/BarbersSection";
 import ServicesSection from "@/components/marketing/ServicesSection";
 import InstagramGallery from "@/components/marketing/InstagramGallery";
-import ReviewsSection from "@/components/marketing/ReviewsSection";
 import BookingCta from "@/components/marketing/BookingCta";
 import LocationSection from "@/components/marketing/LocationSection";
 import { shop } from "@/lib/shop";
@@ -109,7 +108,6 @@ export default async function HomePage(props: { params: Promise<{ locale: string
       <ServicesSection services={activeServices} t={servicesT} />
       <BarbersSection barbers={activeBarbers} t={homeT} />
       <InstagramGallery />
-      <ReviewsSection />
       <LocationSection locale={locale} />
       <BookingCta t={bookingT} common={commonT} />
     </>
