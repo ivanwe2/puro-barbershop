@@ -11,8 +11,6 @@
   --surface: #fbfaf6; /* cards / alt sections */
   --ink: #15120e; /* text + all actions */
   --ink-soft: #221e18;
-  --pole-red: #b43330;
-  --pole-blue: #2e4a8b;
   --hairline: rgba(21, 18, 14, 0.1);
 
   --background: #f4f0e9;
@@ -141,18 +139,6 @@ h6 {
   }
 }
 
-/* ============ The signature: animated barber-pole ============ */
-/* The stripes repeat every 44px along the 60° gradient axis. A seamless loop
-   needs a vertical shift of one full period: 44 / cos(60°) = 88px. */
-@keyframes poleSpin {
-  from {
-    background-position: 0 0;
-  }
-  to {
-    background-position: 0 -88px;
-  }
-}
-
 @keyframes fadeUp {
   from {
     opacity: 0;
@@ -173,40 +159,6 @@ h6 {
   }
 }
 
-/* Slim vertical rail pinned to the hero. A restrained take on the barber
-   pole: muted tri-tone with feathered transitions, a soft cylindrical sheen
-   layered on top, rounded ends, and a slow, quiet rotation. Geometry stays at
-   60deg / 44px period so poleSpin's -88px shift loops seamlessly. */
-.pole-rail {
-  background-image:
-    linear-gradient(90deg, rgba(0, 0, 0, 0.5), rgba(255, 255, 255, 0.22) 50%, rgba(0, 0, 0, 0.5)),
-    repeating-linear-gradient(
-      60deg,
-      #8f302d 0 7px,
-      #e8e0d1 12px 14px,
-      #33507e 19px 30px,
-      #e8e0d1 35px 37px,
-      #8f302d 44px
-    );
-  border-radius: 999px;
-  box-shadow:
-    inset -1px 0 3px rgba(0, 0, 0, 0.5),
-    inset 1px 0 2px rgba(255, 255, 255, 0.18);
-  opacity: 0.9;
-  animation: poleSpin 7.5s linear infinite;
-}
-
-/* Horizontal echo of the pole — a thin rule above the footer columns. */
-.pole-rule {
-  background: repeating-linear-gradient(
-    90deg,
-    var(--pole-red) 0 14px,
-    var(--paper) 14px 24px,
-    var(--pole-blue) 24px 38px,
-    var(--paper) 38px 48px
-  );
-}
-
 .ken-burns {
   animation: kenburns 22s ease-in-out infinite alternate;
 }
@@ -217,7 +169,6 @@ h6 {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .pole-rail,
   .ken-burns,
   .reveal {
     animation: none !important;

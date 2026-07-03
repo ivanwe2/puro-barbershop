@@ -12,9 +12,6 @@ export default function Footer() {
   return (
     <footer className="bg-[var(--ink)] text-[var(--paper)]">
       <div className="mx-auto max-w-[1280px] px-[clamp(22px,5vw,40px)] pt-[clamp(56px,9vw,84px)] pb-10">
-        {/* Thin pole rule — the second and final appearance of the swirl. */}
-        <div className="pole-rule mb-16 h-1 w-full rounded-[2px] opacity-85" />
-
         <div className="grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-4">
           <div>
             <Wordmark className="mb-[18px] block text-[42px]" />
