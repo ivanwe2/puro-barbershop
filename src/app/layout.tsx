@@ -27,7 +27,7 @@ const pirata = Pirata_One({
 });
 
 export const metadata: Metadata = {
-  title: "Puro Barbershop — Precision · Confidence · Clean Look",
+  title: "Puro Barbershop",
   description: "Прецизност · Увереност · Стил. Запази час в Puro Barbershop, Пловдив.",
 };
 

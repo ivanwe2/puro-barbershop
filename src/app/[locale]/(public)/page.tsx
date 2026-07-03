@@ -24,7 +24,7 @@ export async function generateMetadata(props: {
   const baseUrl = process.env.AUTH_URL || "https://purobarbershop.com";
 
   return {
-    title: `${t("heroTitle")} — ${common("slogan")}`,
+    // Tab title inherits the layout default ("Puro Barbershop"); no slogan.
     description: `${t("heroSubtitle")} | ${t("address")}`,
     alternates: {
       canonical: `${baseUrl}/${params.locale}`,
