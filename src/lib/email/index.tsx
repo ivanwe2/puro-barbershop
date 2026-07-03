@@ -6,6 +6,7 @@ import {
   CustomerReminder,
   BarberInvite,
 } from "./templates";
+import { emailStrings, type EmailLocale } from "./i18n";
 
 const emailClient = createEmailClient();
 
@@ -19,6 +20,7 @@ interface SendBookingConfirmationParams {
   cancellationLink: string;
   address: string;
   phone: string;
+  locale?: EmailLocale;
 }
 
 interface SendBarberNotificationParams {
@@ -29,6 +31,7 @@ interface SendBarberNotificationParams {
   time: string;
   serviceName: string;
   customerPhone: string;
+  locale?: EmailLocale;
 }
 
 interface SendCancellationEmailParams {
@@ -39,6 +42,7 @@ interface SendCancellationEmailParams {
   serviceName: string;
   address: string;
   phone: string;
+  locale?: EmailLocale;
 }
 
 interface SendReminderParams {
@@ -50,16 +54,18 @@ interface SendReminderParams {
   barberName: string;
   cancellationLink: string;
   address: string;
+  locale?: EmailLocale;
 }
 
 export async function sendBookingConfirmation(
   params: SendBookingConfirmationParams,
 ): Promise<void> {
+  const locale = params.locale ?? "bg";
   try {
     await emailClient.send({
       to: params.to,
-      subject: "Booking Confirmation — Puro Barbershop",
-      react: <CustomerConfirmation {...params} />,
+      subject: emailStrings(locale).subjects.confirmation,
+      react: <CustomerConfirmation {...params} locale={locale} />,
     });
   } catch (error) {
     console.error("[email] Failed to send booking confirmation:", error);
@@ -67,11 +73,12 @@ export async function sendBookingConfirmation(
 }
 
 export async function sendBarberNotification(params: SendBarberNotificationParams): Promise<void> {
+  const locale = params.locale ?? "bg";
   try {
     await emailClient.send({
       to: params.to,
-      subject: "New Booking — Puro Barbershop",
-      react: <BarberNotification {...params} />,
+      subject: emailStrings(locale).subjects.notification,
+      react: <BarberNotification {...params} locale={locale} />,
     });
   } catch (error) {
     console.error("[email] Failed to send barber notification:", error);
@@ -79,11 +86,12 @@ export async function sendBarberNotification(params: SendBarberNotificationParam
 }
 
 export async function sendCancellationEmail(params: SendCancellationEmailParams): Promise<void> {
+  const locale = params.locale ?? "bg";
   try {
     await emailClient.send({
       to: params.to,
-      subject: "Booking Cancelled — Puro Barbershop",
-      react: <CustomerCancellation {...params} />,
+      subject: emailStrings(locale).subjects.cancellation,
+      react: <CustomerCancellation {...params} locale={locale} />,
     });
   } catch (error) {
     console.error("[email] Failed to send cancellation email:", error);
@@ -91,11 +99,12 @@ export async function sendCancellationEmail(params: SendCancellationEmailParams)
 }
 
 export async function sendReminder(params: SendReminderParams): Promise<void> {
+  const locale = params.locale ?? "bg";
   try {
     await emailClient.send({
       to: params.to,
-      subject: "Booking Reminder — Puro Barbershop",
-      react: <CustomerReminder {...params} />,
+      subject: emailStrings(locale).subjects.reminder,
+      react: <CustomerReminder {...params} locale={locale} />,
     });
   } catch (error) {
     console.error("[email] Failed to send reminder:", error);
@@ -108,14 +117,16 @@ interface SendBarberInviteParams {
   email: string;
   tempPassword: string;
   loginUrl: string;
+  locale?: EmailLocale;
 }
 
 export async function sendBarberInvite(params: SendBarberInviteParams): Promise<void> {
+  const locale = params.locale ?? "bg";
   try {
     await emailClient.send({
       to: params.to,
-      subject: "You've been added to Puro Barbershop",
-      react: <BarberInvite {...params} />,
+      subject: emailStrings(locale).subjects.invite,
+      react: <BarberInvite {...params} locale={locale} />,
     });
   } catch (error) {
     console.error("[email] Failed to send barber invite:", error);

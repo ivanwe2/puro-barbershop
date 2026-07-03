@@ -50,6 +50,7 @@ export async function cancelBooking(token: string): Promise<CancelBookingResult>
       serviceName: "—",
       address: "—",
       phone: "—",
+      locale: booking.locale === "bg" ? "bg" : "en",
     }).catch((err) => {
       console.error("[cancel] Failed to send cancellation email:", err);
     });

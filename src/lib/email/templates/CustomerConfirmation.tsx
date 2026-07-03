@@ -10,6 +10,7 @@ import {
   Text,
 } from "@react-email/components";
 import { render } from "@react-email/render";
+import { emailStrings, type EmailLocale } from "../i18n";
 
 interface CustomerConfirmationProps {
   name: string;
@@ -20,6 +21,7 @@ interface CustomerConfirmationProps {
   cancellationLink: string;
   address: string;
   phone: string;
+  locale?: EmailLocale;
 }
 
 export function CustomerConfirmation({
@@ -31,34 +33,36 @@ export function CustomerConfirmation({
   cancellationLink,
   address,
   phone,
+  locale = "bg",
 }: CustomerConfirmationProps) {
+  const s = emailStrings(locale);
   return (
     <Html>
       <Head />
-      <Preview>Booking Confirmation — Puro Barbershop</Preview>
+      <Preview>{s.subjects.confirmation}</Preview>
       <Body style={body}>
         <Container style={container}>
-          <Heading style={heading}>Puro Barbershop</Heading>
-          <Text style={text}>Hello, {name}!</Text>
-          <Text style={text}>Your booking is confirmed:</Text>
+          <Heading style={heading}>{s.brand}</Heading>
+          <Text style={text}>{s.greeting(name)}</Text>
+          <Text style={text}>{s.confirmation.intro}</Text>
           <Section style={detailsSection}>
             <Text style={detailRow}>
-              <strong>Service:</strong> {serviceName}
+              <strong>{s.labels.service}:</strong> {serviceName}
             </Text>
             <Text style={detailRow}>
-              <strong>Barber:</strong> {barberName}
+              <strong>{s.labels.barber}:</strong> {barberName}
             </Text>
             <Text style={detailRow}>
-              <strong>Date:</strong> {date}
+              <strong>{s.labels.date}:</strong> {date}
             </Text>
             <Text style={detailRow}>
-              <strong>Time:</strong> {time}
+              <strong>{s.labels.time}:</strong> {time}
             </Text>
           </Section>
           <Text style={text}>
-            To cancel, click here:{" "}
+            {s.confirmation.cancelPrefix}{" "}
             <Link href={cancellationLink} style={link}>
-              Cancel booking
+              {s.confirmation.cancelLink}
             </Link>
           </Text>
           <Text style={text}>
@@ -66,7 +70,7 @@ export function CustomerConfirmation({
             <br />
             {phone}
           </Text>
-          <Text style={footer}>Puro Barbershop</Text>
+          <Text style={footer}>{s.brand}</Text>
         </Container>
       </Body>
     </Html>

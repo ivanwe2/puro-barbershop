@@ -8,6 +8,7 @@ import {
   Section,
   Text,
 } from "@react-email/components";
+import { emailStrings, type EmailLocale } from "../i18n";
 
 interface CustomerCancellationProps {
   name: string;
@@ -16,6 +17,7 @@ interface CustomerCancellationProps {
   serviceName: string;
   address: string;
   phone: string;
+  locale?: EmailLocale;
 }
 
 export function CustomerCancellation({
@@ -25,35 +27,37 @@ export function CustomerCancellation({
   serviceName,
   address,
   phone,
+  locale = "bg",
 }: CustomerCancellationProps) {
+  const s = emailStrings(locale);
   return (
     <Html>
       <Head />
-      <Preview>Booking Cancelled — Puro Barbershop</Preview>
+      <Preview>{s.subjects.cancellation}</Preview>
       <Body style={body}>
         <Container style={container}>
-          <Heading style={heading}>Booking Cancelled</Heading>
-          <Text style={text}>Hello, {name}!</Text>
-          <Text style={text}>Your booking has been cancelled:</Text>
+          <Heading style={heading}>{s.cancellation.title}</Heading>
+          <Text style={text}>{s.greeting(name)}</Text>
+          <Text style={text}>{s.cancellation.intro}</Text>
           <Section style={detailsSection}>
             <Text style={detailRow}>
-              <strong>Service:</strong> {serviceName}
+              <strong>{s.labels.service}:</strong> {serviceName}
             </Text>
             <Text style={detailRow}>
-              <strong>Date:</strong> {date}
+              <strong>{s.labels.date}:</strong> {date}
             </Text>
             <Text style={detailRow}>
-              <strong>Time:</strong> {time}
+              <strong>{s.labels.time}:</strong> {time}
             </Text>
           </Section>
           <Text style={text}>
-            If you&apos;d like to book again, visit us at:
+            {s.cancellation.rebook}
             <br />
             {address}
             <br />
             {phone}
           </Text>
-          <Text style={footer}>Puro Barbershop</Text>
+          <Text style={footer}>{s.brand}</Text>
         </Container>
       </Body>
     </Html>

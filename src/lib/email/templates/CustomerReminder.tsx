@@ -10,6 +10,7 @@ import {
   Section,
   Text,
 } from "@react-email/components";
+import { emailStrings, type EmailLocale } from "../i18n";
 
 interface CustomerReminderProps {
   name: string;
@@ -19,42 +20,44 @@ interface CustomerReminderProps {
   barberName: string;
   cancellationLink: string;
   address: string;
+  locale?: EmailLocale;
 }
 
 export function CustomerReminder({
   name,
-  date,
   time,
   serviceName,
   barberName,
   cancellationLink,
   address,
+  locale = "bg",
 }: CustomerReminderProps) {
+  const s = emailStrings(locale);
   return (
     <Html>
       <Head />
-      <Preview>Booking Reminder — Puro Barbershop</Preview>
+      <Preview>{s.subjects.reminder}</Preview>
       <Body style={body}>
         <Container style={container}>
-          <Heading style={heading}>Booking Reminder</Heading>
-          <Text style={text}>Hello, {name}!</Text>
-          <Text style={text}>You have a booking tomorrow:</Text>
+          <Heading style={heading}>{s.reminder.title}</Heading>
+          <Text style={text}>{s.greeting(name)}</Text>
+          <Text style={text}>{s.reminder.intro}</Text>
           <Section style={detailsSection}>
             <Text style={detailRow}>
-              <strong>Service:</strong> {serviceName}
+              <strong>{s.labels.service}:</strong> {serviceName}
             </Text>
             <Text style={detailRow}>
-              <strong>Barber:</strong> {barberName}
+              <strong>{s.labels.barber}:</strong> {barberName}
             </Text>
             <Text style={detailRow}>
-              <strong>Time:</strong> {time}
+              <strong>{s.labels.time}:</strong> {time}
             </Text>
           </Section>
           <Text style={text}>{address}</Text>
           <Button style={button} href={cancellationLink}>
-            Cancel Booking
+            {s.reminder.cancelButton}
           </Button>
-          <Text style={footer}>Puro Barbershop</Text>
+          <Text style={footer}>{s.brand}</Text>
         </Container>
       </Body>
     </Html>

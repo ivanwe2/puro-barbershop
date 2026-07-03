@@ -71,6 +71,7 @@ export async function GET(request: Request) {
           barberName,
           cancellationLink: `${env.AUTH_URL}/${booking.locale}/book/cancel/${booking.cancellationUrl}`,
           address,
+          locale: booking.locale === "bg" ? "bg" : "en",
         });
 
         await db

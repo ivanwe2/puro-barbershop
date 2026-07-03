@@ -291,8 +291,10 @@ export async function createBooking(input: unknown): Promise<CreateBookingResult
             ? "Бул. Христо Ботев 114, Пловдив, България"
             : "114 Hristo Botev Blvd, Plovdiv, Bulgaria",
         phone: shop.phone,
+        locale: locale === "bg" ? "bg" : "en",
       });
       if (barberUserEmail) {
+        // Staff-facing — send in the shop's language.
         await sendBarberNotification({
           to: barberUserEmail,
           barberName,
@@ -301,6 +303,7 @@ export async function createBooking(input: unknown): Promise<CreateBookingResult
           time: timeStr,
           serviceName,
           customerPhone: sanitizedPhone,
+          locale: "bg",
         });
       }
     });

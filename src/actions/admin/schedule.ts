@@ -270,6 +270,7 @@ export async function updateBookingStatus(
           ? "Бул. Христо Ботев 114, Пловдив, България"
           : "114 Hristo Botev Blvd, Plovdiv, Bulgaria",
         phone: shop.phone,
+        locale: isBg ? "bg" : "en",
       });
     });
   }

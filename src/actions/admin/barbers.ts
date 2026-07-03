@@ -204,6 +204,7 @@ export async function inviteBarber(input: { barberId: number; email: string }) {
     email: normalizedEmail,
     tempPassword,
     loginUrl,
+    locale: "bg",
   }).catch((err) => console.error("[invite] Failed to send invite email:", err));
 
   revalidatePath("/admin/barbers");
