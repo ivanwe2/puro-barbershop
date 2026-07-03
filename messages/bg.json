@@ -155,6 +155,7 @@
     "password": "Парола",
     "signIn": "Влез",
     "invalidCredentials": "Невалидни данни за вход",
+    "tooManyAttempts": "Твърде много опити. Опитайте отново по-късно.",
     "dashboard": "Табло",
     "schedule": "График",
     "timeOff": "Отсъствия",

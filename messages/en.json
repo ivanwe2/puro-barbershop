@@ -155,6 +155,7 @@
     "password": "Password",
     "signIn": "Sign In",
     "invalidCredentials": "Invalid credentials",
+    "tooManyAttempts": "Too many attempts. Please try again later.",
     "dashboard": "Dashboard",
     "schedule": "Schedule",
     "timeOff": "Time Off",
