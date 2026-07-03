@@ -7,10 +7,7 @@ import { getTranslations } from "next-intl/server";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Link } from "@/lib/i18n/routing";
 import { Button } from "@/components/ui/button";
-
-function toSofiaLocal(date: Date): Date {
-  return new Date(date.toLocaleString("en-US", { timeZone: "Europe/Sofia" }));
-}
+import { sofiaTime } from "@/lib/datetime";
 
 function getTodaySofia(): { start: Date; end: Date } {
   const now = new Date();
@@ -169,12 +166,7 @@ export default async function DashboardPage() {
                     <p className="text-muted-foreground text-xs">{b.serviceName}</p>
                   </div>
                   <div className="space-y-1 text-right">
-                    <p className="text-foreground text-sm">
-                      {toSofiaLocal(b.startDatetime).toLocaleTimeString("bg-BG", {
-                        hour: "2-digit",
-                        minute: "2-digit",
-                      })}
-                    </p>
+                    <p className="text-foreground text-sm">{sofiaTime(b.startDatetime)}</p>
                     <p className="text-muted-foreground text-xs">{b.barberName}</p>
                   </div>
                 </div>
@@ -229,13 +221,15 @@ export default async function DashboardPage() {
                   <div className="space-y-1">
                     <p className="text-foreground text-sm font-medium">{to.barberName}</p>
                     <p className="text-muted-foreground text-xs">
-                      {toSofiaLocal(to.startDatetime).toLocaleDateString("bg-BG", {
+                      {to.startDatetime.toLocaleDateString("bg-BG", {
+                        timeZone: "Europe/Sofia",
                         day: "numeric",
                         month: "long",
                         year: "numeric",
                       })}{" "}
                       —{" "}
-                      {toSofiaLocal(to.endDatetime).toLocaleDateString("bg-BG", {
+                      {to.endDatetime.toLocaleDateString("bg-BG", {
+                        timeZone: "Europe/Sofia",
                         day: "numeric",
                         month: "long",
                         year: "numeric",

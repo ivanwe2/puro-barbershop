@@ -5,7 +5,7 @@ import { db } from "@/db";
 import { bookings } from "@/db/schema";
 import { verifyCancellationToken } from "@/lib/booking/tokens";
 import { sendCancellationEmail } from "@/lib/email";
-import { format } from "date-fns";
+import { sofiaLongDate, sofiaTime } from "@/lib/datetime";
 
 type CancelBookingResult = { success: true } | { success: false; error: "cannotCancel" };
 
@@ -39,8 +39,8 @@ export async function cancelBooking(token: string): Promise<CancelBookingResult>
       .set({ status: "cancelled", updatedAt: new Date() })
       .where(eq(bookings.id, booking.id));
 
-    const dateStr = format(booking.startDatetime, "EEEE, MMMM d, yyyy");
-    const timeStr = format(booking.startDatetime, "HH:mm");
+    const dateStr = sofiaLongDate(booking.startDatetime, booking.locale === "bg" ? "bg" : "en");
+    const timeStr = sofiaTime(booking.startDatetime);
 
     sendCancellationEmail({
       to: booking.customerEmail,

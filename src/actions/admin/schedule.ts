@@ -8,7 +8,7 @@ import { revalidatePath } from "next/cache";
 import { after } from "next/server";
 import crypto from "crypto";
 import { z } from "zod";
-import { format } from "date-fns";
+import { sofiaLongDate, sofiaTime, sofiaWallToInstant } from "@/lib/datetime";
 import { getAvailableSlots } from "@/lib/booking/availability";
 import { generateCancellationToken } from "@/lib/booking/tokens";
 import { sendCancellationEmail } from "@/lib/email";
@@ -176,7 +176,7 @@ export async function createWalkInBooking(input: unknown) {
   const service = serviceRows[0];
   if (!service) return { error: "notFound" } as const;
 
-  const startDatetime = new Date(`${date}T${time}:00+03:00`);
+  const startDatetime = sofiaWallToInstant(`${date}T${time}`);
   const endDatetime = new Date(startDatetime.getTime() + service.durationMinutes * 60000);
   // Random placeholder token — updated with HMAC after insert
   const placeholderToken = crypto.randomBytes(32).toString("hex");
@@ -263,8 +263,8 @@ export async function updateBookingStatus(
       await sendCancellationEmail({
         to: existing.customerEmail,
         name: existing.customerName,
-        date: format(existing.startDatetime, "EEEE, MMMM d, yyyy"),
-        time: format(existing.startDatetime, "HH:mm"),
+        date: sofiaLongDate(existing.startDatetime, isBg ? "bg" : "en"),
+        time: sofiaTime(existing.startDatetime),
         serviceName: (isBg ? existing.serviceNameBg : existing.serviceNameEn) ?? "",
         address: isBg
           ? "Бул. Христо Ботев 114, Пловдив, България"

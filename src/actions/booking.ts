@@ -11,7 +11,7 @@ import { headers } from "next/headers";
 import { after } from "next/server";
 import crypto from "crypto";
 import { sendBookingConfirmation, sendBarberNotification } from "@/lib/email";
-import { format } from "date-fns";
+import { sofiaLongDate, sofiaTime, sofiaWallToInstant } from "@/lib/datetime";
 import { env } from "@/lib/env";
 import { shop } from "@/lib/shop";
 import type { InferSelectModel } from "drizzle-orm";
@@ -207,8 +207,9 @@ export async function createBooking(input: unknown): Promise<CreateBookingResult
     return { success: false, error: "booking_error" };
   }
 
-  // Compute start/end datetime in Sofia timezone
-  const startDatetime = new Date(`${date}T${time}:00+03:00`);
+  // Compute start/end datetime from the Sofia wall-clock the customer picked
+  // (DST-correct year-round, unlike a hardcoded +03:00 offset).
+  const startDatetime = sofiaWallToInstant(`${date}T${time}`);
   const endDatetime = new Date(startDatetime.getTime() + service.durationMinutes * 60000);
 
   // Generate a random placeholder token to avoid unique constraint collisions under concurrency.
@@ -263,8 +264,8 @@ export async function createBooking(input: unknown): Promise<CreateBookingResult
         : barber.nameEn
       : "Puro Barbershop";
 
-    const dateStr = format(startDatetime, "EEEE, MMMM d, yyyy");
-    const timeStr = format(startDatetime, "HH:mm");
+    const dateStr = sofiaLongDate(startDatetime, locale === "bg" ? "bg" : "en");
+    const timeStr = sofiaTime(startDatetime);
 
     const cancellationLink = `${env.AUTH_URL}/${locale}/book/cancel/${realToken}`;
 

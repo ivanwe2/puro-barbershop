@@ -4,6 +4,7 @@ import { bookings, barbers, services } from "@/db/schema";
 import { and, eq, gte, lte } from "drizzle-orm";
 import { env } from "@/lib/env";
 import { sendReminder } from "@/lib/email";
+import { sofiaLongDate, sofiaTime } from "@/lib/datetime";
 
 const ADDRESS_BG = "Бул. Христо Ботев 114, Пловдив, България";
 const ADDRESS_EN = "114 Hristo Botev Blvd, Plovdiv, Bulgaria";
@@ -64,14 +65,8 @@ export async function GET(request: Request) {
         await sendReminder({
           to: booking.customerEmail,
           name: booking.customerName,
-          date: booking.startDatetime.toLocaleDateString(
-            booking.locale === "bg" ? "bg-BG" : "en-US",
-            { weekday: "long", year: "numeric", month: "long", day: "numeric" },
-          ),
-          time: booking.startDatetime.toLocaleTimeString(
-            booking.locale === "bg" ? "bg-BG" : "en-US",
-            { hour: "2-digit", minute: "2-digit" },
-          ),
+          date: sofiaLongDate(booking.startDatetime, booking.locale === "bg" ? "bg" : "en"),
+          time: sofiaTime(booking.startDatetime),
           serviceName,
           barberName,
           cancellationLink: `${env.AUTH_URL}/${booking.locale}/book/cancel/${booking.cancellationUrl}`,

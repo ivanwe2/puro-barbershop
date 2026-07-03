@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect, useRef } from "react";
 import { useTranslations } from "next-intl";
 import {
   format,
@@ -10,9 +10,7 @@ import {
   endOfWeek,
   eachDayOfInterval,
   isSameDay,
-  parseISO,
 } from "date-fns";
-import { bg } from "date-fns/locale";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Select,
@@ -31,7 +29,13 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
-import { updateBookingStatus, createWalkInBooking } from "@/actions/admin/schedule";
+import {
+  updateBookingStatus,
+  createWalkInBooking,
+  fetchScheduleBookings,
+  fetchTimeOff,
+} from "@/actions/admin/schedule";
+import { sofiaTime, sofiaDateKey, sofiaShortDate } from "@/lib/datetime";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import type { BookingRow } from "./types";
@@ -72,7 +76,7 @@ export default function ScheduleClient({
   const [weekStart, setWeekStart] = useState(startOfWeek(new Date(), { weekStartsOn: 1 }));
   const [selectedBarberId, setSelectedBarberId] = useState<string | null>("all");
   const [bookings, setBookings] = useState(initialBookings);
-  const [timeOff] = useState(initialTimeOff);
+  const [timeOff, setTimeOff] = useState(initialTimeOff);
   const [selectedBooking, setSelectedBooking] = useState<BookingRow | null>(null);
   const [confirmAction, setConfirmAction] = useState<{
     bookingId: number;
@@ -84,6 +88,31 @@ export default function ScheduleClient({
   );
 
   const weekEnd = endOfWeek(weekStart, { weekStartsOn: 1 });
+
+  // Initial data only covers the first week; refetch when the admin navigates
+  // to a different week so future/past bookings actually load.
+  const didMountRef = useRef(false);
+  useEffect(() => {
+    if (!didMountRef.current) {
+      didMountRef.current = true;
+      return;
+    }
+    let cancelled = false;
+    const startDate = format(weekStart, "yyyy-MM-dd");
+    const endDate = format(weekEnd, "yyyy-MM-dd");
+    void (async () => {
+      const [bk, to] = await Promise.all([
+        fetchScheduleBookings({ startDate, endDate }),
+        fetchTimeOff({ startDate, endDate }),
+      ]);
+      if (cancelled) return;
+      if (!("error" in bk)) setBookings(bk.bookings);
+      if (!("error" in to)) setTimeOff(to.timeOff);
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [weekStart, weekEnd]);
 
   const filteredBookings = useMemo(() => {
     // Cancelled bookings free their slot — drop them from the calendar.
@@ -154,7 +183,7 @@ export default function ScheduleClient({
 
   const bookingsForDay = (day: Date) => {
     const dayStr = format(day, "yyyy-MM-dd");
-    return filteredBookings.filter((b) => format(b.startDatetime, "yyyy-MM-dd") === dayStr);
+    return filteredBookings.filter((b) => sofiaDateKey(b.startDatetime) === dayStr);
   };
 
   const timeOffForDay = (day: Date) => {
@@ -257,7 +286,7 @@ export default function ScheduleClient({
                       className={`hover:bg-muted/60 mb-1 rounded border p-2 text-left text-xs transition-colors ${b.barberColor}`}
                     >
                       <div className="font-medium">
-                        {format(b.startDatetime, "HH:mm")}–{format(b.endDatetime, "HH:mm")}
+                        {sofiaTime(b.startDatetime)}–{sofiaTime(b.endDatetime)}
                       </div>
                       <div>{b.customerName}</div>
                       <div className="text-muted-foreground">{b.serviceName}</div>
@@ -388,7 +417,7 @@ export default function ScheduleClient({
                   >
                     <div className="flex items-center justify-between">
                       <span className="font-medium">
-                        {format(b.startDatetime, "HH:mm")}–{format(b.endDatetime, "HH:mm")}
+                        {sofiaTime(b.startDatetime)}–{sofiaTime(b.endDatetime)}
                       </span>
                       <Badge variant="secondary" className={statusBadgeClass(b.status)}>
                         {statusLabel(b.status)}
@@ -477,11 +506,8 @@ function BookingDetailDialog({
             [t("customerName"), booking.customerName],
             [t("customerEmail"), booking.customerEmail],
             [t("customerPhone"), booking.customerPhone],
-            [t("date"), format(booking.startDatetime, "dd.MM.yyyy")],
-            [
-              t("time"),
-              `${format(booking.startDatetime, "HH:mm")}–${format(booking.endDatetime, "HH:mm")}`,
-            ],
+            [t("date"), sofiaShortDate(booking.startDatetime)],
+            [t("time"), `${sofiaTime(booking.startDatetime)}–${sofiaTime(booking.endDatetime)}`],
             [t("service"), booking.serviceName ?? ""],
             [
               t("status"),

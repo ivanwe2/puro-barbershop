@@ -2,8 +2,7 @@
 
 import { useState } from "react";
 import { useTranslations } from "next-intl";
-import { format } from "date-fns";
-import { bg } from "date-fns/locale";
+import { sofiaShortDateTime, sofiaDateTimeLocal, sofiaWallToInstant } from "@/lib/datetime";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -68,10 +67,11 @@ export default function TimeOffClient({
     const formData = new FormData(form);
 
     // datetime-local fields are "YYYY-MM-DDTHH:mm" (no seconds/zone); the server
-    // schema expects a full ISO datetime. Convert from the admin's local time.
+    // schema expects a full ISO datetime. The admin enters Sofia wall-clock
+    // time, so convert it to the correct UTC instant regardless of browser TZ.
     for (const field of ["startDatetime", "endDatetime"]) {
       const v = formData.get(field) as string | null;
-      if (v) formData.set(field, new Date(v).toISOString());
+      if (v) formData.set(field, sofiaWallToInstant(v).toISOString());
     }
 
     // Barber is a controlled Select (a required, visually-hidden native control
@@ -197,8 +197,8 @@ export default function TimeOffClient({
                       {isPast(entry) && <Badge variant="secondary">Past</Badge>}
                     </div>
                     <p className="text-muted-foreground text-xs">
-                      {format(new Date(entry.startDatetime), "dd.MM.yyyy HH:mm", { locale: bg })} —{" "}
-                      {format(new Date(entry.endDatetime), "dd.MM.yyyy HH:mm", { locale: bg })}
+                      {sofiaShortDateTime(entry.startDatetime)} —{" "}
+                      {sofiaShortDateTime(entry.endDatetime)}
                     </p>
                     {entry.reason && (
                       <p className="text-muted-foreground text-xs">{entry.reason}</p>
@@ -274,11 +274,7 @@ export default function TimeOffClient({
               <Input
                 type="datetime-local"
                 name="startDatetime"
-                defaultValue={
-                  editingEntry
-                    ? format(new Date(editingEntry.startDatetime), "yyyy-MM-dd'T'HH:mm")
-                    : ""
-                }
+                defaultValue={editingEntry ? sofiaDateTimeLocal(editingEntry.startDatetime) : ""}
                 required
               />
             </div>
@@ -288,11 +284,7 @@ export default function TimeOffClient({
               <Input
                 type="datetime-local"
                 name="endDatetime"
-                defaultValue={
-                  editingEntry
-                    ? format(new Date(editingEntry.endDatetime), "yyyy-MM-dd'T'HH:mm")
-                    : ""
-                }
+                defaultValue={editingEntry ? sofiaDateTimeLocal(editingEntry.endDatetime) : ""}
                 required
               />
             </div>
