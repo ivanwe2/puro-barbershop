@@ -152,10 +152,10 @@ h6 {
 
 @keyframes kenburns {
   0% {
-    transform: scale(1.06);
+    transform: scale(1);
   }
   100% {
-    transform: scale(1.16);
+    transform: scale(1.08);
   }
 }
 
