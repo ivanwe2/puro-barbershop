@@ -38,8 +38,7 @@ export default function BookingCta({ t, common }: BookingCtaProps) {
             className="font-semibold text-[var(--paper)] underline underline-offset-4 hover:text-white"
           >
             {t("call")}
-          </a>{" "}
-          · {t("walkins")}
+          </a>
         </p>
       </div>
     </section>

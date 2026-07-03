@@ -391,8 +391,7 @@ export default function BookPage() {
                   className="font-semibold text-[var(--ink)] underline underline-offset-4"
                 >
                   {t("call")}
-                </a>{" "}
-                · {t("walkins")}
+                </a>
               </p>
             </form>
           )}

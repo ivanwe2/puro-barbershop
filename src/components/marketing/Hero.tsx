@@ -61,7 +61,7 @@ export default function Hero({ t, common, imageSrc }: HeroProps) {
       )}
 
       {/* Signature animated barber-pole rail, pinned left */}
-      <div className="absolute top-0 left-[clamp(18px,5vw,54px)] z-[2] h-full w-[9px]">
+      <div className="absolute top-0 left-[clamp(18px,5vw,54px)] z-[2] h-full w-[5px]">
         <div className="pole-rail absolute inset-0" />
       </div>
 

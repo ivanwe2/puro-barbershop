@@ -87,6 +87,16 @@ export default function Footer() {
             <Link href="/legal/cookie-info" className="transition-colors hover:text-[var(--paper)]">
               {t("cookies")}
             </Link>
+            <span aria-hidden className="text-[var(--paper)]/20">
+              ·
+            </span>
+            <Link
+              href="/admin"
+              className="transition-colors hover:text-[var(--paper)]"
+              rel="nofollow"
+            >
+              {t("admin")}
+            </Link>
           </nav>
           <span className="hidden md:inline">{t("slogan")}</span>
         </div>

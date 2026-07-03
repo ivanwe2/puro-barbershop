@@ -54,7 +54,6 @@
     "ctaKicker": "Reserve your chair",
     "ctaCall": "Prefer to talk?",
     "call": "Call us",
-    "walkins": "Walk-ins welcome",
     "subtitle": "Reserve your chair",
     "service": "Service",
     "barber": "Barber",
@@ -142,6 +141,7 @@
     "privacy": "Privacy Policy",
     "terms": "Terms of Service",
     "cookies": "Cookie Info",
+    "admin": "Admin",
     "copyright": "© {year} Puro Barbershop. All rights reserved."
   },
   "legal": {
