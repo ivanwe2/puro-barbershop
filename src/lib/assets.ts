@@ -46,3 +46,25 @@ export function resolveHeroImage(): string | null {
 export function resolveBarberPhoto(nameEn: string): string | null {
   return firstExisting("barbers", slugify(nameEn));
 }
+
+/**
+ * Every image inside `public/gallery/`, as web paths, sorted by filename
+ * (numeric-aware, so `1, 2, 10` order as expected). Returns [] if the folder
+ * is missing or empty. Owner controls order/content by naming the files.
+ */
+export function listGalleryImages(): string[] {
+  const dir = path.join(PUBLIC_DIR, "gallery");
+  let entries: string[];
+  try {
+    entries = fs.readdirSync(dir);
+  } catch {
+    return [];
+  }
+  return entries
+    .filter((name) => {
+      const ext = name.slice(name.lastIndexOf(".") + 1).toLowerCase();
+      return (IMAGE_EXTS as readonly string[]).includes(ext);
+    })
+    .sort((a, b) => a.localeCompare(b, undefined, { numeric: true, sensitivity: "base" }))
+    .map((name) => `/gallery/${name}`);
+}

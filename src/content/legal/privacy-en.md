@@ -123,7 +123,7 @@ We use a small number of cookies. None of them are used for advertising or track
 
 The cookies listed above are **strictly necessary** for the website to function in the way you have requested. Under the EU ePrivacy regime they are exempt from prior consent.
 
-**Third-party content (Instagram):** Our gallery section can optionally load posts from our Instagram account. This content is hosted by LightWidget Sp. z o.o. (Poland) and Meta Platforms Ireland Limited. **We do not load this content unless you actively click the "Show Instagram feed" button.** If you do click, your browser will then connect to those services, which may set their own cookies under their own privacy policies. We do not control or receive those cookies. Reload the page to undo this — the choice is not persisted.
+**Gallery images:** The photos in our gallery are hosted on our own website. Viewing them does not connect you to any third party and does not set any additional cookies. We also link to our Instagram and TikTok profiles — following those links takes you to those external services, which are governed by their own privacy policies.
 
 ---
 
@@ -164,16 +164,14 @@ After the retention period, the records are deleted automatically by a scheduled
 
 We do not sell or rent your personal data. We share it only with the following categories of processors who help us run the service. Each operates under a Data Processing Agreement that requires them to process the data only on our instructions and to apply appropriate security measures.
 
-| Recipient                             | Role                                             | What they see                                                                                    | Location of processing                 |
-| ------------------------------------- | ------------------------------------------------ | ------------------------------------------------------------------------------------------------ | -------------------------------------- |
-| Neon, Inc. (USA)                      | Database hosting (Postgres)                      | All booking and account data, stored at rest                                                     | EU region (`eu-central-1 (Frankfurt)`) |
-| Vercel Inc. (USA)                     | Website hosting and request routing              | All website traffic; processes data in memory during request handling                            | EU region (`fra1 (Frankfurt)`)         |
-| Resend (USA)                          | Transactional email delivery                     | Recipient email address, subject line, and email body (name, booking details, cancellation link) | EU region where available (`EU`)       |
-| Upstash, Inc. (USA)                   | Rate-limiting state (Redis)                      | Hashed identifiers of recent booking attempts (IP, email, phone) — short-lived                   | EU region (`EU`)                       |
-| LightWidget Sp. z o.o. (Poland)       | Instagram feed embed                             | No customer data — only loads when a visitor clicks to load the Instagram feed                   | EU                                     |
-| Google Ireland Ltd. (Ireland)         | Map embed in the "Find us" section               | The visitor's IP and browser metadata when the map loads (as they scroll to that section)        | EU / global                            |
-| Cloudflare, Inc. (USA)                | Domain registrar and DNS                         | DNS resolution traffic only (not customer data)                                                  | Global                                 |
-| Meta Platforms Ireland Ltd. (Ireland) | Instagram content (loaded only on visitor click) | The visitor's IP and browser metadata, when they click to load                                   | EU / global                            |
+| Recipient                     | Role                                | What they see                                                                                    | Location of processing                 |
+| ----------------------------- | ----------------------------------- | ------------------------------------------------------------------------------------------------ | -------------------------------------- |
+| Neon, Inc. (USA)              | Database hosting (Postgres)         | All booking and account data, stored at rest                                                     | EU region (`eu-central-1 (Frankfurt)`) |
+| Vercel Inc. (USA)             | Website hosting and request routing | All website traffic; processes data in memory during request handling                            | EU region (`fra1 (Frankfurt)`)         |
+| Resend (USA)                  | Transactional email delivery        | Recipient email address, subject line, and email body (name, booking details, cancellation link) | EU region where available (`EU`)       |
+| Upstash, Inc. (USA)           | Rate-limiting state (Redis)         | Hashed identifiers of recent booking attempts (IP, email, phone) — short-lived                   | EU region (`EU`)                       |
+| Google Ireland Ltd. (Ireland) | Map embed in the "Find us" section  | The visitor's IP and browser metadata when the map loads (as they scroll to that section)        | EU / global                            |
+| Cloudflare, Inc. (USA)        | Domain registrar and DNS            | DNS resolution traffic only (not customer data)                                                  | Global                                 |
 
 If a court or competent authority in Bulgaria orders us to disclose data (for example, in connection with a criminal investigation), we may have to do so. Such requests are rare and we will challenge any that we consider unlawful or disproportionate.
 

@@ -22,3 +22,13 @@ changes needed. Until a file exists, the site shows a styled placeholder.
   centre-cropped to fill the card.
 - Alternatively, set a photo URL (or `/barbers/…` path) per barber in the admin
   panel under **Barbers → edit → Photo URL**.
+
+## Gallery
+
+- Folder: `public/gallery/`
+- **Every** image in this folder is shown in the homepage gallery grid,
+  automatically — just drop files in.
+- Accepts `.jpg`, `.png`, `.webp`, `.avif`.
+- Order is by filename (numeric-aware), so prefix them to control order:
+  `01.jpg`, `02.jpg`, … `10.jpg`.
+- Tiles are square, centre-cropped. Roughly square source images look best.
