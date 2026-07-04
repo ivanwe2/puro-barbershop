@@ -125,7 +125,7 @@ export async function sendRescheduleEmail(params: SendRescheduleEmailParams): Pr
   }
 }
 
-export async function sendReminder(params: SendReminderParams): Promise<void> {
+export async function sendReminder(params: SendReminderParams): Promise<boolean> {
   const locale = params.locale ?? "bg";
   try {
     await emailClient.send({
@@ -133,8 +133,10 @@ export async function sendReminder(params: SendReminderParams): Promise<void> {
       subject: emailStrings(locale).subjects.reminder,
       react: <CustomerReminder {...params} locale={locale} />,
     });
+    return true;
   } catch (error) {
     console.error("[email] Failed to send reminder:", error);
+    return false;
   }
 }
 

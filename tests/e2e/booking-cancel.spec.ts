@@ -1,5 +1,5 @@
 import { test, expect, type Page } from "@playwright/test";
-import { sql, clearMail, waitForMail, ymd } from "./helpers";
+import { sql, clearMail, waitForMail, ymd, cancellationToken } from "./helpers";
 
 // Book a slot end-to-end. Uses name-based inputs so it works in any locale.
 async function book(page: Page, locale: "bg" | "en", barberLabel: string) {
@@ -65,6 +65,35 @@ test("booking → localized confirmation email → cancellation (en)", async ({ 
     )
     .toBe("cancelled");
   expect(await waitForMail("Booking Cancelled", email)).not.toBeNull();
+});
+
+test("cancelling within the window is refused with a call-us message", async ({ page }) => {
+  const email = `toolate-${Date.now()}@example.com`;
+  const start = new Date(Date.now() + 2 * 60 * 60 * 1000); // 2h out (< 24h window)
+  const b = (
+    await sql`
+      insert into bookings
+        (service_id, barber_id, customer_name, customer_email, customer_phone,
+         start_datetime, end_datetime, status, cancellation_token, locale)
+      select
+        (select id from services where active limit 1),
+        (select id from barbers where active limit 1),
+        'Too Late QA', ${email}, '+359888100123',
+        ${start.toISOString()}, ${new Date(start.getTime() + 30 * 60000).toISOString()},
+        'confirmed', ${"placeholder-" + Date.now()}, 'en'
+      returning id`
+  )[0]!;
+  await sql`update bookings set cancellation_token = ${cancellationToken(b.id)} where id = ${b.id}`;
+
+  await page.goto(`/en/book/cancel/${cancellationToken(b.id)}`, { waitUntil: "networkidle" });
+  await page.getByRole("button", { name: "Cancel Booking" }).click();
+
+  await expect(page.getByText(/less than 24 hours/i)).toBeVisible({ timeout: 15000 });
+  await expect(page.getByRole("link", { name: /\+359/ })).toBeVisible();
+  // Booking stays confirmed.
+  expect((await sql`select status from bookings where id = ${b.id}`)[0]!.status).toBe("confirmed");
+
+  await sql`delete from bookings where id = ${b.id}`;
 });
 
 test("booking → confirmation email is Bulgarian (bg)", async ({ page }) => {

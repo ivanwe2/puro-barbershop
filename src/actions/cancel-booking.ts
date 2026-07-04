@@ -2,12 +2,15 @@
 
 import { eq } from "drizzle-orm";
 import { db } from "@/db";
-import { bookings } from "@/db/schema";
+import { bookings, settings } from "@/db/schema";
 import { verifyCancellationToken } from "@/lib/booking/tokens";
 import { sendCancellationEmail } from "@/lib/email";
 import { sofiaLongDate, sofiaTime } from "@/lib/datetime";
 
-type CancelBookingResult = { success: true } | { success: false; error: "cannotCancel" };
+type CancelBookingResult =
+  | { success: true }
+  | { success: false; error: "cannotCancel" }
+  | { success: false; error: "tooLate"; windowHours: number };
 
 export async function cancelBooking(token: string): Promise<CancelBookingResult> {
   try {
@@ -30,8 +33,15 @@ export async function cancelBooking(token: string): Promise<CancelBookingResult>
     const now = new Date();
     const hoursUntil = (booking.startDatetime.getTime() - now.getTime()) / 3600000;
 
-    if (hoursUntil < 24) {
-      return { success: false, error: "cannotCancel" };
+    // Respect the admin-configured cancellation window (falls back to 24h).
+    const [windowSetting] = await db
+      .select({ value: settings.value })
+      .from(settings)
+      .where(eq(settings.key, "cancellation_window_hours"));
+    const windowHours = windowSetting ? parseInt(windowSetting.value, 10) : 24;
+
+    if (hoursUntil < windowHours) {
+      return { success: false, error: "tooLate", windowHours };
     }
 
     await db

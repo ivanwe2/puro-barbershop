@@ -6,6 +6,7 @@ import { useParams } from "next/navigation";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { cancelBooking } from "@/actions/cancel-booking";
+import { shop } from "@/lib/shop";
 
 export default function CancelPage() {
   const t = useTranslations("booking");
@@ -14,6 +15,9 @@ export default function CancelPage() {
   const token = params.token as string;
 
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
+  // When cancellation is refused because it's inside the window, hold the
+  // window size so we can explain why and point them to a phone call.
+  const [tooLate, setTooLate] = useState<number | null>(null);
 
   const handleCancel = async () => {
     setStatus("loading");
@@ -22,6 +26,7 @@ export default function CancelPage() {
     if (result.success) {
       setStatus("success");
     } else {
+      setTooLate(result.error === "tooLate" ? result.windowHours : null);
       setStatus("error");
     }
   };
@@ -46,7 +51,20 @@ export default function CancelPage() {
         <h1 className="text-foreground mb-4 text-3xl font-bold tracking-tight">
           {t("cancelTitle")}
         </h1>
-        <p className="text-muted-foreground mb-8">{t("cancelExpired")}</p>
+        {tooLate !== null ? (
+          <p className="text-muted-foreground mb-8">
+            {t("cancelTooLate", { hours: tooLate })}{" "}
+            <a
+              href={shop.phoneHref}
+              className="text-foreground font-semibold underline underline-offset-2"
+            >
+              {shop.phoneDisplay}
+            </a>
+            .
+          </p>
+        ) : (
+          <p className="text-muted-foreground mb-8">{t("cancelExpired")}</p>
+        )}
         <Button onClick={() => router.push("/")} variant="outline">
           {t("backToHome")}
         </Button>
