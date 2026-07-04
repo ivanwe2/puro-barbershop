@@ -32,10 +32,12 @@ import { Badge } from "@/components/ui/badge";
 import {
   updateBookingStatus,
   createWalkInBooking,
+  rescheduleBooking,
   fetchScheduleBookings,
   fetchTimeOff,
 } from "@/actions/admin/schedule";
-import { sofiaTime, sofiaDateKey, sofiaShortDate } from "@/lib/datetime";
+import { sofiaTime, sofiaDateKey, sofiaShortDate, sofiaWallToInstant } from "@/lib/datetime";
+import { barberColor } from "@/lib/barber-colors";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import type { BookingRow } from "./types";
@@ -78,6 +80,7 @@ export default function ScheduleClient({
   const [bookings, setBookings] = useState(initialBookings);
   const [timeOff, setTimeOff] = useState(initialTimeOff);
   const [selectedBooking, setSelectedBooking] = useState<BookingRow | null>(null);
+  const [rescheduleTarget, setRescheduleTarget] = useState<BookingRow | null>(null);
   const [confirmAction, setConfirmAction] = useState<{
     bookingId: number;
     action: "cancel" | "noShow" | "complete";
@@ -98,8 +101,10 @@ export default function ScheduleClient({
       return;
     }
     let cancelled = false;
+    // Compute the range inside the effect so it doesn't depend on `weekEnd`,
+    // which is a fresh Date object every render (that would loop forever).
     const startDate = format(weekStart, "yyyy-MM-dd");
-    const endDate = format(weekEnd, "yyyy-MM-dd");
+    const endDate = format(endOfWeek(weekStart, { weekStartsOn: 1 }), "yyyy-MM-dd");
     void (async () => {
       const [bk, to] = await Promise.all([
         fetchScheduleBookings({ startDate, endDate }),
@@ -112,7 +117,7 @@ export default function ScheduleClient({
     return () => {
       cancelled = true;
     };
-  }, [weekStart, weekEnd]);
+  }, [weekStart]);
 
   const filteredBookings = useMemo(() => {
     // Cancelled bookings free their slot — drop them from the calendar.
@@ -156,16 +161,34 @@ export default function ScheduleClient({
     }
   };
 
+  // Move the booking to its new time in local state (keeps the same duration).
+  const handleRescheduled = (bookingId: number, date: string, time: string) => {
+    const newStart = sofiaWallToInstant(`${date}T${time}`);
+    setBookings((prev) =>
+      prev.map((b) => {
+        if (b.id !== bookingId) return b;
+        const durationMs = new Date(b.endDatetime).getTime() - new Date(b.startDatetime).getTime();
+        return {
+          ...b,
+          startDatetime: newStart,
+          endDatetime: new Date(newStart.getTime() + durationMs),
+        };
+      }),
+    );
+    setRescheduleTarget(null);
+    setSelectedBooking(null);
+  };
+
   const statusBadgeClass = (status: string) => {
     switch (status) {
       case "confirmed":
-        return "bg-emerald-500/20 text-emerald-300";
+        return "bg-emerald-100 text-emerald-800";
       case "completed":
-        return "bg-blue-500/20 text-blue-300";
+        return "bg-blue-100 text-blue-800";
       case "cancelled":
-        return "bg-red-500/20 text-red-300";
+        return "bg-red-100 text-red-800";
       case "no_show":
-        return "bg-amber-500/20 text-amber-300";
+        return "bg-amber-100 text-amber-800";
       default:
         return "";
     }
@@ -201,6 +224,22 @@ export default function ScheduleClient({
   };
 
   const days = eachDayOfInterval({ start: weekStart, end: weekEnd });
+
+  // Colour key for the barbers; the current barber (if logged in as one) is
+  // marked so they can spot their own bookings at a glance.
+  const legend = (
+    <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs">
+      {initialBarbers.map((b) => (
+        <span key={b.id} className="flex items-center gap-1.5">
+          <span className={`inline-block h-2.5 w-2.5 rounded-full ${barberColor(b.id).dot}`} />
+          <span className="text-foreground">
+            {b.nameBg}
+            {b.id === userBarberId ? ` (${t("you")})` : ""}
+          </span>
+        </span>
+      ))}
+    </div>
+  );
 
   // Week view
   if (view === "week") {
@@ -249,6 +288,8 @@ export default function ScheduleClient({
           </span>
         </div>
 
+        {legend}
+
         <div className="overflow-x-auto">
           <div className="grid min-w-[900px] grid-cols-7 gap-2">
             {days.map((day) => {
@@ -273,9 +314,9 @@ export default function ScheduleClient({
                   {dayTimeOff.map((to) => (
                     <div
                       key={to.id}
-                      className="mb-1 rounded border border-amber-500/30 bg-amber-500/10 px-2 py-1 text-xs text-amber-300"
+                      className="mb-1 rounded border border-amber-400 bg-amber-50 px-2 py-1 text-xs text-amber-900"
                     >
-                      {to.reason ?? "🕐"}
+                      🕐 {to.reason ?? ""}
                     </div>
                   ))}
 
@@ -283,13 +324,13 @@ export default function ScheduleClient({
                     <button
                       key={b.id}
                       onClick={() => setSelectedBooking(b)}
-                      className={`hover:bg-muted/60 mb-1 rounded border p-2 text-left text-xs transition-colors ${b.barberColor}`}
+                      className={`mb-1 rounded border p-2 text-left text-xs transition-opacity hover:opacity-80 ${b.barberColor} ${b.barberId === userBarberId ? "ring-2 ring-[var(--ink)]" : ""}`}
                     >
-                      <div className="font-medium">
+                      <div className="font-semibold">
                         {sofiaTime(b.startDatetime)}–{sofiaTime(b.endDatetime)}
                       </div>
                       <div>{b.customerName}</div>
-                      <div className="text-muted-foreground">{b.serviceName}</div>
+                      <div className="opacity-70">{b.serviceName}</div>
                     </button>
                   ))}
 
@@ -310,6 +351,11 @@ export default function ScheduleClient({
           t={t}
           statusBadgeClass={statusBadgeClass}
           statusLabel={statusLabel}
+          canEdit={!!selectedBooking && (isSuperAdmin || selectedBooking.barberId === userBarberId)}
+          onReschedule={(b) => {
+            setSelectedBooking(null);
+            setRescheduleTarget(b);
+          }}
         />
 
         <ConfirmActionDialog
@@ -338,6 +384,16 @@ export default function ScheduleClient({
             setWalkInMsg({ type: "error", text: msg });
           }}
         />
+
+        {rescheduleTarget && (
+          <RescheduleDialog
+            key={rescheduleTarget.id}
+            booking={rescheduleTarget}
+            t={t}
+            onClose={() => setRescheduleTarget(null)}
+            onDone={handleRescheduled}
+          />
+        )}
       </div>
     );
   }
@@ -388,6 +444,8 @@ export default function ScheduleClient({
         </span>
       </div>
 
+      {legend}
+
       <div className="mx-auto max-w-md space-y-3">
         {days.map((day) => {
           const dayBookings = bookingsForDay(day);
@@ -413,7 +471,7 @@ export default function ScheduleClient({
                   <button
                     key={b.id}
                     onClick={() => setSelectedBooking(b)}
-                    className={`hover:bg-muted/60 w-full rounded border p-3 text-left text-sm transition-colors ${b.barberColor}`}
+                    className={`w-full rounded border p-3 text-left text-sm transition-opacity hover:opacity-80 ${b.barberColor} ${b.barberId === userBarberId ? "ring-2 ring-[var(--ink)]" : ""}`}
                   >
                     <div className="flex items-center justify-between">
                       <span className="font-medium">
@@ -446,6 +504,11 @@ export default function ScheduleClient({
         t={t}
         statusBadgeClass={statusBadgeClass}
         statusLabel={statusLabel}
+        canEdit={!!selectedBooking && (isSuperAdmin || selectedBooking.barberId === userBarberId)}
+        onReschedule={(b) => {
+          setSelectedBooking(null);
+          setRescheduleTarget(b);
+        }}
       />
 
       <ConfirmActionDialog
@@ -470,6 +533,16 @@ export default function ScheduleClient({
         onSuccess={(msg) => setWalkInMsg({ type: "success", text: msg })}
         onError={(msg) => setWalkInMsg({ type: "error", text: msg })}
       />
+
+      {rescheduleTarget && (
+        <RescheduleDialog
+          key={rescheduleTarget.id}
+          booking={rescheduleTarget}
+          t={t}
+          onClose={() => setRescheduleTarget(null)}
+          onDone={handleRescheduled}
+        />
+      )}
     </div>
   );
 }
@@ -481,6 +554,8 @@ function BookingDetailDialog({
   t,
   statusBadgeClass,
   statusLabel,
+  canEdit,
+  onReschedule,
 }: {
   booking: BookingRow | null;
   onClose: () => void;
@@ -488,6 +563,8 @@ function BookingDetailDialog({
   t: (key: string) => string;
   statusBadgeClass: (status: string) => string;
   statusLabel: (status: string) => string;
+  canEdit: boolean;
+  onReschedule: (booking: BookingRow) => void;
 }) {
   if (!booking) return null;
 
@@ -504,8 +581,30 @@ function BookingDetailDialog({
         <div className="space-y-2 text-sm">
           {[
             [t("customerName"), booking.customerName],
-            [t("customerEmail"), booking.customerEmail],
-            [t("customerPhone"), booking.customerPhone],
+            [
+              t("customerEmail"),
+              booking.customerEmail.endsWith("@internal.local") ? (
+                booking.customerEmail
+              ) : (
+                <a
+                  key="em"
+                  href={`mailto:${booking.customerEmail}`}
+                  className="text-[var(--ink)] underline underline-offset-2"
+                >
+                  {booking.customerEmail}
+                </a>
+              ),
+            ],
+            [
+              t("customerPhone"),
+              <a
+                key="ph"
+                href={`tel:${booking.customerPhone.replace(/\s+/g, "")}`}
+                className="text-[var(--ink)] underline underline-offset-2"
+              >
+                {booking.customerPhone}
+              </a>,
+            ],
             [t("date"), sofiaShortDate(booking.startDatetime)],
             [t("time"), `${sofiaTime(booking.startDatetime)}–${sofiaTime(booking.endDatetime)}`],
             [t("service"), booking.serviceName ?? ""],
@@ -529,14 +628,19 @@ function BookingDetailDialog({
           )}
         </div>
 
+        {!canEdit && <p className="text-muted-foreground text-xs">{t("readOnlyOtherBarber")}</p>}
+
         <DialogFooter className="flex-wrap gap-2">
-          {booking.status === "confirmed" && (
+          {booking.status === "confirmed" && canEdit && (
             <>
               <Button variant="outline" size="sm" onClick={() => onAction(booking.id, "complete")}>
                 {t("markCompleted")}
               </Button>
               <Button variant="outline" size="sm" onClick={() => onAction(booking.id, "noShow")}>
                 {t("markNoShow")}
+              </Button>
+              <Button variant="outline" size="sm" onClick={() => onReschedule(booking)}>
+                {t("reschedule")}
               </Button>
               <Button
                 variant="destructive"
@@ -763,6 +867,74 @@ function WalkInDialog({
             }
           >
             {t("confirm")}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+function RescheduleDialog({
+  booking,
+  onClose,
+  onDone,
+  t,
+}: {
+  booking: BookingRow;
+  onClose: () => void;
+  onDone: (bookingId: number, date: string, time: string) => void;
+  t: (key: string) => string;
+}) {
+  const [date, setDate] = useState(sofiaDateKey(booking.startDatetime));
+  const [time, setTime] = useState(sofiaTime(booking.startDatetime));
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const handleSubmit = async () => {
+    setSubmitting(true);
+    setError(null);
+    const res = await rescheduleBooking(booking.id, { date, time });
+    setSubmitting(false);
+    if ("success" in res && res.success) {
+      onDone(booking.id, date, time);
+    } else if ("error" in res) {
+      setError(res.error === "slotTaken" ? t("rescheduleSlotTaken") : t("error"));
+    }
+  };
+
+  return (
+    <Dialog open onOpenChange={onClose}>
+      <DialogContent onOpenChange={onClose}>
+        <DialogHeader>
+          <DialogTitle>{t("reschedule")}</DialogTitle>
+          <DialogDescription>
+            {booking.customerName} — {booking.serviceName}
+          </DialogDescription>
+        </DialogHeader>
+
+        {error && (
+          <p className="text-destructive text-sm" role="alert">
+            {error}
+          </p>
+        )}
+
+        <div className="grid grid-cols-2 gap-3">
+          <div className="space-y-1">
+            <Label>{t("date")}</Label>
+            <Input type="date" value={date} onChange={(e) => setDate(e.target.value)} />
+          </div>
+          <div className="space-y-1">
+            <Label>{t("time")}</Label>
+            <Input type="time" value={time} onChange={(e) => setTime(e.target.value)} />
+          </div>
+        </div>
+
+        <DialogFooter>
+          <Button variant="ghost" onClick={onClose}>
+            {t("close")}
+          </Button>
+          <Button onClick={handleSubmit} disabled={submitting || !date || !time}>
+            {submitting ? "…" : t("confirm")}
           </Button>
         </DialogFooter>
       </DialogContent>

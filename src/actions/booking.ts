@@ -1,6 +1,6 @@
 "use server";
 
-import { eq, asc, and } from "drizzle-orm";
+import { eq, asc, and, or, inArray, gte, lte, sql } from "drizzle-orm";
 import { db } from "@/db";
 import { getAvailableSlots, getAvailableSlotsForAnyBarber } from "@/lib/booking/availability";
 import { getSlotsSchema, bookingDetailsSchema } from "@/lib/booking/schema";
@@ -152,7 +152,7 @@ export async function createBooking(input: unknown): Promise<CreateBookingResult
 
   if (barberId === "any") {
     try {
-      const dateObj = new Date(`${date}T${time}:00+03:00`);
+      const dateObj = sofiaWallToInstant(`${date}T${time}`);
       const results = await getAvailableSlotsForAnyBarber({
         serviceId,
         date: dateObj,
@@ -165,11 +165,38 @@ export async function createBooking(input: unknown): Promise<CreateBookingResult
         return { success: false, error: "slotTaken" };
       }
 
-      const firstBarber = matchingSlot.availableBarberIds[0];
-      if (firstBarber == null) {
-        return { success: false, error: "slotTaken" };
+      // Load-balance: among the barbers free at this slot, pick the one with the
+      // fewest bookings that day (ties broken by display order, since
+      // availableBarberIds is already ordered that way).
+      const dayStart = sofiaWallToInstant(`${date}T00:00`);
+      const dayEnd = new Date(dayStart.getTime() + 24 * 60 * 60 * 1000);
+      const counts = await db
+        .select({
+          barberId: bookings.barberId,
+          count: sql<number>`count(*)`.mapWith(Number),
+        })
+        .from(bookings)
+        .where(
+          and(
+            inArray(bookings.barberId, matchingSlot.availableBarberIds),
+            or(eq(bookings.status, "confirmed"), eq(bookings.status, "completed")),
+            gte(bookings.startDatetime, dayStart),
+            lte(bookings.startDatetime, dayEnd),
+          ),
+        )
+        .groupBy(bookings.barberId);
+      const countByBarber = new Map(counts.map((r) => [r.barberId, r.count]));
+
+      let bestBarber = matchingSlot.availableBarberIds[0]!;
+      let bestCount = countByBarber.get(bestBarber) ?? 0;
+      for (const id of matchingSlot.availableBarberIds) {
+        const c = countByBarber.get(id) ?? 0;
+        if (c < bestCount) {
+          bestBarber = id;
+          bestCount = c;
+        }
       }
-      resolvedBarberId = firstBarber;
+      resolvedBarberId = bestBarber;
     } catch {
       return { success: false, error: "booking_error" };
     }
@@ -179,7 +206,7 @@ export async function createBooking(input: unknown): Promise<CreateBookingResult
 
   // Server-side re-check: is the slot still available?
   try {
-    const dateObj = new Date(`${date}T${time}:00+03:00`);
+    const dateObj = sofiaWallToInstant(`${date}T${time}`);
     const slots = await getAvailableSlots({
       serviceId,
       barberId: resolvedBarberId,

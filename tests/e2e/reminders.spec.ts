@@ -26,7 +26,7 @@ test("reminder cron emails a booking ~24h out and flips reminderSent", async ({ 
   expect((await res.json()).sent).toBeGreaterThanOrEqual(1);
 
   expect(await waitForMail("Booking Reminder", email)).not.toBeNull();
-  const [row] = await sql`select reminder_sent from bookings where customer_email = ${email}`;
+  const row = (await sql`select reminder_sent from bookings where customer_email = ${email}`)[0]!;
   expect(row.reminder_sent).toBe(true);
 
   await sql`delete from bookings where customer_email = ${email}`;

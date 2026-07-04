@@ -1,5 +1,6 @@
 import type { Page } from "@playwright/test";
 import postgres from "postgres";
+import crypto from "node:crypto";
 
 // These E2E tests drive the real app and assert against the real dev services
 // (Postgres on :5432, Mailpit on :8025). Start the stack first:
@@ -54,3 +55,9 @@ export async function login(page: Page): Promise<void> {
 
 const pad = (n: number) => String(n).padStart(2, "0");
 export const ymd = (d: Date) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+
+/** Same HMAC cancellation token the server generates (keyed on AUTH_SECRET). */
+export function cancellationToken(bookingId: number): string {
+  const secret = process.env.AUTH_SECRET || "";
+  return crypto.createHmac("sha256", secret).update(String(bookingId)).digest("hex").slice(0, 32);
+}

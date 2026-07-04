@@ -17,9 +17,13 @@ export async function GET(request: Request) {
   }
 
   try {
+    // On Vercel's Hobby tier crons run at most once per day, so this fires
+    // daily. Remind every confirmed booking in the next ~26h that hasn't been
+    // reminded yet. The window is >24h (plus slack for cron jitter) so
+    // consecutive daily runs overlap and no appointment slips through a gap;
+    // the `reminderSent` flag guarantees each booking is emailed only once.
     const now = new Date();
-    const twentyThreeHoursFromNow = new Date(now.getTime() + 23 * 60 * 60 * 1000);
-    const twentyFiveHoursFromNow = new Date(now.getTime() + 25 * 60 * 60 * 1000);
+    const windowEnd = new Date(now.getTime() + 26 * 60 * 60 * 1000);
 
     const pendingReminders = await db
       .select({
@@ -37,14 +41,23 @@ export async function GET(request: Request) {
         and(
           eq(bookings.status, "confirmed"),
           eq(bookings.reminderSent, false),
-          gte(bookings.startDatetime, twentyThreeHoursFromNow),
-          lte(bookings.startDatetime, twentyFiveHoursFromNow),
+          gte(bookings.startDatetime, now),
+          lte(bookings.startDatetime, windowEnd),
         ),
       );
 
     let sent = 0;
 
     for (const booking of pendingReminders) {
+      // Walk-in placeholders have no real inbox — mark done, don't email.
+      if (booking.customerEmail.endsWith("@internal.local")) {
+        await db
+          .update(bookings)
+          .set({ reminderSent: true, updatedAt: new Date() })
+          .where(eq(bookings.id, booking.id));
+        continue;
+      }
+
       try {
         const [barber] = await db
           .select({ nameBg: barbers.nameBg, nameEn: barbers.nameEn })
@@ -62,7 +75,7 @@ export async function GET(request: Request) {
           booking.locale === "bg" ? (barber?.nameBg ?? "") : (barber?.nameEn ?? "");
         const address = booking.locale === "bg" ? ADDRESS_BG : ADDRESS_EN;
 
-        await sendReminder({
+        const ok = await sendReminder({
           to: booking.customerEmail,
           name: booking.customerName,
           date: sofiaLongDate(booking.startDatetime, booking.locale === "bg" ? "bg" : "en"),
@@ -74,12 +87,16 @@ export async function GET(request: Request) {
           locale: booking.locale === "bg" ? "bg" : "en",
         });
 
-        await db
-          .update(bookings)
-          .set({ reminderSent: true, updatedAt: new Date() })
-          .where(eq(bookings.id, booking.id));
-
-        sent++;
+        // Only mark as reminded when the email actually went out — otherwise a
+        // transient failure would be lost. Leaving it unset lets the next
+        // daily run retry (the 26h window still covers it next time).
+        if (ok) {
+          await db
+            .update(bookings)
+            .set({ reminderSent: true, updatedAt: new Date() })
+            .where(eq(bookings.id, booking.id));
+          sent++;
+        }
       } catch (err) {
         console.error(`Failed to send reminder for booking ${booking.id}:`, err);
       }

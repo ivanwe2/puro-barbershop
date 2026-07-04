@@ -53,9 +53,11 @@ test("barber CRUD + invite", async ({ page }) => {
   await clickAndReload(page, create.getByRole("button", { name: "Create", exact: true }));
   await expect(rowFor()).toBeVisible({ timeout: 20000 });
 
-  const [b] = await sql`select id, active from barbers where name_en = ${nameEn}`;
+  const b = (await sql`select id, active from barbers where name_en = ${nameEn}`)[0]!;
   expect(b.active).toBe(true);
-  const [wh] = await sql`select count(*)::int as c from working_hours where barber_id = ${b.id}`;
+  const wh = (
+    await sql`select count(*)::int as c from working_hours where barber_id = ${b.id}`
+  )[0]!;
   expect(wh.c, "7 default working-hours rows").toBe(7);
 
   // Toggle inactive — navigate fresh, then edit.
@@ -64,7 +66,7 @@ test("barber CRUD + invite", async ({ page }) => {
   const edit = page.getByRole("dialog");
   await edit.getByRole("checkbox").click();
   await clickAndReload(page, edit.getByRole("button", { name: "Save", exact: true }));
-  expect((await sql`select active from barbers where name_en = ${nameEn}`)[0].active).toBe(false);
+  expect((await sql`select active from barbers where name_en = ${nameEn}`)[0]!.active).toBe(false);
 
   // Invite — navigate fresh, then open the invite dialog.
   await clearMail();
@@ -187,6 +189,23 @@ test("walk-in + week-nav refetch + mark completed", async ({ page }) => {
   }
   expect(found, "future-week booking appears after navigation").toBe(true);
 
+  // Reschedule to 15:00 and confirm the stored Sofia time moved.
+  await page.getByText(custName).first().click();
+  await page.getByRole("button", { name: "Reschedule" }).click();
+  const rd = page.getByRole("dialog");
+  await rd.locator('input[type="time"]').fill("15:00");
+  await rd.getByRole("button", { name: "Confirm" }).click();
+  await expect
+    .poll(
+      async () =>
+        (
+          await sql`select to_char(start_datetime at time zone 'Europe/Sofia','HH24:MI') as hm from bookings where customer_name = ${custName}`
+        )[0]?.hm,
+      { timeout: 15000 },
+    )
+    .toBe("15:00");
+
+  // Mark completed.
   await page.getByText(custName).first().click();
   await page.getByRole("button", { name: "Mark as Completed" }).click();
   await page.getByRole("button", { name: "Confirm", exact: true }).last().click();
