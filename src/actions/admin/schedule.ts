@@ -163,7 +163,7 @@ export async function createWalkInBooking(input: unknown) {
   }
 
   // Server-side slot availability check
-  const dateObj = new Date(`${date}T${time}:00+03:00`);
+  const dateObj = sofiaWallToInstant(`${date}T${time}`);
   const slots = await getAvailableSlots({ serviceId, barberId, date: dateObj, db });
   const isAvailable = slots.some((s) => s.toTimeString().slice(0, 5) === time);
   if (!isAvailable) return { error: "slotTaken" } as const;

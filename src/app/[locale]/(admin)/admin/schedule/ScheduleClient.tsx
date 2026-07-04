@@ -581,8 +581,30 @@ function BookingDetailDialog({
         <div className="space-y-2 text-sm">
           {[
             [t("customerName"), booking.customerName],
-            [t("customerEmail"), booking.customerEmail],
-            [t("customerPhone"), booking.customerPhone],
+            [
+              t("customerEmail"),
+              booking.customerEmail.endsWith("@internal.local") ? (
+                booking.customerEmail
+              ) : (
+                <a
+                  key="em"
+                  href={`mailto:${booking.customerEmail}`}
+                  className="text-[var(--ink)] underline underline-offset-2"
+                >
+                  {booking.customerEmail}
+                </a>
+              ),
+            ],
+            [
+              t("customerPhone"),
+              <a
+                key="ph"
+                href={`tel:${booking.customerPhone.replace(/\s+/g, "")}`}
+                className="text-[var(--ink)] underline underline-offset-2"
+              >
+                {booking.customerPhone}
+              </a>,
+            ],
             [t("date"), sofiaShortDate(booking.startDatetime)],
             [t("time"), `${sofiaTime(booking.startDatetime)}–${sofiaTime(booking.endDatetime)}`],
             [t("service"), booking.serviceName ?? ""],
