@@ -17,14 +17,14 @@ lang: en
 
 ---
 
-**Effective date:** `[PLACEHOLDER:effective_date]`
+**Effective date:** `3 July 2026`
 **Version:** 1.0
 
 ---
 
 ## 1. About these terms
 
-These terms of service ("Terms") govern your use of the website at **purobarbershop.com** ("the Website") and the booking service it provides ("the Service"), operated by `[PLACEHOLDER:legal_entity_name]`, EIK `[PLACEHOLDER:eik]`, registered at `[PLACEHOLDER:registered_address]`, with its barbershop at Бул. Христо Ботев 114, Plovdiv, Bulgaria ("we", "us", "Puro Barbershop").
+These terms of service ("Terms") govern your use of the website at **purobarbershop.com** ("the Website") and the booking service it provides ("the Service"), operated by `EXACTO Ltd (ЕКСАКТО ЕООД)`, EIK `208808320`, registered at `19 Georgi Kondolov St., fl. 3, apt. 8, Yuzhen district, 4004 Plovdiv, Bulgaria`, with its barbershop at Бул. Христо Ботев 114, Plovdiv, Bulgaria ("we", "us", "Puro Barbershop").
 
 By making a booking through the Website, you agree to these Terms. If you do not agree, please do not use the Service — you are welcome to walk in or call us directly to book.
 
@@ -62,7 +62,7 @@ In such cases we will notify you as soon as possible.
 
 Prices are listed on the Website in Bulgarian leva (BGN, лв) and include applicable taxes where due. Payment is taken **in person** at the barbershop after your appointment. We do not collect payment information through the Website.
 
-Cash and `[PLACEHOLDER:other_payment_methods_supported]` are accepted.
+Cash and `cash and card, paid in person at the barbershop` are accepted.
 
 We may change prices from time to time. The price in effect at the time you make a booking is the price you pay for that booking, regardless of subsequent changes.
 
@@ -74,7 +74,7 @@ We may change prices from time to time. The price in effect at the time you make
 
 You may cancel a confirmed booking free of charge **up to 24 hours before its scheduled start time**, by clicking the cancellation link in your confirmation email.
 
-If you need to cancel **within the 24-hour window** before your appointment, please call us at `[PLACEHOLDER:shop_phone]` so we can adjust the schedule. We may, at our discretion, decline to take future bookings from you if late cancellations or no-shows become a pattern.
+If you need to cancel **within the 24-hour window** before your appointment, please call us at `+359 892 919 649` so we can adjust the schedule. We may, at our discretion, decline to take future bookings from you if late cancellations or no-shows become a pattern.
 
 To reschedule, please cancel the existing booking (if possible) and make a new one for your preferred time.
 
@@ -152,10 +152,10 @@ If any provision of these Terms is found to be unenforceable, the rest will rema
 
 ### 10.5 Contact
 
-`[PLACEHOLDER:legal_entity_name]`
-`[PLACEHOLDER:registered_address]`
-Email: `[PLACEHOLDER:shop_email]`
-Phone: `[PLACEHOLDER:shop_phone]`
+`EXACTO Ltd (ЕКСАКТО ЕООД)`
+`19 Georgi Kondolov St., fl. 3, apt. 8, Yuzhen district, 4004 Plovdiv, Bulgaria`
+Email: `seneymurad111@gmail.com`
+Phone: `+359 892 919 649`
 
 ---
 

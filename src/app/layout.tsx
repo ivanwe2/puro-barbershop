@@ -1,29 +1,33 @@
 import type { Metadata } from "next";
-import { Cormorant_Garamond, Inter, Geist } from "next/font/google";
+import { Playfair_Display, Inter, Pirata_One } from "next/font/google";
 import { cn } from "@/lib/utils";
 import "./globals.css";
 
-const geist = Geist({
-  subsets: ["latin"],
-  variable: "--font-sans",
-});
-
-const cormorant = Cormorant_Garamond({
-  subsets: ["latin", "cyrillic"],
-  weight: ["400", "500", "600"],
-  variable: "--font-cormorant",
+// Display / headings — high-contrast editorial serif with full Cyrillic, so
+// Bulgarian and English render in the same face.
+const playfair = Playfair_Display({
+  subsets: ["latin", "latin-ext", "cyrillic"],
+  variable: "--font-playfair",
   display: "swap",
 });
 
+// Body / UI sans — full Cyrillic, used for both languages.
 const inter = Inter({
-  subsets: ["latin", "cyrillic"],
-  weight: ["400", "500", "600"],
+  subsets: ["latin", "latin-ext", "cyrillic"],
   variable: "--font-inter",
   display: "swap",
 });
 
+// Blackletter wordmark — used for "PURO" only (Latin).
+const pirata = Pirata_One({
+  subsets: ["latin"],
+  weight: "400",
+  variable: "--font-pirata",
+  display: "swap",
+});
+
 export const metadata: Metadata = {
-  title: "Puro Barbershop — Precision · Confidence · Clean Look",
+  title: "Puro Barbershop",
   description: "Прецизност · Увереност · Стил. Запази час в Puro Barbershop, Пловдив.",
 };
 
@@ -35,7 +39,7 @@ export default function RootLayout({
   return (
     <html
       lang="bg"
-      className={cn("h-full antialiased", cormorant.variable, inter.variable, geist.variable)}
+      className={cn("h-full antialiased", playfair.variable, inter.variable, pirata.variable)}
     >
       <body className="flex min-h-full flex-col">{children}</body>
     </html>

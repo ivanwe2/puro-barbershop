@@ -1,11 +1,13 @@
 "use client";
 
 import { useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useTranslations } from "next-intl";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Dialog,
   DialogContent,
@@ -30,24 +32,23 @@ interface Barber {
   userId: number | null;
 }
 
-export default function BarbersClient({
-  t,
-  initialBarbers,
-}: {
-  t: (key: string) => string;
-  initialBarbers: Barber[];
-}) {
+export default function BarbersClient({ initialBarbers }: { initialBarbers: Barber[] }) {
+  const t = useTranslations("admin");
   const [barbers, setBarbers] = useState(initialBarbers);
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState<number | null>(null);
   const [deleteConfirm, setDeleteConfirm] = useState<number | null>(null);
   const [inviteId, setInviteId] = useState<number | null>(null);
   const [inviteEmail, setInviteEmail] = useState("");
+  const [formActive, setFormActive] = useState(true);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const form = e.currentTarget;
     const formData = new FormData(form);
+    // Active is a controlled checkbox (base-ui checkboxes don't reliably submit
+    // a native "on" value), so set it explicitly.
+    formData.set("active", formActive ? "on" : "off");
 
     if (editingId) {
       const result = await updateBarber(editingId, formData);
@@ -109,6 +110,7 @@ export default function BarbersClient({
         <Button
           onClick={() => {
             setEditingId(null);
+            setFormActive(true);
             setShowForm(true);
           }}
         >
@@ -117,18 +119,18 @@ export default function BarbersClient({
       </div>
 
       <Card>
-        <CardHeader>
-          <CardTitle>{t("barbers")}</CardTitle>
-        </CardHeader>
-        <CardContent>
+        <CardContent className="pt-6">
           {barbers.length === 0 ? (
             <p className="text-muted-foreground text-sm">No barbers found</p>
           ) : (
             <div className="space-y-3">
               {barbers.map((b) => (
-                <div key={b.id} className="flex items-center justify-between rounded-lg border p-3">
+                <div
+                  key={b.id}
+                  className="flex flex-col gap-3 rounded-lg border p-3 sm:flex-row sm:items-center sm:justify-between"
+                >
                   <div className="space-y-1">
-                    <div className="flex items-center gap-2">
+                    <div className="flex flex-wrap items-center gap-2">
                       <p className="text-foreground text-sm font-medium">{b.nameBg}</p>
                       <span className="text-muted-foreground text-xs">({b.nameEn})</span>
                       <Badge variant={b.active ? "default" : "secondary"}>
@@ -141,7 +143,7 @@ export default function BarbersClient({
                     )}
                     <p className="text-muted-foreground text-xs">Order: {b.displayOrder}</p>
                   </div>
-                  <div className="flex gap-2">
+                  <div className="flex flex-wrap gap-2">
                     {b.userId === null && (
                       <Button
                         variant="outline"
@@ -159,6 +161,7 @@ export default function BarbersClient({
                       size="sm"
                       onClick={() => {
                         setEditingId(b.id);
+                        setFormActive(b.active);
                         setShowForm(true);
                       }}
                     >
@@ -217,7 +220,11 @@ export default function BarbersClient({
             </div>
             <div className="space-y-2">
               <Label>{t("photo")} URL</Label>
-              <Input name="photoUrl" defaultValue={editingBarber?.photoUrl ?? ""} />
+              <Input
+                name="photoUrl"
+                defaultValue={editingBarber?.photoUrl ?? ""}
+                placeholder="/barbers/name.jpg  ·  https://…"
+              />
             </div>
             <div className="space-y-2">
               <Label>{t("displayOrder")}</Label>
@@ -226,6 +233,14 @@ export default function BarbersClient({
                 type="number"
                 defaultValue={editingBarber?.displayOrder ?? 0}
               />
+            </div>
+            <div className="flex items-center gap-2">
+              <Checkbox
+                id="barber-active"
+                checked={formActive}
+                onCheckedChange={(c) => setFormActive(c === true)}
+              />
+              <Label htmlFor="barber-active">{t("active")}</Label>
             </div>
             <DialogFooter>
               <Button

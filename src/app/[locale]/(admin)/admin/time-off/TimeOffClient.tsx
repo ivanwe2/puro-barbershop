@@ -1,8 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { format } from "date-fns";
-import { bg } from "date-fns/locale";
+import { useTranslations } from "next-intl";
+import { sofiaShortDateTime, sofiaDateTimeLocal, sofiaWallToInstant } from "@/lib/datetime";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -38,21 +38,21 @@ interface TimeOffEntry {
 }
 
 export default function TimeOffClient({
-  t,
   initialEntries,
   initialBarbers,
   isSuperAdmin,
   barberId,
 }: {
-  t: (key: string) => string;
   initialEntries: TimeOffEntry[];
   initialBarbers: { id: number; nameBg: string }[];
   isSuperAdmin: boolean;
   barberId?: number;
 }) {
+  const t = useTranslations("admin");
   const [entries, setEntries] = useState(initialEntries);
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState<number | null>(null);
+  const [formBarberId, setFormBarberId] = useState("");
   const [deleteConfirm, setDeleteConfirm] = useState<number | null>(null);
   const [overlappingWarning, setOverlappingWarning] = useState<{
     message: string;
@@ -65,6 +65,24 @@ export default function TimeOffClient({
     e.preventDefault();
     const form = e.currentTarget;
     const formData = new FormData(form);
+
+    // datetime-local fields are "YYYY-MM-DDTHH:mm" (no seconds/zone); the server
+    // schema expects a full ISO datetime. The admin enters Sofia wall-clock
+    // time, so convert it to the correct UTC instant regardless of browser TZ.
+    for (const field of ["startDatetime", "endDatetime"]) {
+      const v = formData.get(field) as string | null;
+      if (v) formData.set(field, sofiaWallToInstant(v).toISOString());
+    }
+
+    // Barber is a controlled Select (a required, visually-hidden native control
+    // can silently block submit), so supply its value explicitly.
+    if (isSuperAdmin) {
+      if (!formBarberId) {
+        toast.error(t("error"));
+        return;
+      }
+      formData.set("barberId", formBarberId);
+    }
 
     if (editingId) {
       formData.set("id", String(editingId));
@@ -138,6 +156,7 @@ export default function TimeOffClient({
 
   const handleEdit = (entry: TimeOffEntry) => {
     setEditingId(entry.id);
+    setFormBarberId(String(entry.barberId));
     setShowForm(true);
   };
 
@@ -150,6 +169,7 @@ export default function TimeOffClient({
         <Button
           onClick={() => {
             setEditingId(null);
+            setFormBarberId("");
             setShowForm(true);
           }}
         >
@@ -169,23 +189,23 @@ export default function TimeOffClient({
               {entries.map((entry) => (
                 <div
                   key={entry.id}
-                  className={`flex items-center justify-between rounded-lg border p-3 ${isPast(entry) ? "opacity-50" : ""}`}
+                  className={`flex flex-col gap-3 rounded-lg border p-3 sm:flex-row sm:items-center sm:justify-between ${isPast(entry) ? "opacity-50" : ""}`}
                 >
                   <div className="space-y-1">
-                    <div className="flex items-center gap-2">
+                    <div className="flex flex-wrap items-center gap-2">
                       <p className="text-foreground text-sm font-medium">{entry.barberName}</p>
                       {isPast(entry) && <Badge variant="secondary">Past</Badge>}
                     </div>
                     <p className="text-muted-foreground text-xs">
-                      {format(new Date(entry.startDatetime), "dd.MM.yyyy HH:mm", { locale: bg })} —{" "}
-                      {format(new Date(entry.endDatetime), "dd.MM.yyyy HH:mm", { locale: bg })}
+                      {sofiaShortDateTime(entry.startDatetime)} —{" "}
+                      {sofiaShortDateTime(entry.endDatetime)}
                     </p>
                     {entry.reason && (
                       <p className="text-muted-foreground text-xs">{entry.reason}</p>
                     )}
                   </div>
                   {!isPast(entry) && (
-                    <div className="flex gap-2">
+                    <div className="flex flex-wrap gap-2">
                       <Button variant="outline" size="sm" onClick={() => handleEdit(entry)}>
                         {t("edit")}
                       </Button>
@@ -234,12 +254,8 @@ export default function TimeOffClient({
             {isSuperAdmin && (
               <div className="space-y-2">
                 <Label>{t("name")}</Label>
-                <Select
-                  name="barberId"
-                  defaultValue={editingEntry ? String(editingEntry.barberId) : ""}
-                  required
-                >
-                  <SelectTrigger>
+                <Select value={formBarberId} onValueChange={(v) => setFormBarberId(v ?? "")}>
+                  <SelectTrigger className="w-full">
                     <SelectValue placeholder="Select barber" />
                   </SelectTrigger>
                   <SelectContent>
@@ -258,11 +274,7 @@ export default function TimeOffClient({
               <Input
                 type="datetime-local"
                 name="startDatetime"
-                defaultValue={
-                  editingEntry
-                    ? format(new Date(editingEntry.startDatetime), "yyyy-MM-dd'T'HH:mm")
-                    : ""
-                }
+                defaultValue={editingEntry ? sofiaDateTimeLocal(editingEntry.startDatetime) : ""}
                 required
               />
             </div>
@@ -272,11 +284,7 @@ export default function TimeOffClient({
               <Input
                 type="datetime-local"
                 name="endDatetime"
-                defaultValue={
-                  editingEntry
-                    ? format(new Date(editingEntry.endDatetime), "yyyy-MM-dd'T'HH:mm")
-                    : ""
-                }
+                defaultValue={editingEntry ? sofiaDateTimeLocal(editingEntry.endDatetime) : ""}
                 required
               />
             </div>

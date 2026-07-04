@@ -22,22 +22,25 @@ export default auth((req) => {
   if (pathname.startsWith("/bg/admin") || pathname.startsWith("/en/admin")) {
     const locale = pathname.startsWith("/bg") ? "bg" : "en";
 
-    // Allow login page without auth
+    let res: NextResponse;
     if (pathname.endsWith("/admin/login")) {
-      return intlMiddleware(req);
-    }
-
-    // Redirect to login if not authenticated
-    if (!req.auth) {
+      // Login page — reachable without auth.
+      res = intlMiddleware(req);
+    } else if (!req.auth) {
+      // Not authenticated — send to login, preserving the intended target.
       const signInUrl = new URL(`/${locale}/admin/login`, req.url);
       signInUrl.searchParams.set("callbackUrl", req.nextUrl.href);
-      return NextResponse.redirect(signInUrl);
+      res = NextResponse.redirect(signInUrl);
+    } else if (req.auth.user?.role === "barber" && isSuperAdminRoute(pathname)) {
+      // Block barbers from super-admin-only routes.
+      res = NextResponse.redirect(new URL(`/${locale}/admin`, req.url));
+    } else {
+      res = intlMiddleware(req);
     }
 
-    // Block barbers from super-admin-only routes
-    if (req.auth.user?.role === "barber" && isSuperAdminRoute(pathname)) {
-      return NextResponse.redirect(new URL(`/${locale}/admin`, req.url));
-    }
+    // Keep the entire admin area (including login) out of search indexes.
+    res.headers.set("X-Robots-Tag", "noindex, nofollow");
+    return res;
   }
 
   // Run locale middleware for all other requests

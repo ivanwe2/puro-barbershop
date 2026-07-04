@@ -2,11 +2,12 @@ import type { ReactNode } from "react";
 import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetTrigger, SheetClose } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { logoutAction } from "@/actions/admin/logout";
 import { Link } from "@/lib/i18n/routing";
+import Wordmark from "@/components/shared/Wordmark";
 
 const adminNavItems = [
   { href: "/admin", labelKey: "dashboard" },
@@ -24,30 +25,48 @@ const superAdminNavItems = [
 function SidebarNav({
   navItems,
   t,
+  inSheet = false,
 }: {
   navItems: { href: string; labelKey: string }[];
   t: (key: string) => string;
+  inSheet?: boolean;
 }) {
+  const linkClass =
+    "text-muted-foreground hover:bg-accent hover:text-accent-foreground block rounded-lg px-3 py-2 text-sm font-medium transition-colors";
   return (
     <nav className="flex-1 space-y-1 px-3 py-4">
-      {navItems.map((item) => (
-        <Link
-          key={item.href}
-          href={item.href}
-          className="text-muted-foreground hover:bg-accent hover:text-accent-foreground block rounded-lg px-3 py-2 text-sm font-medium transition-colors"
-        >
-          {t(item.labelKey)}
-        </Link>
-      ))}
+      {navItems.map((item) =>
+        // Inside the mobile drawer, clicking a link should also close it.
+        inSheet ? (
+          <SheetClose
+            key={item.href}
+            nativeButton={false}
+            render={<Link href={item.href} className={linkClass} />}
+          >
+            {t(item.labelKey)}
+          </SheetClose>
+        ) : (
+          <Link key={item.href} href={item.href} className={linkClass}>
+            {t(item.labelKey)}
+          </Link>
+        ),
+      )}
     </nav>
   );
 }
 
-export default async function AdminLayout({ children }: { children: ReactNode }) {
+export default async function AdminLayout({
+  children,
+  params,
+}: {
+  children: ReactNode;
+  params: Promise<{ locale: string }>;
+}) {
+  const { locale } = await params;
   const session = await auth();
 
   if (!session) {
-    redirect("/bg/admin/login");
+    redirect(`/${locale}/admin/login`);
   }
 
   const t = await getTranslations("admin");
@@ -60,8 +79,8 @@ export default async function AdminLayout({ children }: { children: ReactNode })
       <aside className="hidden w-64 border-r lg:block">
         <div className="bg-muted/40 flex h-full flex-col border-r">
           <div className="flex h-14 items-center border-b px-6">
-            <Link href="/bg" className="font-heading text-foreground text-xl">
-              Puro
+            <Link href="/" className="text-foreground">
+              <Wordmark className="text-2xl" />
             </Link>
           </div>
           <SidebarNav navItems={navItems} t={t} />
@@ -71,44 +90,44 @@ export default async function AdminLayout({ children }: { children: ReactNode })
       {/* Main content */}
       <div className="flex flex-1 flex-col">
         {/* Top bar */}
-        <header className="bg-background flex h-14 items-center justify-between border-b px-4 lg:px-6">
-          <div className="flex items-center gap-4">
+        <header className="bg-background flex h-14 items-center justify-between gap-2 border-b px-4 lg:px-6">
+          <div className="flex min-w-0 items-center gap-2 sm:gap-4">
             {/* Mobile sidebar trigger */}
             <Sheet>
-              <SheetTrigger>
-                <Button variant="ghost" size="icon" className="lg:hidden">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="24"
-                    height="24"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
-                    <line x1="4" x2="20" y1="12" y2="12" />
-                    <line x1="4" x2="20" y1="6" y2="6" />
-                    <line x1="4" x2="20" y1="18" y2="18" />
-                  </svg>
-                  <span className="sr-only">Menu</span>
-                </Button>
+              <SheetTrigger render={<Button variant="ghost" size="icon" className="lg:hidden" />}>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <line x1="4" x2="20" y1="12" y2="12" />
+                  <line x1="4" x2="20" y1="6" y2="6" />
+                  <line x1="4" x2="20" y1="18" y2="18" />
+                </svg>
+                <span className="sr-only">Menu</span>
               </SheetTrigger>
               <SheetContent side="left" className="w-64 p-0">
                 <div className="flex h-full flex-col">
                   <div className="flex h-14 items-center border-b px-6">
-                    <Link href="/bg" className="font-heading text-foreground text-xl">
-                      Puro
+                    <Link href="/" className="text-foreground">
+                      <Wordmark className="text-2xl" />
                     </Link>
                   </div>
-                  <SidebarNav navItems={navItems} t={t} />
+                  <SidebarNav navItems={navItems} t={t} inSheet />
                 </div>
               </SheetContent>
             </Sheet>
 
-            <span className="text-muted-foreground text-sm">{session.user?.email}</span>
-            <Badge variant={isSuperAdmin ? "default" : "secondary"}>
+            <span className="text-muted-foreground hidden truncate text-sm sm:inline">
+              {session.user?.email}
+            </span>
+            <Badge variant={isSuperAdmin ? "default" : "secondary"} className="shrink-0">
               {isSuperAdmin ? t("roleSuperAdmin") : t("roleBarber")}
             </Badge>
           </div>

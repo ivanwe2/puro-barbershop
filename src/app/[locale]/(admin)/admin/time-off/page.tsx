@@ -1,6 +1,5 @@
 import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
-import { getTranslations } from "next-intl/server";
 import { db } from "@/db";
 import { barbers } from "@/db/schema";
 import { eq, asc } from "drizzle-orm";
@@ -11,7 +10,6 @@ export default async function TimeOffPage() {
   const session = await auth();
   if (!session) redirect("/bg/admin/login");
 
-  const t = await getTranslations("admin");
   const isSuperAdmin = session.user?.role === "super_admin";
 
   const entriesResult = await fetchTimeOffEntries();
@@ -29,7 +27,6 @@ export default async function TimeOffPage() {
 
   return (
     <TimeOffClient
-      t={t}
       initialEntries={entries}
       initialBarbers={barbersList}
       isSuperAdmin={isSuperAdmin}

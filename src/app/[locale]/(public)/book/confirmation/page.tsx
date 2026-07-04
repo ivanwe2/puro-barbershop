@@ -1,7 +1,7 @@
 import { db } from "@/db";
 import { bookings, services, barbers } from "@/db/schema";
 import { eq } from "drizzle-orm";
-import { format } from "date-fns";
+import { sofiaLongDate, sofiaTime } from "@/lib/datetime";
 import { getTranslations } from "next-intl/server";
 import { Link } from "@/lib/i18n/routing";
 
@@ -79,8 +79,8 @@ export default async function ConfirmationPage({
   const serviceName = service ? (booking.locale === "bg" ? service.nameBg : service.nameEn) : "—";
   const barberName = barber ? (booking.locale === "bg" ? barber.nameBg : barber.nameEn) : "—";
 
-  const dateStr = format(booking.startDatetime, "EEEE, MMMM d, yyyy");
-  const timeStr = format(booking.startDatetime, "HH:mm");
+  const dateStr = sofiaLongDate(booking.startDatetime, booking.locale === "bg" ? "bg" : "en");
+  const timeStr = sofiaTime(booking.startDatetime);
 
   return (
     <div className="mx-auto max-w-2xl px-4 py-12 sm:px-6 lg:px-8">

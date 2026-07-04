@@ -1,6 +1,5 @@
 import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
-import { getTranslations } from "next-intl/server";
 import ScheduleClient from "./ScheduleClient";
 import {
   fetchScheduleBookings,
@@ -12,8 +11,6 @@ import {
 export default async function SchedulePage() {
   const session = await auth();
   if (!session) redirect("/bg/admin/login");
-
-  const t = await getTranslations("admin");
 
   // Compute week range
   const now = new Date();
@@ -47,7 +44,6 @@ export default async function SchedulePage() {
 
   return (
     <ScheduleClient
-      t={t}
       initialBookings={"error" in bookingsResult ? [] : bookingsResult.bookings}
       initialBarbers={"error" in barbersResult ? [] : barbersResult.barbers}
       initialTimeOff={"error" in timeOffResult ? [] : timeOffResult.timeOff}

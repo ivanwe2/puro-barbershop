@@ -2,6 +2,7 @@ import "dotenv/config";
 import bcrypt from "bcryptjs";
 import pg from "postgres";
 import { drizzle } from "drizzle-orm/postgres-js";
+import { eq } from "drizzle-orm";
 import * as schema from "../src/db/schema";
 
 const DB_URL = process.env.DATABASE_URL || process.env.DATABASE_URL_UNPOOLED;
@@ -21,6 +22,18 @@ if (!seedPassword || seedPassword.length < 16) {
 async function main() {
   const client = pg(DB_URL as string);
   const db = drizzle(client, { schema });
+
+  const existing = await db
+    .select({ id: schema.users.id })
+    .from(schema.users)
+    .where(eq(schema.users.email, "admin@purobarbershop.com"))
+    .limit(1);
+
+  if (existing.length > 0) {
+    console.log("Already seeded — skipping.");
+    await client.end();
+    return;
+  }
 
   console.log("Seeding database...");
 
@@ -50,8 +63,8 @@ async function main() {
   const [barber1] = await db
     .insert(schema.barbers)
     .values({
-      nameEn: "[PLACEHOLDER:barber_1_name]",
-      nameBg: "[PLACEHOLDER:barber_1_name]",
+      nameEn: "Seney",
+      nameBg: "Сеней",
       displayOrder: 1,
       active: true,
       userId: adminUser.id,
@@ -69,8 +82,8 @@ async function main() {
   const [barber2] = await db
     .insert(schema.barbers)
     .values({
-      nameEn: "[PLACEHOLDER:barber_2_name]",
-      nameBg: "[PLACEHOLDER:barber_2_name]",
+      nameEn: "Andrey",
+      nameBg: "Андрей",
       displayOrder: 2,
       active: true,
     })
@@ -96,14 +109,14 @@ async function main() {
     },
     {
       nameEn: "Haircut + Beard",
-      nameBg: "Подстрижка + Бръснене",
+      nameBg: "Подстрижка + Брада",
       durationMinutes: 45,
       priceBgn: "0.00", // [PLACEHOLDER:price]
       displayOrder: 2,
     },
     {
       nameEn: "Beard trim",
-      nameBg: "Бръснене",
+      nameBg: "Оформяне на брада",
       durationMinutes: 20,
       priceBgn: "0.00", // [PLACEHOLDER:price]
       displayOrder: 3,
@@ -122,15 +135,16 @@ async function main() {
     console.log(`  Created service: ${s.nameEn}`);
   }
 
-  // 4. Working hours: Mon-Fri 09:00-19:00, Sat 09:00-17:00, Sun closed
+  // 4. Working hours: every day 10:00-19:30
   const barberIds = [barber1.id, barber2.id];
   const hours = [
-    { dayOfWeek: 1, startTime: "09:00", endTime: "19:00" }, // Mon
-    { dayOfWeek: 2, startTime: "09:00", endTime: "19:00" }, // Tue
-    { dayOfWeek: 3, startTime: "09:00", endTime: "19:00" }, // Wed
-    { dayOfWeek: 4, startTime: "09:00", endTime: "19:00" }, // Thu
-    { dayOfWeek: 5, startTime: "09:00", endTime: "19:00" }, // Fri
-    { dayOfWeek: 6, startTime: "09:00", endTime: "17:00" }, // Sat
+    { dayOfWeek: 0, startTime: "10:00", endTime: "19:30" }, // Sun
+    { dayOfWeek: 1, startTime: "10:00", endTime: "19:30" }, // Mon
+    { dayOfWeek: 2, startTime: "10:00", endTime: "19:30" }, // Tue
+    { dayOfWeek: 3, startTime: "10:00", endTime: "19:30" }, // Wed
+    { dayOfWeek: 4, startTime: "10:00", endTime: "19:30" }, // Thu
+    { dayOfWeek: 5, startTime: "10:00", endTime: "19:30" }, // Fri
+    { dayOfWeek: 6, startTime: "10:00", endTime: "19:30" }, // Sat
   ];
 
   for (const barberId of barberIds) {

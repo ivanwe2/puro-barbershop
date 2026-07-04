@@ -16,7 +16,9 @@ const barberSchema = z.object({
   nameEn: z.string().min(1).max(100),
   bioBg: z.string().max(2000).optional(),
   bioEn: z.string().max(2000).optional(),
-  photoUrl: z.string().url().optional().or(z.literal("")),
+  // Accept a full URL, a root-relative local path (e.g. "/barbers/seney.jpg"
+  // for an image dropped into /public), or empty.
+  photoUrl: z.union([z.string().url(), z.string().regex(/^\/[^\s]+$/), z.literal("")]).optional(),
   displayOrder: z.string().regex(/^\d+$/).transform(Number).default(0),
   active: z.coerce.boolean().default(true),
 });
@@ -79,14 +81,15 @@ export async function createBarber(formData: FormData) {
   const barberId = result[0]?.id;
 
   if (barberId) {
-    // Set default working hours for the new barber
+    // Set default working hours for the new barber: every day 10:00-19:30
     const defaultHours = [
-      { dayOfWeek: 1, startTime: "09:00", endTime: "19:00" },
-      { dayOfWeek: 2, startTime: "09:00", endTime: "19:00" },
-      { dayOfWeek: 3, startTime: "09:00", endTime: "19:00" },
-      { dayOfWeek: 4, startTime: "09:00", endTime: "19:00" },
-      { dayOfWeek: 5, startTime: "09:00", endTime: "19:00" },
-      { dayOfWeek: 6, startTime: "09:00", endTime: "17:00" },
+      { dayOfWeek: 0, startTime: "10:00", endTime: "19:30" },
+      { dayOfWeek: 1, startTime: "10:00", endTime: "19:30" },
+      { dayOfWeek: 2, startTime: "10:00", endTime: "19:30" },
+      { dayOfWeek: 3, startTime: "10:00", endTime: "19:30" },
+      { dayOfWeek: 4, startTime: "10:00", endTime: "19:30" },
+      { dayOfWeek: 5, startTime: "10:00", endTime: "19:30" },
+      { dayOfWeek: 6, startTime: "10:00", endTime: "19:30" },
     ];
 
     await db.insert(workingHours).values(
@@ -201,6 +204,7 @@ export async function inviteBarber(input: { barberId: number; email: string }) {
     email: normalizedEmail,
     tempPassword,
     loginUrl,
+    locale: "bg",
   }).catch((err) => console.error("[invite] Failed to send invite email:", err));
 
   revalidatePath("/admin/barbers");

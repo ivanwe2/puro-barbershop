@@ -8,10 +8,12 @@ import { barbers, services, bookings, emailBlacklist, users } from "@/db/schema"
 import { generateCancellationToken } from "@/lib/booking/tokens";
 import { rateLimiters } from "@/lib/rate-limit";
 import { headers } from "next/headers";
+import { after } from "next/server";
 import crypto from "crypto";
 import { sendBookingConfirmation, sendBarberNotification } from "@/lib/email";
-import { format } from "date-fns";
+import { sofiaLongDate, sofiaTime, sofiaWallToInstant } from "@/lib/datetime";
 import { env } from "@/lib/env";
+import { shop } from "@/lib/shop";
 import type { InferSelectModel } from "drizzle-orm";
 
 type ServiceRow = InferSelectModel<typeof services>;
@@ -205,8 +207,9 @@ export async function createBooking(input: unknown): Promise<CreateBookingResult
     return { success: false, error: "booking_error" };
   }
 
-  // Compute start/end datetime in Sofia timezone
-  const startDatetime = new Date(`${date}T${time}:00+03:00`);
+  // Compute start/end datetime from the Sofia wall-clock the customer picked
+  // (DST-correct year-round, unlike a hardcoded +03:00 offset).
+  const startDatetime = sofiaWallToInstant(`${date}T${time}`);
   const endDatetime = new Date(startDatetime.getTime() + service.durationMinutes * 60000);
 
   // Generate a random placeholder token to avoid unique constraint collisions under concurrency.
@@ -261,46 +264,49 @@ export async function createBooking(input: unknown): Promise<CreateBookingResult
         : barber.nameEn
       : "Puro Barbershop";
 
-    const dateStr = format(startDatetime, "EEEE, MMMM d, yyyy");
-    const timeStr = format(startDatetime, "HH:mm");
+    const dateStr = sofiaLongDate(startDatetime, locale === "bg" ? "bg" : "en");
+    const timeStr = sofiaTime(startDatetime);
 
     const cancellationLink = `${env.AUTH_URL}/${locale}/book/cancel/${realToken}`;
 
-    // Send emails asynchronously (don't block response)
-    sendBookingConfirmation({
-      to: sanitizedEmail,
-      name: sanitizedName,
-      date: dateStr,
-      time: timeStr,
-      serviceName,
-      barberName,
-      cancellationLink,
-      address:
-        locale === "bg"
-          ? "Бул. Христо Ботев 114, Пловдив, България"
-          : "114 Hristo Botev Blvd, Plovdiv, Bulgaria",
-      phone: env.NEXT_PUBLIC_SHOP_PHONE ?? "",
-    }).catch((err) => {
-      console.error("[booking] Failed to send confirmation email:", err);
-    });
-
+    let barberUserEmail: string | null = null;
     if (barber?.userId) {
       const userRows = await db.select().from(users).where(eq(users.id, barber.userId));
-      const user = userRows.find((u) => u.id === barber.userId);
-      if (user?.email) {
-        sendBarberNotification({
-          to: user.email,
+      barberUserEmail = userRows.find((u) => u.id === barber.userId)?.email ?? null;
+    }
+
+    // Send emails after the response flushes (reliable in the same process;
+    // a bare fire-and-forget promise can be dropped when the action returns).
+    after(async () => {
+      await sendBookingConfirmation({
+        to: sanitizedEmail,
+        name: sanitizedName,
+        date: dateStr,
+        time: timeStr,
+        serviceName,
+        barberName,
+        cancellationLink,
+        address:
+          locale === "bg"
+            ? "Бул. Христо Ботев 114, Пловдив, България"
+            : "114 Hristo Botev Blvd, Plovdiv, Bulgaria",
+        phone: shop.phone,
+        locale: locale === "bg" ? "bg" : "en",
+      });
+      if (barberUserEmail) {
+        // Staff-facing — send in the shop's language.
+        await sendBarberNotification({
+          to: barberUserEmail,
           barberName,
           customerName: sanitizedName,
           date: dateStr,
           time: timeStr,
           serviceName,
           customerPhone: sanitizedPhone,
-        }).catch((err) => {
-          console.error("[booking] Failed to send barber notification:", err);
+          locale: "bg",
         });
       }
-    }
+    });
 
     return { success: true, bookingId };
   } catch (err) {

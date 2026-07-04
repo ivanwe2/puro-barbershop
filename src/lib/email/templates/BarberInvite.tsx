@@ -8,42 +8,46 @@ import {
   Section,
   Text,
 } from "@react-email/components";
+import { emailStrings, type EmailLocale } from "../i18n";
 
 interface BarberInviteProps {
   barberName: string;
   email: string;
   tempPassword: string;
   loginUrl: string;
+  locale?: EmailLocale;
 }
 
-export function BarberInvite({ barberName, email, tempPassword, loginUrl }: BarberInviteProps) {
+export function BarberInvite({
+  barberName,
+  email,
+  tempPassword,
+  loginUrl,
+  locale = "bg",
+}: BarberInviteProps) {
+  const s = emailStrings(locale);
   return (
     <Html>
       <Head />
-      <Preview>You&apos;ve been added to Puro Barbershop</Preview>
+      <Preview>{s.subjects.invite}</Preview>
       <Body style={body}>
         <Container style={container}>
-          <Heading style={heading}>Welcome to Puro Barbershop</Heading>
-          <Text style={text}>Hi {barberName},</Text>
-          <Text style={text}>
-            You&apos;ve been added to the Puro Barbershop admin panel. Use the credentials below to
-            log in.
-          </Text>
+          <Heading style={heading}>{s.invite.title}</Heading>
+          <Text style={text}>{s.invite.greeting(barberName)}</Text>
+          <Text style={text}>{s.invite.body}</Text>
           <Section style={detailsSection}>
             <Text style={detailRow}>
-              <strong>Email:</strong> {email}
+              <strong>{s.labels.email}:</strong> {email}
             </Text>
             <Text style={detailRow}>
-              <strong>Temporary password:</strong> {tempPassword}
+              <strong>{s.labels.tempPassword}:</strong> {tempPassword}
             </Text>
             <Text style={detailRow}>
-              <strong>Login:</strong> {loginUrl}
+              <strong>{s.labels.login}:</strong> {loginUrl}
             </Text>
           </Section>
-          <Text style={importantNote}>
-            Please change your password immediately after logging in for the first time.
-          </Text>
-          <Text style={footer}>Puro Barbershop</Text>
+          <Text style={importantNote}>{s.invite.changePassword}</Text>
+          <Text style={footer}>{s.brand}</Text>
         </Container>
       </Body>
     </Html>

@@ -87,4 +87,6 @@ export const rateLimiters = {
   ip: createLimiter(5, "10m"),
   email: createLimiter(3, "24h"),
   phone: createLimiter(3, "24h"),
+  // Admin login attempts per client IP.
+  login: createLimiter(10, "15m"),
 };

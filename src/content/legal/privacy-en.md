@@ -19,25 +19,25 @@ lang: en
 
 ---
 
-**Effective date:** `[PLACEHOLDER:effective_date]`
+**Effective date:** `3 July 2026`
 **Version:** 1.0
-**Document last reviewed:** `[PLACEHOLDER:review_date]`
+**Document last reviewed:** `3 July 2026`
 
 ---
 
 ## 1. Who we are
 
-This privacy policy describes how `[PLACEHOLDER:legal_entity_name]` ("we", "us", "our", or "Puro Barbershop"), the operator of the Puro Barbershop located at Бул. Христо Ботев 114, Plovdiv, Bulgaria, processes personal data about visitors to our website at **purobarbershop.com** and customers who use it to book appointments.
+This privacy policy describes how `EXACTO Ltd (ЕКСАКТО ЕООД)` ("we", "us", "our", or "Puro Barbershop"), the operator of the Puro Barbershop located at Бул. Христо Ботев 114, Plovdiv, Bulgaria, processes personal data about visitors to our website at **purobarbershop.com** and customers who use it to book appointments.
 
 **Data controller:**
 
-- **Legal name:** `[PLACEHOLDER:legal_entity_name]`
-- **Unique identification code (EIK):** `[PLACEHOLDER:eik]`
-- **VAT number (where applicable):** `[PLACEHOLDER:vat_id]`
-- **Registered address:** `[PLACEHOLDER:registered_address]`
+- **Legal name:** `EXACTO Ltd (ЕКСАКТО ЕООД)`
+- **Unique identification code (EIK):** `208808320`
+- **VAT number (where applicable):** `not applicable (not registered for VAT)`
+- **Registered address:** `19 Georgi Kondolov St., fl. 3, apt. 8, Yuzhen district, 4004 Plovdiv, Bulgaria`
 - **Trading address:** Бул. Христо Ботев 114, Plovdiv, Bulgaria
-- **Email:** `[PLACEHOLDER:shop_email]`
-- **Phone:** `[PLACEHOLDER:shop_phone]`
+- **Email:** `seneymurad111@gmail.com`
+- **Phone:** `+359 892 919 649`
 
 We are the data controller for all personal data described in this policy, meaning we determine why and how it is processed.
 
@@ -123,7 +123,7 @@ We use a small number of cookies. None of them are used for advertising or track
 
 The cookies listed above are **strictly necessary** for the website to function in the way you have requested. Under the EU ePrivacy regime they are exempt from prior consent.
 
-**Third-party content (Instagram):** Our gallery section can optionally load posts from our Instagram account. This content is hosted by LightWidget Sp. z o.o. (Poland) and Meta Platforms Ireland Limited. **We do not load this content unless you actively click the "Show Instagram feed" button.** If you do click, your browser will then connect to those services, which may set their own cookies under their own privacy policies. We do not control or receive those cookies. Reload the page to undo this — the choice is not persisted.
+**Gallery images:** The photos in our gallery are hosted on our own website. Viewing them does not connect you to any third party and does not set any additional cookies. We also link to our Instagram and TikTok profiles — following those links takes you to those external services, which are governed by their own privacy policies.
 
 ---
 
@@ -164,16 +164,14 @@ After the retention period, the records are deleted automatically by a scheduled
 
 We do not sell or rent your personal data. We share it only with the following categories of processors who help us run the service. Each operates under a Data Processing Agreement that requires them to process the data only on our instructions and to apply appropriate security measures.
 
-| Recipient                             | Role                                                      | What they see                                                                                    | Location of processing                                        |
-| ------------------------------------- | --------------------------------------------------------- | ------------------------------------------------------------------------------------------------ | ------------------------------------------------------------- |
-| Neon, Inc. (USA)                      | Database hosting (Postgres)                               | All booking and account data, stored at rest                                                     | EU region (`[PLACEHOLDER:neon_region]`)                       |
-| Vercel Inc. (USA)                     | Website hosting and request routing                       | All website traffic; processes data in memory during request handling                            | EU region (`[PLACEHOLDER:vercel_region]`)                     |
-| Resend (USA)                          | Transactional email delivery                              | Recipient email address, subject line, and email body (name, booking details, cancellation link) | EU region where available (`[PLACEHOLDER:resend_region]`)     |
-| Upstash, Inc. (USA)                   | Rate-limiting state (Redis)                               | Hashed identifiers of recent booking attempts (IP, email, phone) — short-lived                   | EU region (`[PLACEHOLDER:upstash_region]`)                    |
-| Cloudinary Ltd. (Israel)              | Image hosting for barber portraits and any uploaded media | Images we upload (not customer data)                                                             | EU region where available (`[PLACEHOLDER:cloudinary_region]`) |
-| LightWidget Sp. z o.o. (Poland)       | Instagram feed embed                                      | No customer data — only loads when a visitor clicks to load the Instagram feed                   | EU                                                            |
-| Cloudflare, Inc. (USA)                | Domain registrar and DNS                                  | DNS resolution traffic only (not customer data)                                                  | Global                                                        |
-| Meta Platforms Ireland Ltd. (Ireland) | Instagram content (loaded only on visitor click)          | The visitor's IP and browser metadata, when they click to load                                   | EU / global                                                   |
+| Recipient                     | Role                                | What they see                                                                                    | Location of processing                 |
+| ----------------------------- | ----------------------------------- | ------------------------------------------------------------------------------------------------ | -------------------------------------- |
+| Neon, Inc. (USA)              | Database hosting (Postgres)         | All booking and account data, stored at rest                                                     | EU region (`eu-central-1 (Frankfurt)`) |
+| Vercel Inc. (USA)             | Website hosting and request routing | All website traffic; processes data in memory during request handling                            | EU region (`fra1 (Frankfurt)`)         |
+| Resend (USA)                  | Transactional email delivery        | Recipient email address, subject line, and email body (name, booking details, cancellation link) | EU region where available (`EU`)       |
+| Upstash, Inc. (USA)           | Rate-limiting state (Redis)         | Hashed identifiers of recent booking attempts (IP, email, phone) — short-lived                   | EU region (`EU`)                       |
+| Google Ireland Ltd. (Ireland) | Map embed in the "Find us" section  | The visitor's IP and browser metadata when the map loads (as they scroll to that section)        | EU / global                            |
+| Cloudflare, Inc. (USA)        | Domain registrar and DNS            | DNS resolution traffic only (not customer data)                                                  | Global                                 |
 
 If a court or competent authority in Bulgaria orders us to disclose data (for example, in connection with a criminal investigation), we may have to do so. Such requests are rare and we will challenge any that we consider unlawful or disproportionate.
 
@@ -189,7 +187,7 @@ Several of the processors listed in §6 are established in countries outside the
 
 For each processor we use, we have evaluated whether its country's laws on government access to personal data are compatible with EU requirements. We will update this policy if our assessment changes.
 
-You can request a copy of the safeguards in place for any specific transfer by contacting us at `[PLACEHOLDER:shop_email]`.
+You can request a copy of the safeguards in place for any specific transfer by contacting us at `seneymurad111@gmail.com`.
 
 ---
 
@@ -212,7 +210,7 @@ Exercising these rights is **free**. We will respond within one month of receivi
 
 ## 9. How to exercise your rights
 
-To exercise any of the rights in §8, email us at **`[PLACEHOLDER:shop_email]`** with:
+To exercise any of the rights in §8, email us at **`seneymurad111@gmail.com`** with:
 
 - a clear description of the right you are exercising and what you would like us to do;
 - enough information for us to identify the booking or account you are referring to (typically the email address you used to book and the approximate date of the appointment).
@@ -225,7 +223,7 @@ If we refuse a request (for example, because the data is no longer held, or beca
 
 ## 10. Complaints
 
-If you believe we have not handled your personal data in accordance with the law, please contact us first at `[PLACEHOLDER:shop_email]` — we take complaints seriously and would like the opportunity to resolve the matter.
+If you believe we have not handled your personal data in accordance with the law, please contact us first at `seneymurad111@gmail.com` — we take complaints seriously and would like the opportunity to resolve the matter.
 
 You also have the right to lodge a complaint with the Bulgarian supervisory authority:
 
@@ -285,9 +283,9 @@ Previous versions of this policy are kept on file and available on request.
 
 For any question about this policy or about how we handle your personal data:
 
-- **Email:** `[PLACEHOLDER:shop_email]`
-- **Phone:** `[PLACEHOLDER:shop_phone]`
-- **Address:** `[PLACEHOLDER:registered_address]`
+- **Email:** `seneymurad111@gmail.com`
+- **Phone:** `+359 892 919 649`
+- **Address:** `19 Georgi Kondolov St., fl. 3, apt. 8, Yuzhen district, 4004 Plovdiv, Bulgaria`
 
 ---
 

@@ -1,11 +1,13 @@
 "use client";
 
 import { useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useTranslations } from "next-intl";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Dialog,
   DialogContent,
@@ -30,22 +32,19 @@ interface Service {
   active: boolean;
 }
 
-export default function ServicesClient({
-  t,
-  initialServices,
-}: {
-  t: (key: string) => string;
-  initialServices: Service[];
-}) {
+export default function ServicesClient({ initialServices }: { initialServices: Service[] }) {
+  const t = useTranslations("admin");
   const [services, setServices] = useState(initialServices);
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState<number | null>(null);
   const [deleteConfirm, setDeleteConfirm] = useState<number | null>(null);
+  const [formActive, setFormActive] = useState(true);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const form = e.currentTarget;
     const formData = new FormData(form);
+    formData.set("active", formActive ? "on" : "off");
 
     if (editingId) {
       const result = await updateService(editingId, formData);
@@ -88,6 +87,7 @@ export default function ServicesClient({
         <Button
           onClick={() => {
             setEditingId(null);
+            setFormActive(true);
             setShowForm(true);
           }}
         >
@@ -96,18 +96,18 @@ export default function ServicesClient({
       </div>
 
       <Card>
-        <CardHeader>
-          <CardTitle>{t("services")}</CardTitle>
-        </CardHeader>
-        <CardContent>
+        <CardContent className="pt-6">
           {services.length === 0 ? (
             <p className="text-muted-foreground text-sm">No services found</p>
           ) : (
             <div className="space-y-3">
               {services.map((s) => (
-                <div key={s.id} className="flex items-center justify-between rounded-lg border p-3">
+                <div
+                  key={s.id}
+                  className="flex flex-col gap-3 rounded-lg border p-3 sm:flex-row sm:items-center sm:justify-between"
+                >
                   <div className="space-y-1">
-                    <div className="flex items-center gap-2">
+                    <div className="flex flex-wrap items-center gap-2">
                       <p className="text-foreground text-sm font-medium">{s.nameBg}</p>
                       <span className="text-muted-foreground text-xs">({s.nameEn})</span>
                       <Badge variant={s.active ? "default" : "secondary"}>
@@ -115,15 +115,16 @@ export default function ServicesClient({
                       </Badge>
                     </div>
                     <p className="text-muted-foreground text-xs">
-                      {s.durationMinutes} min · {s.priceBgn} лв · Order: {s.displayOrder}
+                      {s.durationMinutes} min · €{s.priceBgn} · Order: {s.displayOrder}
                     </p>
                   </div>
-                  <div className="flex gap-2">
+                  <div className="flex flex-wrap gap-2">
                     <Button
                       variant="outline"
                       size="sm"
                       onClick={() => {
                         setEditingId(s.id);
+                        setFormActive(s.active);
                         setShowForm(true);
                       }}
                     >
@@ -198,7 +199,7 @@ export default function ServicesClient({
               />
             </div>
             <div className="space-y-2">
-              <Label>{t("price")} (лв)</Label>
+              <Label>{t("price")} (€)</Label>
               <Input
                 name="priceBgn"
                 type="number"
@@ -214,6 +215,14 @@ export default function ServicesClient({
                 type="number"
                 defaultValue={editingService?.displayOrder ?? 0}
               />
+            </div>
+            <div className="flex items-center gap-2">
+              <Checkbox
+                id="service-active"
+                checked={formActive}
+                onCheckedChange={(c) => setFormActive(c === true)}
+              />
+              <Label htmlFor="service-active">{t("active")}</Label>
             </div>
             <DialogFooter>
               <Button

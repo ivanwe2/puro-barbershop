@@ -1,3 +1,4 @@
+import "dotenv/config";
 import { defineConfig, devices } from "@playwright/test";
 
 export default defineConfig({
@@ -6,6 +7,9 @@ export default defineConfig({
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,
   workers: process.env.CI ? 1 : 1,
+  // Dev-mode navigations (Turbopack compiles on first hit) + reloads are slow;
+  // these integration flows do several per test.
+  timeout: 90 * 1000,
   reporter: "list",
   use: {
     baseURL: "http://localhost:3000",

@@ -8,6 +8,7 @@ import {
   Section,
   Text,
 } from "@react-email/components";
+import { emailStrings, type EmailLocale } from "../i18n";
 
 interface BarberNotificationProps {
   barberName: string;
@@ -16,6 +17,7 @@ interface BarberNotificationProps {
   time: string;
   serviceName: string;
   customerPhone: string;
+  locale?: EmailLocale;
 }
 
 export function BarberNotification({
@@ -25,33 +27,35 @@ export function BarberNotification({
   time,
   serviceName,
   customerPhone,
+  locale = "bg",
 }: BarberNotificationProps) {
+  const s = emailStrings(locale);
   return (
     <Html>
       <Head />
-      <Preview>New Booking — Puro Barbershop</Preview>
+      <Preview>{s.subjects.notification}</Preview>
       <Body style={body}>
         <Container style={container}>
-          <Heading style={heading}>New Booking</Heading>
-          <Text style={text}>Hi {barberName}, you have a new booking:</Text>
+          <Heading style={heading}>{s.notification.title}</Heading>
+          <Text style={text}>{s.notification.intro(barberName)}</Text>
           <Section style={detailsSection}>
             <Text style={detailRow}>
-              <strong>Customer:</strong> {customerName}
+              <strong>{s.labels.customer}:</strong> {customerName}
             </Text>
             <Text style={detailRow}>
-              <strong>Phone:</strong> {customerPhone}
+              <strong>{s.labels.phone}:</strong> {customerPhone}
             </Text>
             <Text style={detailRow}>
-              <strong>Service:</strong> {serviceName}
+              <strong>{s.labels.service}:</strong> {serviceName}
             </Text>
             <Text style={detailRow}>
-              <strong>Date:</strong> {date}
+              <strong>{s.labels.date}:</strong> {date}
             </Text>
             <Text style={detailRow}>
-              <strong>Time:</strong> {time}
+              <strong>{s.labels.time}:</strong> {time}
             </Text>
           </Section>
-          <Text style={footer}>Puro Barbershop</Text>
+          <Text style={footer}>{s.brand}</Text>
         </Container>
       </Body>
     </Html>

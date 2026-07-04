@@ -15,6 +15,8 @@ Under the EU ePrivacy regime, strictly necessary cookies are exempt from prior c
 
 **Instagram gallery:** Our gallery section can optionally load posts from Instagram. This content is hosted by third parties and **is not loaded unless you click the "Show feed" button**. If you click, those services may set their own cookies under their own policies. Reload the page to undo this — the choice is session-only and not persisted.
 
+**Google map:** Our "Find us" section embeds a Google map. It loads when you scroll to that section, and Google may set its own cookies under its own policy. Use the "Get directions" link if you'd rather not load it.
+
 For more detail, see our [Privacy Policy](/en/legal/privacy).
 
 ---
