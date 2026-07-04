@@ -58,7 +58,7 @@ export default function CancelPage() {
               href={shop.phoneHref}
               className="text-foreground font-semibold underline underline-offset-2"
             >
-              {shop.phoneDisplay}
+              {t("cancelCallUs")}
             </a>
             .
           </p>

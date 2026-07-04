@@ -89,7 +89,9 @@ test("cancelling within the window is refused with a call-us message", async ({ 
   await page.getByRole("button", { name: "Cancel Booking" }).click();
 
   await expect(page.getByText(/less than 24 hours/i)).toBeVisible({ timeout: 15000 });
-  await expect(page.getByRole("link", { name: /\+359/ })).toBeVisible();
+  const callLink = page.getByRole("link", { name: /call us/i });
+  await expect(callLink).toBeVisible();
+  await expect(callLink).toHaveAttribute("href", /^tel:\+359/);
   // Booking stays confirmed.
   expect((await sql`select status from bookings where id = ${b.id}`)[0]!.status).toBe("confirmed");
 
