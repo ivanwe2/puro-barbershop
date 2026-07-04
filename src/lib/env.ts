@@ -39,18 +39,10 @@ export const env = createEnv({
   },
 
   /**
-   * Client-side env vars — MUST be prefixed with NEXT_PUBLIC_.
-   * These are safe to expose in the browser.
+   * No client-side (NEXT_PUBLIC_) env vars — shop details live in
+   * src/lib/shop.ts as constants, so nothing needs exposing to the browser.
    */
-  client: {
-    NEXT_PUBLIC_INSTAGRAM_URL: z.string().url().optional(),
-    NEXT_PUBLIC_SHOP_NAME: z.string().min(1),
-    NEXT_PUBLIC_SHOP_ADDRESS: z.string().min(1),
-    NEXT_PUBLIC_SHOP_PHONE: z.string().optional(),
-    NEXT_PUBLIC_SHOP_EMAIL: z.string().optional(),
-    NEXT_PUBLIC_SHOP_LAT: z.coerce.number(),
-    NEXT_PUBLIC_SHOP_LNG: z.coerce.number(),
-  },
+  client: {},
 
   /**
    * Destructure process.env here.
@@ -78,13 +70,6 @@ export const env = createEnv({
     CRON_SECRET: process.env["CRON_SECRET"],
     SEED_ADMIN_PASSWORD: process.env["SEED_ADMIN_PASSWORD"],
     NODE_ENV: process.env["NODE_ENV"],
-    NEXT_PUBLIC_INSTAGRAM_URL: process.env["NEXT_PUBLIC_INSTAGRAM_URL"],
-    NEXT_PUBLIC_SHOP_NAME: process.env["NEXT_PUBLIC_SHOP_NAME"],
-    NEXT_PUBLIC_SHOP_ADDRESS: process.env["NEXT_PUBLIC_SHOP_ADDRESS"],
-    NEXT_PUBLIC_SHOP_PHONE: process.env["NEXT_PUBLIC_SHOP_PHONE"],
-    NEXT_PUBLIC_SHOP_EMAIL: process.env["NEXT_PUBLIC_SHOP_EMAIL"],
-    NEXT_PUBLIC_SHOP_LAT: process.env["NEXT_PUBLIC_SHOP_LAT"],
-    NEXT_PUBLIC_SHOP_LNG: process.env["NEXT_PUBLIC_SHOP_LNG"],
   },
 
   /**
