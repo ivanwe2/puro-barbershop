@@ -26,11 +26,10 @@ export default async function SchedulePage() {
   weekEnd.setHours(23, 59, 59, 999);
 
   const isSuperAdmin = session.user?.role === "super_admin";
-  const barberId = isSuperAdmin ? undefined : session.user?.barberId;
 
   const [bookingsResult, barbersResult, timeOffResult, servicesResult] = await Promise.all([
+    // Load the whole shop calendar; edit rights are gated per-owner below.
     fetchScheduleBookings({
-      ...(barberId ? { barberId } : {}),
       startDate: format(weekStart, "yyyy-MM-dd"),
       endDate: format(weekEnd, "yyyy-MM-dd"),
     }),

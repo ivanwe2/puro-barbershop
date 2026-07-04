@@ -32,10 +32,11 @@ import { Badge } from "@/components/ui/badge";
 import {
   updateBookingStatus,
   createWalkInBooking,
+  rescheduleBooking,
   fetchScheduleBookings,
   fetchTimeOff,
 } from "@/actions/admin/schedule";
-import { sofiaTime, sofiaDateKey, sofiaShortDate } from "@/lib/datetime";
+import { sofiaTime, sofiaDateKey, sofiaShortDate, sofiaWallToInstant } from "@/lib/datetime";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import type { BookingRow } from "./types";
@@ -78,6 +79,7 @@ export default function ScheduleClient({
   const [bookings, setBookings] = useState(initialBookings);
   const [timeOff, setTimeOff] = useState(initialTimeOff);
   const [selectedBooking, setSelectedBooking] = useState<BookingRow | null>(null);
+  const [rescheduleTarget, setRescheduleTarget] = useState<BookingRow | null>(null);
   const [confirmAction, setConfirmAction] = useState<{
     bookingId: number;
     action: "cancel" | "noShow" | "complete";
@@ -154,6 +156,24 @@ export default function ScheduleClient({
       setConfirmAction(null);
       setSelectedBooking(null);
     }
+  };
+
+  // Move the booking to its new time in local state (keeps the same duration).
+  const handleRescheduled = (bookingId: number, date: string, time: string) => {
+    const newStart = sofiaWallToInstant(`${date}T${time}`);
+    setBookings((prev) =>
+      prev.map((b) => {
+        if (b.id !== bookingId) return b;
+        const durationMs = new Date(b.endDatetime).getTime() - new Date(b.startDatetime).getTime();
+        return {
+          ...b,
+          startDatetime: newStart,
+          endDatetime: new Date(newStart.getTime() + durationMs),
+        };
+      }),
+    );
+    setRescheduleTarget(null);
+    setSelectedBooking(null);
   };
 
   const statusBadgeClass = (status: string) => {
@@ -310,6 +330,11 @@ export default function ScheduleClient({
           t={t}
           statusBadgeClass={statusBadgeClass}
           statusLabel={statusLabel}
+          canEdit={!!selectedBooking && (isSuperAdmin || selectedBooking.barberId === userBarberId)}
+          onReschedule={(b) => {
+            setSelectedBooking(null);
+            setRescheduleTarget(b);
+          }}
         />
 
         <ConfirmActionDialog
@@ -338,6 +363,16 @@ export default function ScheduleClient({
             setWalkInMsg({ type: "error", text: msg });
           }}
         />
+
+        {rescheduleTarget && (
+          <RescheduleDialog
+            key={rescheduleTarget.id}
+            booking={rescheduleTarget}
+            t={t}
+            onClose={() => setRescheduleTarget(null)}
+            onDone={handleRescheduled}
+          />
+        )}
       </div>
     );
   }
@@ -446,6 +481,11 @@ export default function ScheduleClient({
         t={t}
         statusBadgeClass={statusBadgeClass}
         statusLabel={statusLabel}
+        canEdit={!!selectedBooking && (isSuperAdmin || selectedBooking.barberId === userBarberId)}
+        onReschedule={(b) => {
+          setSelectedBooking(null);
+          setRescheduleTarget(b);
+        }}
       />
 
       <ConfirmActionDialog
@@ -470,6 +510,16 @@ export default function ScheduleClient({
         onSuccess={(msg) => setWalkInMsg({ type: "success", text: msg })}
         onError={(msg) => setWalkInMsg({ type: "error", text: msg })}
       />
+
+      {rescheduleTarget && (
+        <RescheduleDialog
+          key={rescheduleTarget.id}
+          booking={rescheduleTarget}
+          t={t}
+          onClose={() => setRescheduleTarget(null)}
+          onDone={handleRescheduled}
+        />
+      )}
     </div>
   );
 }
@@ -481,6 +531,8 @@ function BookingDetailDialog({
   t,
   statusBadgeClass,
   statusLabel,
+  canEdit,
+  onReschedule,
 }: {
   booking: BookingRow | null;
   onClose: () => void;
@@ -488,6 +540,8 @@ function BookingDetailDialog({
   t: (key: string) => string;
   statusBadgeClass: (status: string) => string;
   statusLabel: (status: string) => string;
+  canEdit: boolean;
+  onReschedule: (booking: BookingRow) => void;
 }) {
   if (!booking) return null;
 
@@ -529,14 +583,19 @@ function BookingDetailDialog({
           )}
         </div>
 
+        {!canEdit && <p className="text-muted-foreground text-xs">{t("readOnlyOtherBarber")}</p>}
+
         <DialogFooter className="flex-wrap gap-2">
-          {booking.status === "confirmed" && (
+          {booking.status === "confirmed" && canEdit && (
             <>
               <Button variant="outline" size="sm" onClick={() => onAction(booking.id, "complete")}>
                 {t("markCompleted")}
               </Button>
               <Button variant="outline" size="sm" onClick={() => onAction(booking.id, "noShow")}>
                 {t("markNoShow")}
+              </Button>
+              <Button variant="outline" size="sm" onClick={() => onReschedule(booking)}>
+                {t("reschedule")}
               </Button>
               <Button
                 variant="destructive"
@@ -763,6 +822,74 @@ function WalkInDialog({
             }
           >
             {t("confirm")}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+function RescheduleDialog({
+  booking,
+  onClose,
+  onDone,
+  t,
+}: {
+  booking: BookingRow;
+  onClose: () => void;
+  onDone: (bookingId: number, date: string, time: string) => void;
+  t: (key: string) => string;
+}) {
+  const [date, setDate] = useState(sofiaDateKey(booking.startDatetime));
+  const [time, setTime] = useState(sofiaTime(booking.startDatetime));
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const handleSubmit = async () => {
+    setSubmitting(true);
+    setError(null);
+    const res = await rescheduleBooking(booking.id, { date, time });
+    setSubmitting(false);
+    if ("success" in res && res.success) {
+      onDone(booking.id, date, time);
+    } else if ("error" in res) {
+      setError(res.error === "slotTaken" ? t("rescheduleSlotTaken") : t("error"));
+    }
+  };
+
+  return (
+    <Dialog open onOpenChange={onClose}>
+      <DialogContent onOpenChange={onClose}>
+        <DialogHeader>
+          <DialogTitle>{t("reschedule")}</DialogTitle>
+          <DialogDescription>
+            {booking.customerName} — {booking.serviceName}
+          </DialogDescription>
+        </DialogHeader>
+
+        {error && (
+          <p className="text-destructive text-sm" role="alert">
+            {error}
+          </p>
+        )}
+
+        <div className="grid grid-cols-2 gap-3">
+          <div className="space-y-1">
+            <Label>{t("date")}</Label>
+            <Input type="date" value={date} onChange={(e) => setDate(e.target.value)} />
+          </div>
+          <div className="space-y-1">
+            <Label>{t("time")}</Label>
+            <Input type="time" value={time} onChange={(e) => setTime(e.target.value)} />
+          </div>
+        </div>
+
+        <DialogFooter>
+          <Button variant="ghost" onClick={onClose}>
+            {t("close")}
+          </Button>
+          <Button onClick={handleSubmit} disabled={submitting || !date || !time}>
+            {submitting ? "…" : t("confirm")}
           </Button>
         </DialogFooter>
       </DialogContent>

@@ -3,6 +3,7 @@ import {
   CustomerConfirmation,
   BarberNotification,
   CustomerCancellation,
+  CustomerReschedule,
   CustomerReminder,
   BarberInvite,
 } from "./templates";
@@ -95,6 +96,32 @@ export async function sendCancellationEmail(params: SendCancellationEmailParams)
     });
   } catch (error) {
     console.error("[email] Failed to send cancellation email:", error);
+  }
+}
+
+interface SendRescheduleEmailParams {
+  to: string;
+  name: string;
+  date: string;
+  time: string;
+  serviceName: string;
+  barberName: string;
+  cancellationLink: string;
+  address: string;
+  phone: string;
+  locale?: EmailLocale;
+}
+
+export async function sendRescheduleEmail(params: SendRescheduleEmailParams): Promise<void> {
+  const locale = params.locale ?? "bg";
+  try {
+    await emailClient.send({
+      to: params.to,
+      subject: emailStrings(locale).subjects.reschedule,
+      react: <CustomerReschedule {...params} locale={locale} />,
+    });
+  } catch (error) {
+    console.error("[email] Failed to send reschedule email:", error);
   }
 }
 

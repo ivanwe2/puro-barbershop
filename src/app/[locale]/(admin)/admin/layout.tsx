@@ -9,17 +9,24 @@ import { logoutAction } from "@/actions/admin/logout";
 import { Link } from "@/lib/i18n/routing";
 import Wordmark from "@/components/shared/Wordmark";
 
-const adminNavItems = [
+const baseNavItems = [
   { href: "/admin", labelKey: "dashboard" },
   { href: "/admin/schedule", labelKey: "schedule" },
   { href: "/admin/time-off", labelKey: "timeOff" },
 ];
 
+const accountNavItem = { href: "/admin/account", labelKey: "account" };
+
+// Account (change password) is available to everyone; super-admins also get the
+// management pages. Account sits last in both.
+const adminNavItems = [...baseNavItems, accountNavItem];
+
 const superAdminNavItems = [
-  ...adminNavItems,
+  ...baseNavItems,
   { href: "/admin/barbers", labelKey: "barbers" },
   { href: "/admin/services", labelKey: "services" },
   { href: "/admin/settings", labelKey: "settings" },
+  accountNavItem,
 ];
 
 function SidebarNav({

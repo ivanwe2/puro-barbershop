@@ -15,6 +15,7 @@ const en = {
     confirmation: "Booking Confirmation — Puro Barbershop",
     notification: "New Booking — Puro Barbershop",
     cancellation: "Booking Cancelled — Puro Barbershop",
+    reschedule: "Appointment Rescheduled — Puro Barbershop",
     reminder: "Booking Reminder — Puro Barbershop",
     invite: "You've been added to Puro Barbershop",
   },
@@ -44,6 +45,10 @@ const en = {
     intro: "Your booking has been cancelled:",
     rebook: "If you'd like to book again, visit us at:",
   },
+  reschedule: {
+    title: "Appointment Rescheduled",
+    intro: "Your appointment has been moved to a new time:",
+  },
   reminder: {
     title: "Booking Reminder",
     intro: "You have a booking tomorrow:",
@@ -63,6 +68,7 @@ const bg: typeof en = {
     confirmation: "Потвърждение за резервация — Puro Barbershop",
     notification: "Нова резервация — Puro Barbershop",
     cancellation: "Отменена резервация — Puro Barbershop",
+    reschedule: "Преместен час — Puro Barbershop",
     reminder: "Напомняне за резервация — Puro Barbershop",
     invite: "Добавени сте към Puro Barbershop",
   },
@@ -91,6 +97,10 @@ const bg: typeof en = {
     title: "Отменена резервация",
     intro: "Вашата резервация беше отменена:",
     rebook: "Ако желаете да резервирате отново, заповядайте при нас:",
+  },
+  reschedule: {
+    title: "Преместен час",
+    intro: "Вашият час беше преместен за нов период:",
   },
   reminder: {
     title: "Напомняне за резервация",

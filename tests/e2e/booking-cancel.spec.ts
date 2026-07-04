@@ -49,7 +49,9 @@ test("booking → localized confirmation email → cancellation (en)", async ({ 
   expect(await waitForMail("Нова резервация", "admin@purobarbershop.com")).not.toBeNull();
 
   // Cancel via the emailed link.
-  const [row] = await sql`select cancellation_token from bookings where customer_email = ${email}`;
+  const row = (
+    await sql`select cancellation_token from bookings where customer_email = ${email}`
+  )[0]!;
   await page.goto(`/en/book/cancel/${row.cancellation_token}`, { waitUntil: "networkidle" });
   await page.getByRole("button", { name: "Cancel Booking" }).click();
 
