@@ -17,9 +17,13 @@ export async function GET(request: Request) {
   }
 
   try {
+    // On Vercel's Hobby tier crons run at most once per day, so this fires
+    // daily. Remind every confirmed booking in the next ~26h that hasn't been
+    // reminded yet. The window is >24h (plus slack for cron jitter) so
+    // consecutive daily runs overlap and no appointment slips through a gap;
+    // the `reminderSent` flag guarantees each booking is emailed only once.
     const now = new Date();
-    const twentyThreeHoursFromNow = new Date(now.getTime() + 23 * 60 * 60 * 1000);
-    const twentyFiveHoursFromNow = new Date(now.getTime() + 25 * 60 * 60 * 1000);
+    const windowEnd = new Date(now.getTime() + 26 * 60 * 60 * 1000);
 
     const pendingReminders = await db
       .select({
@@ -37,8 +41,8 @@ export async function GET(request: Request) {
         and(
           eq(bookings.status, "confirmed"),
           eq(bookings.reminderSent, false),
-          gte(bookings.startDatetime, twentyThreeHoursFromNow),
-          lte(bookings.startDatetime, twentyFiveHoursFromNow),
+          gte(bookings.startDatetime, now),
+          lte(bookings.startDatetime, windowEnd),
         ),
       );
 
@@ -85,7 +89,7 @@ export async function GET(request: Request) {
 
         // Only mark as reminded when the email actually went out — otherwise a
         // transient failure would be lost. Leaving it unset lets the next
-        // hourly run retry (the 23–25h window spans ~2 runs).
+        // daily run retry (the 26h window still covers it next time).
         if (ok) {
           await db
             .update(bookings)

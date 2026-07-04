@@ -68,8 +68,12 @@ export const env = createEnv({
     EMAIL_TRANSPORT: process.env["EMAIL_TRANSPORT"],
     SMTP_HOST: process.env["SMTP_HOST"],
     SMTP_PORT: process.env["SMTP_PORT"],
-    UPSTASH_REDIS_REST_URL: process.env["UPSTASH_REDIS_REST_URL"],
-    UPSTASH_REDIS_REST_TOKEN: process.env["UPSTASH_REDIS_REST_TOKEN"],
+    // Vercel's Upstash/KV integration injects KV_REST_API_* names; accept
+    // those as a fallback so the marketplace add-on works without manually
+    // re-creating UPSTASH_* vars.
+    UPSTASH_REDIS_REST_URL: process.env["UPSTASH_REDIS_REST_URL"] ?? process.env["KV_REST_API_URL"],
+    UPSTASH_REDIS_REST_TOKEN:
+      process.env["UPSTASH_REDIS_REST_TOKEN"] ?? process.env["KV_REST_API_TOKEN"],
     RATE_LIMIT_DEV: process.env["RATE_LIMIT_DEV"],
     CRON_SECRET: process.env["CRON_SECRET"],
     SEED_ADMIN_PASSWORD: process.env["SEED_ADMIN_PASSWORD"],

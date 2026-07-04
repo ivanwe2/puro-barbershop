@@ -51,7 +51,7 @@ const en = {
   },
   reminder: {
     title: "Booking Reminder",
-    intro: "You have a booking tomorrow:",
+    intro: "This is a reminder of your upcoming booking:",
     cancelButton: "Cancel Booking",
   },
   invite: {
@@ -104,7 +104,7 @@ const bg: typeof en = {
   },
   reminder: {
     title: "Напомняне за резервация",
-    intro: "Имате резервация утре:",
+    intro: "Напомняме ви за предстоящата ви резервация:",
     cancelButton: "Отмени резервацията",
   },
   invite: {
