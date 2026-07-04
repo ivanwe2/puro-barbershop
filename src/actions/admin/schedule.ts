@@ -14,20 +14,13 @@ import { generateCancellationToken } from "@/lib/booking/tokens";
 import { sendCancellationEmail, sendRescheduleEmail } from "@/lib/email";
 import { shop } from "@/lib/shop";
 import { env } from "@/lib/env";
+import { barberColor } from "@/lib/barber-colors";
 
 const ADDRESS_BG = "Бул. Христо Ботев 114, Пловдив, България";
 const ADDRESS_EN = "114 Hristo Botev Blvd, Plovdiv, Bulgaria";
 
-const barberColors: Record<number, string> = {
-  1: "bg-blue-500/20 border-blue-500/40 text-blue-300",
-  2: "bg-amber-500/20 border-amber-500/40 text-amber-300",
-  3: "bg-emerald-500/20 border-emerald-500/40 text-emerald-300",
-  4: "bg-purple-500/20 border-purple-500/40 text-purple-300",
-  5: "bg-rose-500/20 border-rose-500/40 text-rose-300",
-};
-
 function getBarberColor(id: number): string {
-  return barberColors[id] ?? "bg-gray-500/20 border-gray-500/40 text-gray-300";
+  return barberColor(id).tile;
 }
 
 export async function fetchScheduleBookings({

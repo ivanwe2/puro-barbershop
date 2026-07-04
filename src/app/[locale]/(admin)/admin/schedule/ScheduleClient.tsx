@@ -37,6 +37,7 @@ import {
   fetchTimeOff,
 } from "@/actions/admin/schedule";
 import { sofiaTime, sofiaDateKey, sofiaShortDate, sofiaWallToInstant } from "@/lib/datetime";
+import { barberColor } from "@/lib/barber-colors";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import type { BookingRow } from "./types";
@@ -100,8 +101,10 @@ export default function ScheduleClient({
       return;
     }
     let cancelled = false;
+    // Compute the range inside the effect so it doesn't depend on `weekEnd`,
+    // which is a fresh Date object every render (that would loop forever).
     const startDate = format(weekStart, "yyyy-MM-dd");
-    const endDate = format(weekEnd, "yyyy-MM-dd");
+    const endDate = format(endOfWeek(weekStart, { weekStartsOn: 1 }), "yyyy-MM-dd");
     void (async () => {
       const [bk, to] = await Promise.all([
         fetchScheduleBookings({ startDate, endDate }),
@@ -114,7 +117,7 @@ export default function ScheduleClient({
     return () => {
       cancelled = true;
     };
-  }, [weekStart, weekEnd]);
+  }, [weekStart]);
 
   const filteredBookings = useMemo(() => {
     // Cancelled bookings free their slot — drop them from the calendar.
@@ -179,13 +182,13 @@ export default function ScheduleClient({
   const statusBadgeClass = (status: string) => {
     switch (status) {
       case "confirmed":
-        return "bg-emerald-500/20 text-emerald-300";
+        return "bg-emerald-100 text-emerald-800";
       case "completed":
-        return "bg-blue-500/20 text-blue-300";
+        return "bg-blue-100 text-blue-800";
       case "cancelled":
-        return "bg-red-500/20 text-red-300";
+        return "bg-red-100 text-red-800";
       case "no_show":
-        return "bg-amber-500/20 text-amber-300";
+        return "bg-amber-100 text-amber-800";
       default:
         return "";
     }
@@ -221,6 +224,22 @@ export default function ScheduleClient({
   };
 
   const days = eachDayOfInterval({ start: weekStart, end: weekEnd });
+
+  // Colour key for the barbers; the current barber (if logged in as one) is
+  // marked so they can spot their own bookings at a glance.
+  const legend = (
+    <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs">
+      {initialBarbers.map((b) => (
+        <span key={b.id} className="flex items-center gap-1.5">
+          <span className={`inline-block h-2.5 w-2.5 rounded-full ${barberColor(b.id).dot}`} />
+          <span className="text-foreground">
+            {b.nameBg}
+            {b.id === userBarberId ? ` (${t("you")})` : ""}
+          </span>
+        </span>
+      ))}
+    </div>
+  );
 
   // Week view
   if (view === "week") {
@@ -269,6 +288,8 @@ export default function ScheduleClient({
           </span>
         </div>
 
+        {legend}
+
         <div className="overflow-x-auto">
           <div className="grid min-w-[900px] grid-cols-7 gap-2">
             {days.map((day) => {
@@ -293,9 +314,9 @@ export default function ScheduleClient({
                   {dayTimeOff.map((to) => (
                     <div
                       key={to.id}
-                      className="mb-1 rounded border border-amber-500/30 bg-amber-500/10 px-2 py-1 text-xs text-amber-300"
+                      className="mb-1 rounded border border-amber-400 bg-amber-50 px-2 py-1 text-xs text-amber-900"
                     >
-                      {to.reason ?? "🕐"}
+                      🕐 {to.reason ?? ""}
                     </div>
                   ))}
 
@@ -303,13 +324,13 @@ export default function ScheduleClient({
                     <button
                       key={b.id}
                       onClick={() => setSelectedBooking(b)}
-                      className={`hover:bg-muted/60 mb-1 rounded border p-2 text-left text-xs transition-colors ${b.barberColor}`}
+                      className={`mb-1 rounded border p-2 text-left text-xs transition-opacity hover:opacity-80 ${b.barberColor} ${b.barberId === userBarberId ? "ring-2 ring-[var(--ink)]" : ""}`}
                     >
-                      <div className="font-medium">
+                      <div className="font-semibold">
                         {sofiaTime(b.startDatetime)}–{sofiaTime(b.endDatetime)}
                       </div>
                       <div>{b.customerName}</div>
-                      <div className="text-muted-foreground">{b.serviceName}</div>
+                      <div className="opacity-70">{b.serviceName}</div>
                     </button>
                   ))}
 
@@ -423,6 +444,8 @@ export default function ScheduleClient({
         </span>
       </div>
 
+      {legend}
+
       <div className="mx-auto max-w-md space-y-3">
         {days.map((day) => {
           const dayBookings = bookingsForDay(day);
@@ -448,7 +471,7 @@ export default function ScheduleClient({
                   <button
                     key={b.id}
                     onClick={() => setSelectedBooking(b)}
-                    className={`hover:bg-muted/60 w-full rounded border p-3 text-left text-sm transition-colors ${b.barberColor}`}
+                    className={`w-full rounded border p-3 text-left text-sm transition-opacity hover:opacity-80 ${b.barberColor} ${b.barberId === userBarberId ? "ring-2 ring-[var(--ink)]" : ""}`}
                   >
                     <div className="flex items-center justify-between">
                       <span className="font-medium">

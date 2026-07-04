@@ -227,6 +227,7 @@
     "date": "Date",
     "status": "Status",
     "notes": "Notes",
+    "you": "you",
     "readOnlyOtherBarber": "This booking belongs to another barber — view only.",
     "reschedule": "Reschedule",
     "rescheduleSlotTaken": "That time isn't available. Pick another.",
