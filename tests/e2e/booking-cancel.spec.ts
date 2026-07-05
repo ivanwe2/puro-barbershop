@@ -88,8 +88,11 @@ test("cancelling within the window is refused with a call-us message", async ({ 
   await page.goto(`/en/book/cancel/${cancellationToken(b.id)}`, { waitUntil: "networkidle" });
   await page.getByRole("button", { name: "Cancel Booking" }).click();
 
-  await expect(page.getByText(/less than 24 hours/i)).toBeVisible({ timeout: 15000 });
-  const callLink = page.getByRole("link", { name: /call us/i });
+  // Scope to the too-late message paragraph: the page footer also has a
+  // "Call us" tel link, so an unscoped role query would be ambiguous.
+  const tooLateMessage = page.locator("p", { hasText: /less than 24 hours/i });
+  await expect(tooLateMessage).toBeVisible({ timeout: 15000 });
+  const callLink = tooLateMessage.getByRole("link", { name: /call us/i });
   await expect(callLink).toBeVisible();
   await expect(callLink).toHaveAttribute("href", /^tel:\+359/);
   // Booking stays confirmed.

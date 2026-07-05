@@ -130,10 +130,30 @@ async function main() {
     },
   ];
 
+  const serviceIds: number[] = [];
   for (const s of services) {
-    await db.insert(schema.services).values(s);
+    const [row] = await db.insert(schema.services).values(s).returning({ id: schema.services.id });
+    if (row) serviceIds.push(row.id);
     console.log(`  Created service: ${s.nameEn}`);
   }
+
+  // Sample per-barber price overrides so the pricing feature is visible after a
+  // fresh seed. [PLACEHOLDER:price] — set real prices in Admin → Pricing. A
+  // service with no override falls back to its base price.
+  const sampleOverrides = [
+    { barberId: barber1.id, serviceId: serviceIds[0], priceEur: "30.00" }, // Seney — Haircut
+    { barberId: barber2.id, serviceId: serviceIds[0], priceEur: "25.00" }, // Andrey — Haircut
+    { barberId: barber1.id, serviceId: serviceIds[1], priceEur: "45.00" }, // Seney — Haircut + Beard
+  ];
+  for (const o of sampleOverrides) {
+    if (o.serviceId == null) continue;
+    await db.insert(schema.barberServicePrices).values({
+      barberId: o.barberId,
+      serviceId: o.serviceId,
+      priceEur: o.priceEur,
+    });
+  }
+  console.log(`  Created ${sampleOverrides.length} sample price overrides`);
 
   // 4. Working hours: every day 10:00-19:30
   const barberIds = [barber1.id, barber2.id];

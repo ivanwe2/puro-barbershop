@@ -4,14 +4,22 @@ import { eq, asc, and, or, inArray, gte, lte, sql } from "drizzle-orm";
 import { db } from "@/db";
 import { getAvailableSlots, getAvailableSlotsForAnyBarber } from "@/lib/booking/availability";
 import { getSlotsSchema, bookingDetailsSchema } from "@/lib/booking/schema";
-import { barbers, services, bookings, emailBlacklist, users } from "@/db/schema";
+import {
+  barbers,
+  services,
+  bookings,
+  emailBlacklist,
+  users,
+  barberServicePrices,
+} from "@/db/schema";
+import type { BarberServicePrice } from "@/lib/pricing";
 import { generateCancellationToken } from "@/lib/booking/tokens";
 import { rateLimiters } from "@/lib/rate-limit";
 import { headers } from "next/headers";
 import { after } from "next/server";
 import crypto from "crypto";
 import { sendBookingConfirmation, sendBarberNotification } from "@/lib/email";
-import { sofiaLongDate, sofiaTime, sofiaWallToInstant } from "@/lib/datetime";
+import { sofiaLongDate, sofiaTime, sofiaWallToInstant, slotLabel } from "@/lib/datetime";
 import { env } from "@/lib/env";
 import { shop } from "@/lib/shop";
 import type { InferSelectModel } from "drizzle-orm";
@@ -59,7 +67,7 @@ export async function fetchSlots(input: unknown): Promise<FetchSlotsResult> {
         date: dateObj,
         db,
       });
-      slots = results.map((r) => r.slot.toTimeString().slice(0, 5));
+      slots = results.map((r) => slotLabel(r.slot));
     } else {
       const result = await getAvailableSlots({
         serviceId,
@@ -67,12 +75,30 @@ export async function fetchSlots(input: unknown): Promise<FetchSlotsResult> {
         date: dateObj,
         db,
       });
-      slots = result.map((s) => s.toTimeString().slice(0, 5));
+      slots = result.map((s) => slotLabel(s));
     }
 
     return { slots };
   } catch {
     return { error: "Failed to fetch slots" };
+  }
+}
+
+type FetchServicePricesResult = { prices: BarberServicePrice[] } | { error: string };
+
+/** Per-barber price overrides. Empty until the shop sets them in admin. */
+export async function fetchServicePrices(): Promise<FetchServicePricesResult> {
+  try {
+    const rows = await db
+      .select({
+        barberId: barberServicePrices.barberId,
+        serviceId: barberServicePrices.serviceId,
+        priceEur: barberServicePrices.priceEur,
+      })
+      .from(barberServicePrices);
+    return { prices: rows };
+  } catch {
+    return { error: "Failed to fetch prices" };
   }
 }
 
@@ -159,7 +185,7 @@ export async function createBooking(input: unknown): Promise<CreateBookingResult
         db,
       });
 
-      const matchingSlot = results.find((r) => r.slot.toTimeString().slice(0, 5) === time);
+      const matchingSlot = results.find((r) => slotLabel(r.slot) === time);
 
       if (!matchingSlot || matchingSlot.availableBarberIds.length === 0) {
         return { success: false, error: "slotTaken" };
@@ -214,7 +240,7 @@ export async function createBooking(input: unknown): Promise<CreateBookingResult
       db,
     });
 
-    const isAvailable = slots.some((s) => s.toTimeString().slice(0, 5) === time);
+    const isAvailable = slots.some((s) => slotLabel(s) === time);
 
     if (!isAvailable) {
       return { success: false, error: "slotTaken" };

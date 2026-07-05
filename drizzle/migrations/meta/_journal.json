@@ -15,6 +15,13 @@
       "when": 1783113303914,
       "tag": "0001_magenta_ben_urich",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1783260984137,
+      "tag": "0002_good_mister_fear",
+      "breakpoints": true
     }
   ]
 }

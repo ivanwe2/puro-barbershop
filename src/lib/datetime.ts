@@ -43,6 +43,20 @@ export function sofiaTime(date: Date): string {
   return `${p.hour}:${p.minute}`;
 }
 
+/**
+ * "HH:mm" label for an availability-engine slot. Those Date objects encode the
+ * Sofia wall-clock time in their UTC fields (a "wall-clock-as-UTC" basis — see
+ * src/lib/booking/availability.ts), so read the UTC fields directly. Using the
+ * ambient timezone (Date.toTimeString) would shift the label on any non-UTC
+ * server (e.g. a +3 dev box), mislabelling slots and corrupting the round-trip
+ * back to a stored instant.
+ */
+export function slotLabel(slot: Date): string {
+  const h = String(slot.getUTCHours()).padStart(2, "0");
+  const m = String(slot.getUTCMinutes()).padStart(2, "0");
+  return `${h}:${m}`;
+}
+
 /** "yyyy-MM-dd" Sofia calendar day — stable key for grouping/comparison. */
 export function sofiaDateKey(date: Date): string {
   const p = sofiaParts(date);

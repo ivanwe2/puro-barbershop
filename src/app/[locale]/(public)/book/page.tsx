@@ -8,11 +8,18 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { isValidPhoneNumber } from "libphonenumber-js";
 import { format, addDays } from "date-fns";
-import { fetchServices, fetchBarbers, fetchSlots, createBooking } from "@/actions/booking";
+import {
+  fetchServices,
+  fetchBarbers,
+  fetchSlots,
+  fetchServicePrices,
+  createBooking,
+} from "@/actions/booking";
 import { Link } from "@/lib/i18n/routing";
 import { shop } from "@/lib/shop";
 // EURO-CHANGEOVER: temporary dual EUR/BGN pricing — remove after Aug 2026.
 import { formatEur, formatBgn } from "@/lib/currency";
+import { buildPriceIndex, priceFor, priceRangeFor, type BarberServicePrice } from "@/lib/pricing";
 import type { InferSelectModel } from "drizzle-orm";
 import { services, barbers } from "@/db/schema";
 
@@ -44,11 +51,13 @@ export default function BookPage() {
 
   const [serviceList, setServiceList] = useState<ServiceRow[]>([]);
   const [barberList, setBarberList] = useState<BarberRow[]>([]);
+  const [priceOverrides, setPriceOverrides] = useState<BarberServicePrice[]>([]);
   const [loading, setLoading] = useState(true);
 
   const initialService = Number(searchParams.get("service")) || null;
+  const initialBarber = Number(searchParams.get("barber")) || null;
   const [serviceId, setServiceId] = useState<number | null>(initialService);
-  const [barberId, setBarberId] = useState<number | "any">("any");
+  const [barberId, setBarberId] = useState<number | "any">(initialBarber ?? "any");
   const [date, setDate] = useState<string>("");
   const [time, setTime] = useState<string | null>(null);
 
@@ -76,7 +85,11 @@ export default function BookPage() {
   useEffect(() => {
     let active = true;
     (async () => {
-      const [svc, bar] = await Promise.all([fetchServices(), fetchBarbers()]);
+      const [svc, bar, prices] = await Promise.all([
+        fetchServices(),
+        fetchBarbers(),
+        fetchServicePrices(),
+      ]);
       if (!active) return;
       if ("services" in svc) {
         setServiceList(svc.services);
@@ -84,6 +97,7 @@ export default function BookPage() {
         setServiceId((prev) => prev ?? svc.services[0]?.id ?? null);
       }
       if ("barbers" in bar) setBarberList(bar.barbers);
+      if ("prices" in prices) setPriceOverrides(prices.prices);
       setLoading(false);
     })();
     return () => {
@@ -145,6 +159,21 @@ export default function BookPage() {
   const serviceName = (s: ServiceRow) => (locale === "bg" ? s.nameBg : s.nameEn);
   const barberName = (b: BarberRow) => (locale === "bg" ? b.nameBg : b.nameEn);
 
+  // Price shown in the service dropdown tracks the chosen barber: a specific
+  // price once a barber is picked, or "from €X" while it's "No preference".
+  const priceIndex = buildPriceIndex(priceOverrides);
+  const barberIds = barberList.map((b) => b.id);
+  const priceTag = (s: ServiceRow): string => {
+    if (barberId === "any") {
+      const { min, max } = priceRangeFor(priceIndex, s.id, s.priceBgn, barberIds);
+      const prefix = min !== max ? `${t("from")} ` : "";
+      // EURO-CHANGEOVER: drop the лв. half after Aug 2026.
+      return `${prefix}€${formatEur(min)} / ${formatBgn(min)} лв.`;
+    }
+    const eur = priceFor(priceIndex, s.id, s.priceBgn, barberId);
+    return `€${formatEur(eur)} / ${formatBgn(eur)} лв.`;
+  };
+
   const today = format(new Date(), "yyyy-MM-dd");
   const maxDate = format(addDays(new Date(), 60), "yyyy-MM-dd");
 
@@ -200,8 +229,7 @@ export default function BookPage() {
                   >
                     {serviceList.map((s) => (
                       <option key={s.id} value={s.id}>
-                        {/* EURO-CHANGEOVER: dual price — revert to `€{formatEur(s.priceBgn)}` after Aug 2026 */}
-                        {serviceName(s)} — €{formatEur(s.priceBgn)} / {formatBgn(s.priceBgn)} лв.
+                        {serviceName(s)} — {priceTag(s)}
                       </option>
                     ))}
                   </select>
