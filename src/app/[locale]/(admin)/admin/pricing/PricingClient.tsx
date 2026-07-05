@@ -105,6 +105,7 @@ export default function PricingClient({
                         <Input
                           type="text"
                           inputMode="decimal"
+                          data-testid={`price-${b.id}-${s.id}`}
                           className="w-24 text-right"
                           placeholder={`€${s.priceBgn}`}
                           value={values[cellKey(b.id, s.id)] ?? ""}
