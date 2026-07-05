@@ -1,7 +1,5 @@
-import { getLocale } from "next-intl/server";
-import { Link } from "@/lib/i18n/routing";
-// EURO-CHANGEOVER: temporary dual EUR/BGN pricing — remove after Aug 2026.
-import { formatEur, formatBgn } from "@/lib/currency";
+import ServicesPriceList from "./ServicesPriceList";
+import type { BarberServicePrice } from "@/lib/pricing";
 
 interface T {
   (key: string, params?: Record<string, string | number | Date>): string;
@@ -17,15 +15,25 @@ interface Service {
   priceBgn: string;
 }
 
+interface Barber {
+  id: number;
+  nameEn: string;
+  nameBg: string;
+}
+
 interface ServicesSectionProps {
   services: Service[];
+  barbers: Barber[];
+  priceOverrides: BarberServicePrice[];
   t: T;
 }
 
-export default async function ServicesSection({ services: serviceList, t }: ServicesSectionProps) {
-  const locale = await getLocale();
-  const name = (s: Service) => (locale === "bg" ? s.nameBg : s.nameEn);
-
+export default function ServicesSection({
+  services: serviceList,
+  barbers,
+  priceOverrides,
+  t,
+}: ServicesSectionProps) {
   return (
     <section
       id="services"
@@ -46,30 +54,7 @@ export default async function ServicesSection({ services: serviceList, t }: Serv
           </p>
         </div>
 
-        <div className="grid grid-cols-1 gap-x-[72px] md:grid-cols-2">
-          {serviceList.map((service) => (
-            <Link
-              key={service.id}
-              href={`/book?service=${service.id}`}
-              className="group flex items-baseline gap-[14px] border-b border-[var(--hairline)] py-[22px]"
-            >
-              <span className="font-heading text-[22px] font-semibold whitespace-nowrap text-[var(--ink)]">
-                {name(service)}
-              </span>
-              <span className="flex-1 -translate-y-1 border-b border-dotted border-[rgba(21,18,14,0.25)]" />
-              {/* EURO-CHANGEOVER: dual price block — after Aug 2026, replace this
-                  whole span with a single `€{formatEur(service.priceBgn)}`. */}
-              <span className="flex flex-col items-end text-right whitespace-nowrap">
-                <span className="text-base font-semibold text-[var(--ink)]">
-                  €{formatEur(service.priceBgn)}
-                </span>
-                <span className="text-xs font-medium text-[var(--muted-foreground)]">
-                  {formatBgn(service.priceBgn)} лв.
-                </span>
-              </span>
-            </Link>
-          ))}
-        </div>
+        <ServicesPriceList services={serviceList} barbers={barbers} overrides={priceOverrides} />
       </div>
     </section>
   );

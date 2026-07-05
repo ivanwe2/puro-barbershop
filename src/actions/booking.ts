@@ -4,7 +4,15 @@ import { eq, asc, and, or, inArray, gte, lte, sql } from "drizzle-orm";
 import { db } from "@/db";
 import { getAvailableSlots, getAvailableSlotsForAnyBarber } from "@/lib/booking/availability";
 import { getSlotsSchema, bookingDetailsSchema } from "@/lib/booking/schema";
-import { barbers, services, bookings, emailBlacklist, users } from "@/db/schema";
+import {
+  barbers,
+  services,
+  bookings,
+  emailBlacklist,
+  users,
+  barberServicePrices,
+} from "@/db/schema";
+import type { BarberServicePrice } from "@/lib/pricing";
 import { generateCancellationToken } from "@/lib/booking/tokens";
 import { rateLimiters } from "@/lib/rate-limit";
 import { headers } from "next/headers";
@@ -73,6 +81,24 @@ export async function fetchSlots(input: unknown): Promise<FetchSlotsResult> {
     return { slots };
   } catch {
     return { error: "Failed to fetch slots" };
+  }
+}
+
+type FetchServicePricesResult = { prices: BarberServicePrice[] } | { error: string };
+
+/** Per-barber price overrides. Empty until the shop sets them in admin. */
+export async function fetchServicePrices(): Promise<FetchServicePricesResult> {
+  try {
+    const rows = await db
+      .select({
+        barberId: barberServicePrices.barberId,
+        serviceId: barberServicePrices.serviceId,
+        priceEur: barberServicePrices.priceEur,
+      })
+      .from(barberServicePrices);
+    return { prices: rows };
+  } catch {
+    return { error: "Failed to fetch prices" };
   }
 }
 

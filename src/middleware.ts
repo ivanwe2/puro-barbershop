@@ -9,7 +9,7 @@ const intlMiddleware = createIntlMiddleware({
   localePrefix: "always",
 });
 
-const SUPER_ADMIN_ROUTES = ["/barbers", "/services", "/settings"];
+const SUPER_ADMIN_ROUTES = ["/barbers", "/services", "/pricing", "/settings"];
 
 function isSuperAdminRoute(pathname: string): boolean {
   return SUPER_ADMIN_ROUTES.some((route) => pathname.includes(`/admin${route}`));

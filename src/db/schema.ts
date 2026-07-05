@@ -63,6 +63,28 @@ export const services = pgTable("services", {
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 
+// Per-barber price overrides for a service. Services are shared across barbers,
+// but each barber may charge a different price. When no row exists for a
+// (barber, service) pair, the shared services.priceBgn base price applies.
+// Prices are in EUR (see src/lib/currency.ts).
+export const barberServicePrices = pgTable(
+  "barber_service_prices",
+  {
+    id: serial("id").primaryKey(),
+    barberId: integer("barber_id")
+      .references(() => barbers.id, { onDelete: "cascade" })
+      .notNull(),
+    serviceId: integer("service_id")
+      .references(() => services.id, { onDelete: "cascade" })
+      .notNull(),
+    priceEur: decimal("price_eur", { precision: 10, scale: 2 }).notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  },
+  (table) => ({
+    barberServiceUnique: uniqueIndex("barber_service_unique").on(table.barberId, table.serviceId),
+  }),
+);
+
 export const workingHours = pgTable("working_hours", {
   id: serial("id").primaryKey(),
   barberId: integer("barber_id")

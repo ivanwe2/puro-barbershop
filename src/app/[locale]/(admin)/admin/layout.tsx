@@ -25,6 +25,7 @@ const superAdminNavItems = [
   ...baseNavItems,
   { href: "/admin/barbers", labelKey: "barbers" },
   { href: "/admin/services", labelKey: "services" },
+  { href: "/admin/pricing", labelKey: "pricing" },
   { href: "/admin/settings", labelKey: "settings" },
   accountNavItem,
 ];

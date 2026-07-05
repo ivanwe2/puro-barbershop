@@ -1,7 +1,7 @@
 import { getTranslations } from "next-intl/server";
 import type { Metadata } from "next";
 import { db } from "@/db";
-import { barbers, services } from "@/db/schema";
+import { barbers, services, barberServicePrices } from "@/db/schema";
 import { eq, asc } from "drizzle-orm";
 import Hero from "@/components/marketing/Hero";
 import Statement from "@/components/marketing/Statement";
@@ -68,6 +68,15 @@ export default async function HomePage(props: { params: Promise<{ locale: string
     .where(eq(services.active, true))
     .orderBy(asc(services.displayOrder));
 
+  // Per-barber price overrides (empty until the shop sets them in admin).
+  const priceOverrides = await db
+    .select({
+      barberId: barberServicePrices.barberId,
+      serviceId: barberServicePrices.serviceId,
+      priceEur: barberServicePrices.priceEur,
+    })
+    .from(barberServicePrices);
+
   // Fall back to a portrait dropped in public/barbers/<name>.jpg when the
   // barber has no explicit photoUrl set in the admin panel.
   const barbersWithPhotos = activeBarbers.map((b) => ({
@@ -117,7 +126,12 @@ export default async function HomePage(props: { params: Promise<{ locale: string
         barberCount={activeBarbers.length}
         serviceCount={activeServices.length}
       />
-      <ServicesSection services={activeServices} t={servicesT} />
+      <ServicesSection
+        services={activeServices}
+        barbers={activeBarbers}
+        priceOverrides={priceOverrides}
+        t={servicesT}
+      />
       <BarbersSection barbers={barbersWithPhotos} t={homeT} />
       <GallerySection />
       <LocationSection locale={locale} />
