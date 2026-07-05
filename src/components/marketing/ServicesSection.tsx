@@ -1,5 +1,7 @@
 import { getLocale } from "next-intl/server";
 import { Link } from "@/lib/i18n/routing";
+// EURO-CHANGEOVER: temporary dual EUR/BGN pricing — remove after Aug 2026.
+import { formatEur, formatBgn } from "@/lib/currency";
 
 interface T {
   (key: string, params?: Record<string, string | number | Date>): string;
@@ -23,11 +25,6 @@ interface ServicesSectionProps {
 export default async function ServicesSection({ services: serviceList, t }: ServicesSectionProps) {
   const locale = await getLocale();
   const name = (s: Service) => (locale === "bg" ? s.nameBg : s.nameEn);
-  // Whole-number prices read cleaner without trailing zeros.
-  const price = (s: Service) => {
-    const n = Number(s.priceBgn);
-    return Number.isInteger(n) ? String(n) : s.priceBgn;
-  };
 
   return (
     <section
@@ -60,7 +57,16 @@ export default async function ServicesSection({ services: serviceList, t }: Serv
                 {name(service)}
               </span>
               <span className="flex-1 -translate-y-1 border-b border-dotted border-[rgba(21,18,14,0.25)]" />
-              <span className="text-base font-semibold text-[var(--ink)]">€{price(service)}</span>
+              {/* EURO-CHANGEOVER: dual price block — after Aug 2026, replace this
+                  whole span with a single `€{formatEur(service.priceBgn)}`. */}
+              <span className="flex flex-col items-end text-right whitespace-nowrap">
+                <span className="text-base font-semibold text-[var(--ink)]">
+                  €{formatEur(service.priceBgn)}
+                </span>
+                <span className="text-xs font-medium text-[var(--muted-foreground)]">
+                  {formatBgn(service.priceBgn)} лв.
+                </span>
+              </span>
             </Link>
           ))}
         </div>

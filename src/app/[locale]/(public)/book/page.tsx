@@ -11,6 +11,8 @@ import { format, addDays } from "date-fns";
 import { fetchServices, fetchBarbers, fetchSlots, createBooking } from "@/actions/booking";
 import { Link } from "@/lib/i18n/routing";
 import { shop } from "@/lib/shop";
+// EURO-CHANGEOVER: temporary dual EUR/BGN pricing — remove after Aug 2026.
+import { formatEur, formatBgn } from "@/lib/currency";
 import type { InferSelectModel } from "drizzle-orm";
 import { services, barbers } from "@/db/schema";
 
@@ -140,10 +142,6 @@ export default function BookPage() {
     [serviceId, barberId, date, time, locale, t],
   );
 
-  const priceLabel = (s: ServiceRow) => {
-    const n = Number(s.priceBgn);
-    return Number.isInteger(n) ? String(n) : s.priceBgn;
-  };
   const serviceName = (s: ServiceRow) => (locale === "bg" ? s.nameBg : s.nameEn);
   const barberName = (b: BarberRow) => (locale === "bg" ? b.nameBg : b.nameEn);
 
@@ -202,7 +200,8 @@ export default function BookPage() {
                   >
                     {serviceList.map((s) => (
                       <option key={s.id} value={s.id}>
-                        {serviceName(s)} — €{priceLabel(s)}
+                        {/* EURO-CHANGEOVER: dual price — revert to `€{formatEur(s.priceBgn)}` after Aug 2026 */}
+                        {serviceName(s)} — €{formatEur(s.priceBgn)} / {formatBgn(s.priceBgn)} лв.
                       </option>
                     ))}
                   </select>
