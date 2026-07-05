@@ -8,7 +8,7 @@ import { revalidatePath } from "next/cache";
 import { after } from "next/server";
 import crypto from "crypto";
 import { z } from "zod";
-import { sofiaLongDate, sofiaTime, sofiaWallToInstant } from "@/lib/datetime";
+import { sofiaLongDate, sofiaTime, sofiaWallToInstant, slotLabel } from "@/lib/datetime";
 import { getAvailableSlots } from "@/lib/booking/availability";
 import { generateCancellationToken } from "@/lib/booking/tokens";
 import { sendCancellationEmail, sendRescheduleEmail } from "@/lib/email";
@@ -165,7 +165,7 @@ export async function createWalkInBooking(input: unknown) {
   // Server-side slot availability check
   const dateObj = sofiaWallToInstant(`${date}T${time}`);
   const slots = await getAvailableSlots({ serviceId, barberId, date: dateObj, db });
-  const isAvailable = slots.some((s) => s.toTimeString().slice(0, 5) === time);
+  const isAvailable = slots.some((s) => slotLabel(s) === time);
   if (!isAvailable) return { error: "slotTaken" } as const;
 
   const serviceRows = await db
@@ -338,7 +338,7 @@ export async function rescheduleBooking(bookingId: number, input: unknown) {
     date: startDatetime,
     db,
   });
-  const isAvailable = slots.some((s) => s.toTimeString().slice(0, 5) === time);
+  const isAvailable = slots.some((s) => slotLabel(s) === time);
   if (!isAvailable) return { error: "slotTaken" } as const;
 
   const endDatetime = new Date(startDatetime.getTime() + existing.durationMinutes * 60000);

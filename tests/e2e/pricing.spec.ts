@@ -7,20 +7,22 @@ import { sql, login } from "./helpers";
 // up after itself.
 test.describe("per-barber pricing", () => {
   let serviceId: number;
-  let barberIds: number[];
+  let barber0Id: number;
+  let barber1Id: number;
   let barber0Name: string;
 
   test.beforeAll(async () => {
     const svc = await sql`select id from services where active order by display_order limit 1`;
-    serviceId = svc[0]!.id;
+    serviceId = svc[0]!.id as number;
     const bar =
       await sql`select id, name_en from barbers where active order by display_order limit 2`;
-    barberIds = bar.map((b) => b.id);
-    barber0Name = bar[0]!.name_en;
+    barber0Id = bar[0]!.id as number;
+    barber1Id = bar[1]!.id as number;
+    barber0Name = bar[0]!.name_en as string;
     // barber0 = 14.00 (pricier), barber1 = 11.00 → range "from €11".
     await sql`
       insert into barber_service_prices (barber_id, service_id, price_eur)
-      values (${barberIds[0]}, ${serviceId}, '14.00'), (${barberIds[1]}, ${serviceId}, '11.00')
+      values (${barber0Id}, ${serviceId}, '14.00'), (${barber1Id}, ${serviceId}, '11.00')
       on conflict (barber_id, service_id) do update set price_eur = excluded.price_eur`;
   });
 
@@ -44,7 +46,7 @@ test.describe("per-barber pricing", () => {
     await page.goto("/en/admin/pricing");
     await expect(page.getByRole("heading", { name: /pricing/i })).toBeVisible();
 
-    const cell = page.getByTestId(`price-${barberIds[1]}-${serviceId}`);
+    const cell = page.getByTestId(`price-${barber1Id}-${serviceId}`);
     await expect(cell).toHaveValue("11.00");
     await cell.fill("9.50");
     await page.getByRole("button", { name: /save/i }).click();
@@ -53,7 +55,7 @@ test.describe("per-barber pricing", () => {
     const row = (
       await sql`
         select price_eur from barber_service_prices
-        where barber_id = ${barberIds[1]} and service_id = ${serviceId}`
+        where barber_id = ${barber1Id} and service_id = ${serviceId}`
     )[0]!;
     expect(Number(row.price_eur)).toBe(9.5);
   });

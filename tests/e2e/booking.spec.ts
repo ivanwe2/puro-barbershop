@@ -1,5 +1,5 @@
 import { test, expect } from "@playwright/test";
-import { format } from "date-fns";
+import { format, addDays } from "date-fns";
 
 test("booking flow — single-screen form", async ({ page }) => {
   // Land on homepage
@@ -14,9 +14,10 @@ test("booking flow — single-screen form", async ({ page }) => {
   await expect(page).toHaveURL(/\/book/);
 
   // Service + barber default to sensible values (first service / no preference).
-  // Pick today's date to load available time slots.
-  const today = format(new Date(), "yyyy-MM-dd");
-  await page.locator('input[type="date"]').fill(today);
+  // Book tomorrow so the test is independent of the time of day — once the shop
+  // has closed for the day, "today" legitimately has no slots left.
+  const bookingDate = format(addDays(new Date(), 1), "yyyy-MM-dd");
+  await page.locator('input[type="date"]').fill(bookingDate);
 
   // Wait for slots and choose the first available time chip.
   const timeChip = page.getByRole("button", { name: /^\d{2}:\d{2}$/ });

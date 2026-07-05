@@ -5,9 +5,31 @@ import {
   type SlotResult,
 } from "@/lib/booking/availability";
 import type { DB } from "@/db";
+import { sofiaWallToInstant } from "@/lib/datetime";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type Row = Record<string, any>;
+
+// A Wednesday ~2 weeks out (UTC midnight), computed from now so these tests
+// never expire. The engine derives the Sofia day and builds slots in a
+// wall-clock-as-UTC basis, so a UTC-midnight Wednesday yields Sofia-Wednesday
+// slots whose UTC fields equal the wall-clock time (matching the assertions).
+function futureWednesday(): Date {
+  const d = new Date();
+  d.setUTCHours(0, 0, 0, 0);
+  d.setUTCDate(d.getUTCDate() + 14);
+  while (d.getUTCDay() !== 3) d.setUTCDate(d.getUTCDate() + 1);
+  return d;
+}
+
+const dayKey = (d: Date) =>
+  `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, "0")}-${String(
+    d.getUTCDate(),
+  ).padStart(2, "0")}`;
+
+// True instant for a Sofia wall-clock time on the given day — what bookings and
+// time-off store in production (the engine shifts them into its wall basis).
+const wallInstant = (day: Date, hhmm: string) => sofiaWallToInstant(`${dayKey(day)}T${hhmm}`);
 
 function createMockDB(fromMap: Record<string, Row[]>) {
   let currentTable = "";
@@ -69,7 +91,7 @@ describe("availability engine", () => {
     const slots = await getAvailableSlots({
       serviceId: -1,
       barberId: 1,
-      date: new Date(Date.UTC(2026, 6, 1)),
+      date: futureWednesday(),
       db,
     });
     expect(slots).toEqual([]);
@@ -79,7 +101,7 @@ describe("availability engine", () => {
     const slots = await getAvailableSlots({
       serviceId: 1,
       barberId: 0,
-      date: new Date(Date.UTC(2026, 6, 1)),
+      date: futureWednesday(),
       db,
     });
     expect(slots).toEqual([]);
@@ -100,7 +122,7 @@ describe("availability engine", () => {
     const slots = await getAvailableSlots({
       serviceId: 1,
       barberId: 1,
-      date: new Date(Date.UTC(2026, 6, 1)),
+      date: futureWednesday(),
       db,
     });
     expect(slots).toEqual([]);
@@ -118,7 +140,7 @@ describe("availability engine", () => {
     const slots = await getAvailableSlots({
       serviceId: 1,
       barberId: 1,
-      date: new Date(Date.UTC(2026, 6, 1)),
+      date: futureWednesday(),
       db,
     });
     expect(slots).toEqual([]);
@@ -136,7 +158,7 @@ describe("availability engine", () => {
       { barberId: 1, dayOfWeek: 3, startTime: "09:00:00", endTime: "19:00:00", active: true },
     ];
 
-    const wednesday = new Date(Date.UTC(2026, 6, 1));
+    const wednesday = futureWednesday();
     const slots = await getAvailableSlots({
       serviceId: 1,
       barberId: 1,
@@ -162,16 +184,15 @@ describe("availability engine", () => {
     fromMap.working_hours = [
       { barberId: 1, dayOfWeek: 3, startTime: "09:00:00", endTime: "19:00:00", active: true },
     ];
+    const wednesday = futureWednesday();
     fromMap.bookings = [
       {
         barberId: 1,
-        startDatetime: new Date(Date.UTC(2026, 6, 1, 10, 0, 0)),
-        endDatetime: new Date(Date.UTC(2026, 6, 1, 10, 30, 0)),
+        startDatetime: wallInstant(wednesday, "10:00"),
+        endDatetime: wallInstant(wednesday, "10:30"),
         status: "confirmed",
       },
     ];
-
-    const wednesday = new Date(Date.UTC(2026, 6, 1));
     const slots = await getAvailableSlots({
       serviceId: 1,
       barberId: 1,
@@ -197,15 +218,14 @@ describe("availability engine", () => {
     fromMap.working_hours = [
       { barberId: 1, dayOfWeek: 3, startTime: "09:00:00", endTime: "19:00:00", active: true },
     ];
+    const wednesday = futureWednesday();
     fromMap.time_off = [
       {
         barberId: 1,
-        startDatetime: new Date(Date.UTC(2026, 6, 1, 12, 0, 0)),
-        endDatetime: new Date(Date.UTC(2026, 6, 1, 14, 0, 0)),
+        startDatetime: wallInstant(wednesday, "12:00"),
+        endDatetime: wallInstant(wednesday, "14:00"),
       },
     ];
-
-    const wednesday = new Date(Date.UTC(2026, 6, 1));
     const slots = await getAvailableSlots({
       serviceId: 1,
       barberId: 1,
@@ -258,7 +278,7 @@ describe("availability engine", () => {
       { barberId: 2, dayOfWeek: 3, startTime: "09:00:00", endTime: "19:00:00", active: true },
     ];
 
-    const wednesday = new Date(Date.UTC(2026, 6, 1));
+    const wednesday = futureWednesday();
     const results = await getAvailableSlotsForAnyBarber({
       serviceId: 1,
       date: wednesday,
@@ -278,7 +298,7 @@ describe("availability engine", () => {
 
     const results = await getAvailableSlotsForAnyBarber({
       serviceId: 1,
-      date: new Date(Date.UTC(2026, 6, 1)),
+      date: futureWednesday(),
       db,
     });
     expect(results).toEqual([]);
@@ -296,7 +316,8 @@ describe("availability engine", () => {
       { barberId: 1, dayOfWeek: 3, startTime: "09:00:00", endTime: "19:00:00", active: true },
     ];
 
-    const farFuture = new Date(Date.UTC(2027, 0, 1));
+    // ~2 weeks out is well beyond the 1-day horizon configured above.
+    const farFuture = futureWednesday();
     const slots = await getAvailableSlots({
       serviceId: 1,
       barberId: 1,
@@ -318,7 +339,7 @@ describe("availability engine", () => {
       { barberId: 1, dayOfWeek: 3, startTime: "09:00:00", endTime: "09:44:00", active: true },
     ];
 
-    const wednesday = new Date(Date.UTC(2026, 6, 1));
+    const wednesday = futureWednesday();
     const slots = await getAvailableSlots({
       serviceId: 1,
       barberId: 1,
