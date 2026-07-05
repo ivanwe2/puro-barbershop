@@ -82,12 +82,14 @@ export default function PricingClient({
             <table className="w-full border-collapse text-sm">
               <thead>
                 <tr className="border-b">
-                  <th className="py-2 pr-4 text-left font-medium">{t("service")}</th>
-                  <th className="text-muted-foreground py-2 pr-4 text-right font-medium whitespace-nowrap">
+                  {/* Greedy Service column packs the price columns together on
+                      the right instead of spreading them across the table. */}
+                  <th className="w-full py-2 pr-6 text-left font-medium">{t("service")}</th>
+                  <th className="text-muted-foreground px-3 py-2 text-right font-medium whitespace-nowrap">
                     {t("basePrice")}
                   </th>
                   {barbers.map((b) => (
-                    <th key={b.id} className="px-2 py-2 text-right font-medium whitespace-nowrap">
+                    <th key={b.id} className="px-3 py-2 text-right font-medium whitespace-nowrap">
                       {name(b)}
                     </th>
                   ))}
@@ -96,21 +98,28 @@ export default function PricingClient({
               <tbody>
                 {services.map((s) => (
                   <tr key={s.id} className="border-b last:border-0">
-                    <td className="py-3 pr-4 font-medium whitespace-nowrap">{name(s)}</td>
-                    <td className="text-muted-foreground py-3 pr-4 text-right whitespace-nowrap">
+                    <td className="py-3 pr-6 font-medium whitespace-nowrap">{name(s)}</td>
+                    <td className="text-muted-foreground px-3 py-3 text-right whitespace-nowrap">
                       €{s.priceBgn}
                     </td>
                     {barbers.map((b) => (
-                      <td key={b.id} className="px-2 py-2">
-                        <Input
-                          type="text"
-                          inputMode="decimal"
-                          data-testid={`price-${b.id}-${s.id}`}
-                          className="w-24 text-right"
-                          placeholder={`€${s.priceBgn}`}
-                          value={values[cellKey(b.id, s.id)] ?? ""}
-                          onChange={(e) => setCell(b.id, s.id, e.target.value)}
-                        />
+                      <td key={b.id} className="px-3 py-2">
+                        {/* Leading € so a saved value reads like the base price
+                            (€12.00), while the input value stays numeric. */}
+                        <div className="relative ml-auto w-24">
+                          <span className="text-muted-foreground pointer-events-none absolute top-1/2 left-2.5 -translate-y-1/2">
+                            €
+                          </span>
+                          <Input
+                            type="text"
+                            inputMode="decimal"
+                            data-testid={`price-${b.id}-${s.id}`}
+                            className="w-24 pl-6 text-right"
+                            placeholder={s.priceBgn}
+                            value={values[cellKey(b.id, s.id)] ?? ""}
+                            onChange={(e) => setCell(b.id, s.id, e.target.value)}
+                          />
+                        </div>
                       </td>
                     ))}
                   </tr>
