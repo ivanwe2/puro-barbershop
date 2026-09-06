@@ -17,6 +17,7 @@ import {
 } from "@/actions/booking";
 import { Link } from "@/lib/i18n/routing";
 import { shop } from "@/lib/shop";
+import { isClosedDateKey } from "@/lib/shop-hours";
 // EURO-CHANGEOVER: temporary dual EUR/BGN pricing — remove after Aug 2026.
 import { formatEur, formatBgn } from "@/lib/currency";
 import { buildPriceIndex, priceFor, priceRangeFor, type BarberServicePrice } from "@/lib/pricing";
@@ -107,8 +108,9 @@ export default function BookPage() {
 
   // Fetch available slots whenever service / barber / date change.
   useEffect(() => {
-    if (!serviceId || !date) {
+    if (!serviceId || !date || isClosedDateKey(date)) {
       setSlots([]);
+      setTime(null);
       return;
     }
     let active = true;
@@ -176,6 +178,9 @@ export default function BookPage() {
 
   const today = format(new Date(), "yyyy-MM-dd");
   const maxDate = format(addDays(new Date(), 60), "yyyy-MM-dd");
+  // `<input type="date">` can't grey out individual days, so a closed day is
+  // caught here and explained instead of showing an empty slot list.
+  const dateClosed = date !== "" && isClosedDateKey(date);
 
   // ---- Confirmation state ----
   if (bookingId) {
@@ -273,6 +278,10 @@ export default function BookPage() {
                   {!date ? (
                     <p className="pt-[14px] text-sm text-[var(--muted-foreground)]">
                       {t("selectDateFirst")}
+                    </p>
+                  ) : dateClosed ? (
+                    <p className="pt-[14px] text-sm text-[var(--muted-foreground)]">
+                      {t("closedDay")}
                     </p>
                   ) : slotsLoading ? (
                     <p className="pt-[14px] text-sm text-[var(--muted-foreground)]">

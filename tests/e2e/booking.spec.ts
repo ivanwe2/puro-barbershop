@@ -1,5 +1,5 @@
 import { test, expect } from "@playwright/test";
-import { format, addDays } from "date-fns";
+import { openDateAhead } from "./helpers";
 
 test("booking flow — single-screen form", async ({ page }) => {
   // Land on homepage
@@ -15,8 +15,9 @@ test("booking flow — single-screen form", async ({ page }) => {
 
   // Service + barber default to sensible values (first service / no preference).
   // Book tomorrow so the test is independent of the time of day — once the shop
-  // has closed for the day, "today" legitimately has no slots left.
-  const bookingDate = format(addDays(new Date(), 1), "yyyy-MM-dd");
+  // has closed for the day, "today" legitimately has no slots left. Rolls past
+  // a closed day (Sunday) so the run doesn't depend on the weekday either.
+  const bookingDate = openDateAhead(1);
   await page.locator('input[type="date"]').fill(bookingDate);
 
   // Wait for slots and choose the first available time chip.

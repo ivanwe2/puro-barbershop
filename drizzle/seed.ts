@@ -155,10 +155,10 @@ async function main() {
   }
   console.log(`  Created ${sampleOverrides.length} sample price overrides`);
 
-  // 4. Working hours: every day 10:00-19:30
+  // 4. Working hours: Monday-Saturday 10:00-19:30. Sunday (day 0) is the
+  // owner's rest day — the shop is closed (see src/lib/shop-hours.ts).
   const barberIds = [barber1.id, barber2.id];
   const hours = [
-    { dayOfWeek: 0, startTime: "10:00", endTime: "19:30" }, // Sun
     { dayOfWeek: 1, startTime: "10:00", endTime: "19:30" }, // Mon
     { dayOfWeek: 2, startTime: "10:00", endTime: "19:30" }, // Tue
     { dayOfWeek: 3, startTime: "10:00", endTime: "19:30" }, // Wed

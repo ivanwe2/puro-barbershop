@@ -22,6 +22,15 @@ function futureWednesday(): Date {
   return d;
 }
 
+// Same idea for a Sunday — the shop's closed day.
+function futureSunday(): Date {
+  const d = new Date();
+  d.setUTCHours(0, 0, 0, 0);
+  d.setUTCDate(d.getUTCDate() + 14);
+  while (d.getUTCDay() !== 0) d.setUTCDate(d.getUTCDate() + 1);
+  return d;
+}
+
 const dayKey = (d: Date) =>
   `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, "0")}-${String(
     d.getUTCDate(),
@@ -348,5 +357,79 @@ describe("availability engine", () => {
     });
 
     expect(slots.length).toBe(0);
+  });
+
+  // Sunday is a shop-wide closure, so it wins over any working_hours row that
+  // says otherwise — a stale or hand-added row must not re-open the day.
+  it("returns no slots on Sunday even with active working hours for that day", async () => {
+    fromMap.barbers = [{ id: 1, active: true }];
+    fromMap.services = [{ id: 1, active: true, durationMinutes: 30 }];
+    fromMap.settings = [
+      { key: "buffer_minutes", value: "15" },
+      { key: "slot_granularity_minutes", value: "15" },
+      { key: "booking_horizon_days", value: "60" },
+    ];
+    fromMap.working_hours = [
+      { barberId: 1, dayOfWeek: 0, startTime: "10:00:00", endTime: "19:30:00", active: true },
+    ];
+
+    const slots = await getAvailableSlots({
+      serviceId: 1,
+      barberId: 1,
+      date: futureSunday(),
+      db,
+    });
+
+    expect(slots).toEqual([]);
+  });
+
+  it("getAvailableSlotsForAnyBarber returns nothing on Sunday", async () => {
+    fromMap.barbers = [
+      { id: 1, active: true, displayOrder: 1 },
+      { id: 2, active: true, displayOrder: 2 },
+    ];
+    fromMap.services = [{ id: 1, active: true, durationMinutes: 30 }];
+    fromMap.settings = [
+      { key: "buffer_minutes", value: "15" },
+      { key: "slot_granularity_minutes", value: "15" },
+      { key: "booking_horizon_days", value: "60" },
+    ];
+    fromMap.working_hours = [
+      { barberId: 1, dayOfWeek: 0, startTime: "10:00:00", endTime: "19:30:00", active: true },
+      { barberId: 2, dayOfWeek: 0, startTime: "10:00:00", endTime: "19:30:00", active: true },
+    ];
+
+    const results = await getAvailableSlotsForAnyBarber({
+      serviceId: 1,
+      date: futureSunday(),
+      db,
+    });
+
+    expect(results).toEqual([]);
+  });
+
+  it("still returns slots on Saturday", async () => {
+    fromMap.barbers = [{ id: 1, active: true }];
+    fromMap.services = [{ id: 1, active: true, durationMinutes: 30 }];
+    fromMap.settings = [
+      { key: "buffer_minutes", value: "15" },
+      { key: "slot_granularity_minutes", value: "15" },
+      { key: "booking_horizon_days", value: "60" },
+    ];
+    fromMap.working_hours = [
+      { barberId: 1, dayOfWeek: 6, startTime: "10:00:00", endTime: "19:30:00", active: true },
+    ];
+
+    const saturday = futureSunday();
+    saturday.setUTCDate(saturday.getUTCDate() - 1);
+
+    const slots = await getAvailableSlots({
+      serviceId: 1,
+      barberId: 1,
+      date: saturday,
+      db,
+    });
+
+    expect(slots.length).toBeGreaterThan(0);
   });
 });

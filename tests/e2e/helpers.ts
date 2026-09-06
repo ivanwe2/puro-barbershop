@@ -1,6 +1,7 @@
 import type { Page } from "@playwright/test";
 import postgres from "postgres";
 import crypto from "node:crypto";
+import { isClosedWeekday } from "../../src/lib/shop-hours";
 
 // These E2E tests drive the real app and assert against the real dev services
 // (Postgres on :5432, Mailpit on :8025). Start the stack first:
@@ -55,6 +56,17 @@ export async function login(page: Page): Promise<void> {
 
 const pad = (n: number) => String(n).padStart(2, "0");
 export const ymd = (d: Date) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+
+/**
+ * "yyyy-MM-dd" for `daysAhead` from now, rolled forward past any day the shop
+ * is closed. Without this, a run on the wrong weekday lands on a Sunday, finds
+ * no slots and fails for a reason that has nothing to do with the test.
+ */
+export function openDateAhead(daysAhead: number): string {
+  const d = new Date(Date.now() + daysAhead * 86400000);
+  while (isClosedWeekday(d.getDay())) d.setDate(d.getDate() + 1);
+  return ymd(d);
+}
 
 /** Same HMAC cancellation token the server generates (keyed on AUTH_SECRET). */
 export function cancellationToken(bookingId: number): string {
