@@ -22,7 +22,8 @@ export default async function LocationSection({ locale }: { locale: string }) {
           <address className="mt-8 text-lg leading-relaxed text-[var(--ink)] not-italic">
             {address}
           </address>
-          <p className="mt-1 text-sm text-[var(--muted-foreground)]">{t("hoursDaily")}</p>
+          <p className="mt-1 text-sm text-[var(--muted-foreground)]">{t("hoursOpen")}</p>
+          <p className="text-sm text-[var(--muted-foreground)]/70">{t("hoursClosed")}</p>
           <a
             href={shop.mapsDirections}
             target="_blank"

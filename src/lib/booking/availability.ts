@@ -1,6 +1,7 @@
 import { eq, and, gte, lte, or, asc } from "drizzle-orm";
 
 import { barbers, bookings, services, settings, timeOff, workingHours } from "@/db/schema";
+import { isClosedWeekday } from "@/lib/shop-hours";
 
 const SOFIA_TZ = "Europe/Sofia";
 
@@ -112,6 +113,10 @@ async function getAvailableSlots({
   const granularityMinutes = parseInt(await getSettingValue(db, "slot_granularity_minutes"), 10);
 
   const dayOfWeek = getDayOfWeekSofia(sofiaMidnight);
+
+  // A shop-wide closure outranks whatever the barber's working_hours say, so a
+  // stale row can never re-open a closed day (see src/lib/shop-hours.ts).
+  if (isClosedWeekday(dayOfWeek)) return [];
 
   const hoursRows = await db
     .select()

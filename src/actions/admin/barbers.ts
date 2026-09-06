@@ -81,9 +81,9 @@ export async function createBarber(formData: FormData) {
   const barberId = result[0]?.id;
 
   if (barberId) {
-    // Set default working hours for the new barber: every day 10:00-19:30
+    // Default working hours for the new barber: Mon-Sat 10:00-19:30. Sunday
+    // (day 0) is omitted — the shop is closed (see src/lib/shop-hours.ts).
     const defaultHours = [
-      { dayOfWeek: 0, startTime: "10:00", endTime: "19:30" },
       { dayOfWeek: 1, startTime: "10:00", endTime: "19:30" },
       { dayOfWeek: 2, startTime: "10:00", endTime: "19:30" },
       { dayOfWeek: 3, startTime: "10:00", endTime: "19:30" },

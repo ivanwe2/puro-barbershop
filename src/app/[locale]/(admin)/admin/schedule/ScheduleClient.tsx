@@ -37,6 +37,7 @@ import {
   fetchTimeOff,
 } from "@/actions/admin/schedule";
 import { sofiaTime, sofiaDateKey, sofiaShortDate, sofiaWallToInstant } from "@/lib/datetime";
+import { isClosedWeekday, isClosedDateKey } from "@/lib/shop-hours";
 import { barberColor } from "@/lib/barber-colors";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -297,11 +298,12 @@ export default function ScheduleClient({
               const dayTimeOff = timeOffForDay(day);
               const today = isToday(day);
               const dayOfWeek = day.getDay();
+              const closed = isClosedWeekday(dayOfWeek);
 
               return (
                 <div key={day.toISOString()} className="flex min-h-[250px] flex-col">
                   <div
-                    className={`mb-2 rounded-lg p-2 text-center ${today ? "bg-accent/20" : "bg-muted/40"}`}
+                    className={`mb-2 rounded-lg p-2 text-center ${today ? "bg-accent/20" : "bg-muted/40"} ${closed ? "opacity-60" : ""}`}
                   >
                     <div className="text-muted-foreground text-xs">{t(dayLabels[dayOfWeek]!)}</div>
                     <div
@@ -309,6 +311,11 @@ export default function ScheduleClient({
                     >
                       {format(day, "dd.MM")}
                     </div>
+                    {closed && (
+                      <div className="text-muted-foreground mt-0.5 text-[10px] tracking-wide uppercase">
+                        {t("closedDay")}
+                      </div>
+                    )}
                   </div>
 
                   {dayTimeOff.map((to) => (
@@ -334,7 +341,7 @@ export default function ScheduleClient({
                     </button>
                   ))}
 
-                  {dayBookings.length === 0 && dayTimeOff.length === 0 && (
+                  {dayBookings.length === 0 && dayTimeOff.length === 0 && !closed && (
                     <div className="text-muted-foreground/50 mt-4 text-center text-xs">—</div>
                   )}
                 </div>
@@ -451,11 +458,12 @@ export default function ScheduleClient({
           const dayBookings = bookingsForDay(day);
           const today = isToday(day);
           const dayOfWeek = day.getDay();
+          const closed = isClosedWeekday(dayOfWeek);
 
           return (
             <div key={day.toISOString()}>
               <div
-                className={`mb-1 flex items-center gap-2 rounded-lg p-2 ${today ? "bg-accent/20" : "bg-muted/40"}`}
+                className={`mb-1 flex items-center gap-2 rounded-lg p-2 ${today ? "bg-accent/20" : "bg-muted/40"} ${closed ? "opacity-60" : ""}`}
               >
                 <span className="text-muted-foreground text-xs">{t(dayLabels[dayOfWeek]!)}</span>
                 <span
@@ -464,6 +472,11 @@ export default function ScheduleClient({
                   {format(day, "dd.MM.yyyy")}
                 </span>
                 {today && <span className="text-accent text-xs">({t("today")})</span>}
+                {closed && (
+                  <span className="text-muted-foreground text-xs tracking-wide uppercase">
+                    {t("closedDay")}
+                  </span>
+                )}
               </div>
 
               <div className="ml-4 space-y-2">
@@ -487,7 +500,7 @@ export default function ScheduleClient({
                     <div className="text-muted-foreground text-xs">{b.barberName}</div>
                   </button>
                 ))}
-                {dayBookings.length === 0 && (
+                {dayBookings.length === 0 && !closed && (
                   <div className="text-muted-foreground/50 text-xs">—</div>
                 )}
               </div>
@@ -735,9 +748,11 @@ function WalkInDialog({
   const [customerPhone, setCustomerPhone] = useState("");
   const [customerEmail, setCustomerEmail] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const dateClosed = isClosedDateKey(date);
 
   const handleSubmit = async () => {
     if (!barberId || !serviceId || !date || !time || !customerName || !customerPhone) return;
+    if (dateClosed) return;
 
     setSubmitting(true);
     const result = await createWalkInBooking({
@@ -820,6 +835,12 @@ function WalkInDialog({
             </div>
           </div>
 
+          {dateClosed && (
+            <p className="text-destructive text-sm" role="alert">
+              {t("closedDayHint")}
+            </p>
+          )}
+
           <div className="space-y-1">
             <Label>{t("customerName")}</Label>
             <Input
@@ -858,6 +879,7 @@ function WalkInDialog({
             onClick={handleSubmit}
             disabled={
               submitting ||
+              dateClosed ||
               !barberId ||
               !serviceId ||
               !date ||
@@ -889,8 +911,10 @@ function RescheduleDialog({
   const [time, setTime] = useState(sofiaTime(booking.startDatetime));
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const dateClosed = isClosedDateKey(date);
 
   const handleSubmit = async () => {
+    if (dateClosed) return;
     setSubmitting(true);
     setError(null);
     const res = await rescheduleBooking(booking.id, { date, time });
@@ -929,11 +953,17 @@ function RescheduleDialog({
           </div>
         </div>
 
+        {dateClosed && (
+          <p className="text-destructive text-sm" role="alert">
+            {t("closedDayHint")}
+          </p>
+        )}
+
         <DialogFooter>
           <Button variant="ghost" onClick={onClose}>
             {t("close")}
           </Button>
-          <Button onClick={handleSubmit} disabled={submitting || !date || !time}>
+          <Button onClick={handleSubmit} disabled={submitting || dateClosed || !date || !time}>
             {submitting ? "…" : t("confirm")}
           </Button>
         </DialogFooter>

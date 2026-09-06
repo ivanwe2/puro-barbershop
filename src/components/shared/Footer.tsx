@@ -41,7 +41,8 @@ export default function Footer() {
             <h3 className="mb-[18px] text-xs font-bold tracking-[0.14em] text-[var(--paper)]/50 uppercase">
               {t("hours")}
             </h3>
-            <p className="text-sm leading-[1.8] text-[var(--paper)]/85">{t("hoursDaily")}</p>
+            <p className="text-sm leading-[1.8] text-[var(--paper)]/85">{t("hoursOpen")}</p>
+            <p className="text-sm leading-[1.8] text-[var(--paper)]/60">{t("hoursClosed")}</p>
           </div>
 
           <div>

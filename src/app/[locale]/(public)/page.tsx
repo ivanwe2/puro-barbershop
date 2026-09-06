@@ -104,7 +104,8 @@ export default async function HomePage(props: { params: Promise<{ locale: string
     openingHoursSpecification: [
       {
         "@type": "OpeningHoursSpecification",
-        dayOfWeek: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
+        // Sunday is omitted — the shop is closed (see src/lib/shop-hours.ts).
+        dayOfWeek: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
         opens: "10:00",
         closes: "19:30",
       },

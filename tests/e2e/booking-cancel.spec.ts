@@ -1,10 +1,10 @@
 import { test, expect, type Page } from "@playwright/test";
-import { sql, clearMail, waitForMail, ymd, cancellationToken } from "./helpers";
+import { sql, clearMail, waitForMail, openDateAhead, cancellationToken } from "./helpers";
 
 // Book a slot end-to-end. Uses name-based inputs so it works in any locale.
 async function book(page: Page, locale: "bg" | "en", barberLabel: string) {
   const email = `e2e-${locale}-${Date.now()}@example.com`;
-  const date = ymd(new Date(Date.now() + 5 * 86400000));
+  const date = openDateAhead(5);
 
   await page.goto(`/${locale}/book`, { waitUntil: "networkidle" });
   await page.waitForSelector("select", { timeout: 20000 });

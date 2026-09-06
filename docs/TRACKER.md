@@ -833,6 +833,35 @@ Run `grep -r "PLACEHOLDER"` at any time to find all spots awaiting human data.
 
 ---
 
+## Change request — Sunday closure (2026-09-07)
+
+**Status:** ✅ DONE
+
+The shop is now closed on Sundays (the owner's rest day); previously it opened 7 days a week.
+
+- `src/lib/shop-hours.ts` — **new.** `CLOSED_WEEKDAYS` (JS day numbers, matching `working_hours.day_of_week`) plus `isClosedWeekday` / `isClosedDateKey`. Single source of truth for the closure.
+- `src/lib/booking/availability.ts` — `getAvailableSlots` returns `[]` for a closed day before it reads `working_hours`. The closure outranks the table, so a stale or hand-added row can't re-open Sunday. `getAvailableSlotsForAnyBarber` inherits this.
+- `drizzle/migrations/0003_closed_sundays.sql` — data-only migration (hand-written; no schema change) deactivating existing `day_of_week = 0` rows. Snapshot `0003_snapshot.json` copies 0002 with a fresh id so the generate chain stays intact.
+- `drizzle/seed.ts`, `src/actions/admin/barbers.ts` — default working hours are now Mon–Sat only.
+- `src/app/[locale]/(public)/book/page.tsx` — a Sunday shows `booking.closedDay` instead of an empty slot list, and skips the slot fetch. (`<input type="date">` can't grey out individual days.)
+- `src/app/[locale]/(admin)/admin/schedule/ScheduleClient.tsx` — closed days marked in both week and day views; walk-in and reschedule dialogs block a closed date with `admin.closedDayHint` rather than letting the server answer "slot taken".
+- `src/components/shared/Footer.tsx`, `src/components/marketing/LocationSection.tsx`, homepage `HairSalon` JSON-LD — "Daily · 10:00–19:30" → "Mon–Sat · 10:00–19:30" + "Sun · Closed"; `openingHoursSpecification` drops Sunday.
+- Messages: `hoursDaily` → `hoursOpen` + `hoursClosed` (location, footer); added `booking.closedDay`, `admin.closedDay`, `admin.closedDayHint`.
+- `tests/unit/shop-hours.test.ts` — **new.** `tests/unit/availability.test.ts` — Sunday returns nothing even with an active Sunday `working_hours` row; Saturday still returns slots.
+- `tests/e2e/helpers.ts` — `openDateAhead(days)` rolls a target date past a closed day; used by the booking, cancel, and admin walk-in specs so runs no longer depend on the weekday.
+
+**Deliberately not done:** future bookings already on a Sunday are left alone. They stay visible in the admin calendar so the owner cancels or reschedules them from the CMS, which sends the customer the proper email — a raw SQL cancel would not.
+
+**Definition of Done:**
+
+- [x] `npm run lint` passes (0 errors, 18 pre-existing warnings)
+- [x] `npm run typecheck` passes (0 errors)
+- [x] `npm run test` passes 19/19
+- [x] `npm run format:check` passes
+- [x] `npm run build` passes
+
+---
+
 ## Security checklist (per §6 of build plan)
 
 Checked at each commit. Full checklist in `docs/PURO_BARBERSHOP_BUILD_PLAN.md` §6.

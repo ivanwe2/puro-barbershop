@@ -1,5 +1,5 @@
 import { test, expect, type Page, type Locator } from "@playwright/test";
-import { sql, login, clearMail, waitForMail, ymd } from "./helpers";
+import { sql, login, clearMail, waitForMail, ymd, openDateAhead } from "./helpers";
 
 // Several admin handlers call window.location.reload() after the server action.
 // Click the button AND wait for that reload to finish, so later interactions
@@ -149,12 +149,12 @@ test("time-off create", async ({ page }) => {
 
 test("walk-in + week-nav refetch + mark completed", async ({ page }) => {
   const custName = "Walk QA" + Date.now();
-  const date = new Date(Date.now() + 14 * 86400000);
+  const date = openDateAhead(14);
 
   await page.goto("/en/admin/schedule", { waitUntil: "networkidle" });
   await page.getByRole("button", { name: /Add Walk-in/ }).click();
   const dlg = page.getByRole("dialog");
-  await dlg.locator('input[type="date"]').fill(ymd(date));
+  await dlg.locator('input[type="date"]').fill(date);
   await dlg.locator('input[type="time"]').fill("14:00");
   await dlg.locator('input[placeholder="Customer Name"]').fill(custName);
   await dlg.locator('input[placeholder="+359..."]').fill("+359888123456");
