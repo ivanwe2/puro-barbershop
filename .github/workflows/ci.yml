@@ -35,7 +35,12 @@ jobs:
         env:
           DATABASE_URL: postgresql://test:test@localhost:5432/test
           DATABASE_URL_UNPOOLED: postgresql://test:test@localhost:5432/test
-          AUTH_SECRET: ${{ secrets.AUTH_SECRET }}
+          # Build-time only: env validation requires a >=32-char string
+          # (src/lib/env.ts). Nothing in the build signs or verifies with it —
+          # the real secret lives in the Vercel project env. Reading it from a
+          # repo secret meant the build broke silently whenever that secret was
+          # absent, which is exactly what happened.
+          AUTH_SECRET: ci-build-only-placeholder-not-a-real-secret
           AUTH_URL: http://localhost:3000
           RESEND_API_KEY: test-key
           EMAIL_FROM: test@test.com
